@@ -72,10 +72,15 @@
         <!-- VENDEDOR -->
         <section id="seccion-vendedor" class="space-y-4">
             <div>
-                <h2 class="font-display font-bold text-lg text-[#F1F5F9]">Registrar venta</h2>
-                <p class="text-xs text-[#8B95A7] mt-0.5">El precio se calcula con costo × tipo de cambio, sin margen agregado. Ajusta el precio cobrado a mano si quieres cobrar distinto.</p>
-            </div>
-
+<!-- CAMPO CON BUSCADOR RÁPIDO DE MODELOS -->
+<div>
+    <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo (Escribe para buscar rápido)</label>
+    <input type="text" id="ventaModelo" list="opcionesModelosVenta" oninput="forzarAutofillYRecalcular()" placeholder="Escribe el modelo (ej: iPhone 13)..." autocomplete="off"
+        class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF] placeholder:text-[#5B6472]">
+    
+    <!-- Lista de sugerencias automáticas dinámicas -->
+    <datalist id="opcionesModelosVenta"></datalist>
+</div>
             <form onsubmit="registrarVenta(event)" class="space-y-3">
                 <div>
                     <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Vendedor</label>
@@ -123,10 +128,15 @@
                         <span class="text-[10px] font-bold text-[#8B95A7] uppercase block mb-1">Total</span>
                         <span id="txtTotalCobrar" class="font-display font-bold text-lg text-[#F1F5F9] font-data">0.00</span>
                     </div>
-                    <div class="px-2">
-                        <span class="text-[10px] font-bold text-[#4C8DFF] uppercase block mb-1">Ganancia</span>
-                        <span id="txtGananciaPura" class="font-display font-bold text-lg text-[#4C8DFF] font-data">0.00</span>
-                    </div>
+<!-- CAMPO CON BUSCADOR RÁPIDO PARA CONSIGNACIÓN -->
+<div>
+    <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo del stock</label>
+    <input type="text" id="consModelo" list="opcionesModelosConsignacion" placeholder="Escribe el modelo..." autocomplete="off"
+        class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#9B8CFF] placeholder:text-[#5B6472]">
+    
+    <!-- Lista de sugerencias automáticas para consignaciones -->
+    <datalist id="opcionesModelosConsignacion"></datalist>
+</div>
                     <div class="pl-2">
                         <span class="text-[10px] font-bold text-[#34D399] uppercase block mb-1">Comisión</span>
                         <span id="txtComisionVendedor" class="font-display font-bold text-lg text-[#34D399] font-data">0.00</span>
@@ -227,7 +237,7 @@
 
     <script>
         // URL DE GOOGLE APPS SCRIPT VINCULADA
-        const URL_API_GLOBAL = "https://script.google.com/macros/s/AKfycbwq1LwdO__T-VaqNKhZg6mOVinGhcr0DFyWCtGbQpEKUL1S3aXrPe7Mmu1sbbXr1thw7A/exec";
+        const URL_API_GLOBAL = "https://script.google.com/macros/s/AKfycbyUK60B1sJHiiJMyu7SPE4l_FlRJw8jCOYSyKMHHS0hiXGuA-9-MMpn2jAHJpjBc8fa8g/exec";
 
         let inventarioProductos = [];
         let baseDeDatosVentas = [];
