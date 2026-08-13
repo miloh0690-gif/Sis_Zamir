@@ -71,11 +71,11 @@
                 </div>
 
                 <!-- BUSCADOR RÁPIDO DE MODELOS -->
-                <div>
+                <div class="relative">
                     <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo (Escribe para buscar rápido)</label>
-                    <input type="text" id="ventaModelo" list="opcionesModelosVenta" oninput="forzarAutofillYRecalcular()" placeholder="Escribe el modelo (ej: iPhone 13)..." autocomplete="off" required
+                    <input type="text" id="ventaModelo" oninput="onEscribirModeloVenta()" onfocus="onEscribirModeloVenta()" placeholder="Escribe el modelo (ej: iPhone 13)..." autocomplete="off" required
                         class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF] placeholder:text-[#5B6472]">
-                    <datalist id="opcionesModelosVenta"></datalist>
+                    <div id="sugerenciasVenta" class="hidden absolute left-0 right-0 z-30 mt-1 bg-[#1B2029] border border-[#2A2F3A] rounded-xl max-h-60 overflow-y-auto shadow-2xl"></div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
@@ -141,11 +141,11 @@
                     <input type="text" id="consCliente" required placeholder="Ej: Promotor Juan"
                         class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] placeholder:text-[#5B6472] focus:outline-none focus:ring-2 focus:ring-[#9B8CFF]">
                 </div>
-                <div>
+                <div class="relative">
                     <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo del stock</label>
-                    <input type="text" id="consModelo" list="opcionesModelosConsignacion" placeholder="Escribe el modelo..." autocomplete="off" required
+                    <input type="text" id="consModelo" oninput="onEscribirModeloConsignacion()" onfocus="onEscribirModeloConsignacion()" placeholder="Escribe el modelo..." autocomplete="off" required
                         class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#9B8CFF] placeholder:text-[#5B6472]">
-                    <datalist id="opcionesModelosConsignacion"></datalist>
+                    <div id="sugerenciasConsignacion" class="hidden absolute left-0 right-0 z-30 mt-1 bg-[#1B2029] border border-[#2A2F3A] rounded-xl max-h-60 overflow-y-auto shadow-2xl"></div>
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Cantidad a prestar</label>
@@ -167,7 +167,7 @@
         <section id="seccion-dueno" class="hidden space-y-4">
             <div>
                 <h2 class="font-display font-bold text-lg text-[#F1F5F9]">Inventario maestro</h2>
-                <p class="text-xs text-[#8B95A7] mt-0.5">Sincronizado en tiempo real desde Google Sheets.</p>
+                <p class="text-xs text-[#8B95A7] mt-0.5">Para editar costos o sumar modelos nuevos, agrégalos en tu Google Sheets y vuelve a cargar esta página.</p>
             </div>
             <div id="listaInventarioDueno" class="space-y-2.5"></div>
         </section>
@@ -218,7 +218,11 @@
 
     <script>
         // URL DEL WEB APP EJECUTABLE DE GOOGLE APPS SCRIPT
-        const URL_API_GLOBAL = "https://script.google.com/macros/s/AKfycbwSjKnxGoNd51t3xTmAnc2S0eZ_GWGAGXEQSgCxUWJmd6B3FmZZz1GRBWltErTafT_t/exec";
+        // ⚠️ IMPORTANTE: después de pegar el nuevo Code.gs y publicarlo como
+        // "Nueva implementación", Google te dará una URL /exec. Reemplaza la
+        // de abajo por esa URL nueva (puede ser la misma si reutilizas la
+        // implementación existente, pero normalmente cambia).
+        const URL_API_GLOBAL = "https://script.google.com/macros/s/AKfycbzhxLBhg1b4qzESuXbLhccyTPHOQqttfi3Ctmjd5iWo274qSxkOKihz7SxYU8bG7A6PNw/exec";
 
         let inventarioProductos = [];
         let baseDeDatosVentas = [];
@@ -228,7 +232,7 @@
 
         const fmt = (n) => (Number(n) || 0).toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        // Carga inicial del inventario desde Google Sheets con sanitización de tipos de datos
+        // Carga inicial del inventario desde Google Sheets
         function cargarInventarioDesdeGoogle() {
             const status = document.getElementById('statusConexion');
             if (!URL_API_GLOBAL || URL_API_GLOBAL.includes("AQUÍ_PEGA")) {
@@ -240,15 +244,7 @@
             fetch(URL_API_GLOBAL)
                 .then(response => response.json())
                 .then(data => {
-                    // Mapeamos y sanitizamos los datos recibidos de la nube
-                    inventarioProductos = data.map(item => ({
-                        filaExcel: item.filaExcel,
-                        modelo: String(item.modelo || "").trim(),
-                        sucursal: String(item.sucursal || "Central").trim(),
-                        stock: parseInt(item.stock) || 0,
-                        costoUsd: parseFloat(item.costoUsd) || 0
-                    }));
-
+                    inventarioProductos = data;
                     actualizarSelectoresDeProductos();
                     renderizarInventarioDueno();
 
@@ -263,38 +259,70 @@
                 });
         }
 
-        // Poblado dinámico del autocompletado en el buscador
+        // Ya no se necesita <datalist> (no funciona bien en iPhone / apps agregadas
+        // a la pantalla de inicio). Se mantiene la función solo para no romper
+        // otras llamadas existentes en el código.
         function actualizarSelectoresDeProductos() {
-            const dataListVenta = document.getElementById('opcionesModelosVenta');
-            const dataListCons = document.getElementById('opcionesModelosConsignacion');
-            if (!dataListVenta || !dataListCons) return;
-
-            dataListVenta.innerHTML = '';
-            dataListCons.innerHTML = '';
-
-            if (inventarioProductos.length === 0) return;
-
-            inventarioProductos.forEach((p) => {
-                if (p.stock > 0 && p.modelo !== "") {
-                    let optionVenta = document.createElement('option');
-                    optionVenta.value = p.modelo;
-                    optionVenta.label = `Stock: ${p.stock} u. | Suc: ${p.sucursal} | $${p.costoUsd.toFixed(2)}`;
-                    dataListVenta.appendChild(optionVenta);
-
-                    let optionCons = document.createElement('option');
-                    optionCons.value = p.modelo;
-                    optionCons.label = `Stock: ${p.stock} u. | Suc: ${p.sucursal}`;
-                    dataListCons.appendChild(optionCons);
-                }
-            });
+            onEscribirModeloVenta();
+            onEscribirModeloConsignacion();
         }
+
+        // ===== BUSCADOR DE MODELOS CON SUGERENCIAS (funciona en cualquier celular) =====
+        function renderizarSugerencias(idContenedor, idInput, callbackAlSeleccionar) {
+            const cont = document.getElementById(idContenedor);
+            const texto = document.getElementById(idInput).value.trim().toLowerCase();
+
+            if (!texto) { cont.classList.add('hidden'); cont.innerHTML = ''; return; }
+
+            const coincidencias = inventarioProductos
+                .filter(p => p.stock > 0 && p.modelo.toLowerCase().includes(texto))
+                .slice(0, 8);
+
+            if (coincidencias.length === 0) { cont.classList.add('hidden'); cont.innerHTML = ''; return; }
+
+            cont.innerHTML = '';
+            coincidencias.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'px-4 py-2.5 border-b border-[#2A2F3A] last:border-b-0 active:bg-[#242933]';
+                item.innerHTML = `
+                    <p class="text-[14px] text-[#EDEFF3] font-medium">${p.modelo}</p>
+                    <p class="text-[11px] text-[#8B95A7] font-data">Stock: ${p.stock} u. · Suc: ${p.sucursal}</p>`;
+                item.addEventListener('click', () => {
+                    document.getElementById(idInput).value = p.modelo;
+                    cont.classList.add('hidden');
+                    cont.innerHTML = '';
+                    if (callbackAlSeleccionar) callbackAlSeleccionar();
+                });
+                cont.appendChild(item);
+            });
+            cont.classList.remove('hidden');
+        }
+
+        function onEscribirModeloVenta() {
+            renderizarSugerencias('sugerenciasVenta', 'ventaModelo', forzarAutofillYRecalcular);
+            forzarAutofillYRecalcular();
+        }
+
+        function onEscribirModeloConsignacion() {
+            renderizarSugerencias('sugerenciasConsignacion', 'consModelo', null);
+        }
+
+        // Cierra los menús de sugerencias al tocar fuera de ellos
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#ventaModelo') && !e.target.closest('#sugerenciasVenta')) {
+                document.getElementById('sugerenciasVenta').classList.add('hidden');
+            }
+            if (!e.target.closest('#consModelo') && !e.target.closest('#sugerenciasConsignacion')) {
+                document.getElementById('sugerenciasConsignacion').classList.add('hidden');
+            }
+        });
 
         function forzarAutofillYRecalcular() {
             document.getElementById('ventaPrecioCobrado').dataset.manual = "false";
             actualizarPreciosVenta(false);
         }
 
-        // Cálculo automático de importes al escribir o seleccionar un producto
+        // Cálculo dinámico de totales, ganancias y comisiones
         function actualizarPreciosVenta(manual = false) {
             const inputModelo = document.getElementById('ventaModelo');
             if (!inputModelo) return;
@@ -304,7 +332,7 @@
 
             if (!productoSelected) return;
 
-            const costo = productoSelected.costoUsd;
+            const costo = parseFloat(productoSelected.costoUsd) || 0;
             const cant = parseInt(document.getElementById('ventaCantidad').value) || 0;
             const tc = parseFloat(document.getElementById('ventaTipoCambio').value) || 0;
             const inp = document.getElementById('ventaPrecioCobrado');
@@ -321,6 +349,7 @@
             document.getElementById('txtComisionVendedor').textContent = fmt(com);
         }
 
+        // Registro de venta y envío POST a Google Sheets
         function registrarVenta(e) {
             e.preventDefault();
             const inputModelo = document.getElementById('ventaModelo');
@@ -329,7 +358,7 @@
             const productoSelected = inventarioProductos.find(p => p.modelo.toLowerCase() === nombreModelo.toLowerCase());
 
             if (!productoSelected) { 
-                alert("⚠️ Selecciona un modelo válido de la lista desplegable."); 
+                alert("⚠️ Selecciona un modelo válido de la lista."); 
                 return; 
             }
 
@@ -340,7 +369,7 @@
                 return; 
             }
             if (productoSelected.stock < cant) { 
-                alert(`❌ Operación rechazada: solo hay ${productoSelected.stock} unidades disponibles.`); 
+                alert(`❌ Operación rechazada: solo hay ${productoSelected.stock} unidades de este modelo.`); 
                 return; 
             }
 
@@ -373,7 +402,7 @@
             });
 
             enviarANube(payload);
-            alert(`💰 Venta registrada con éxito.\nSe actualizará el stock en la fila ${productoSelected.filaExcel} de Google Sheets.`);
+            alert(`💰 Venta registrada con éxito.\nSe actualizará la fila ${productoSelected.filaExcel} en Google Sheets.`);
 
             document.getElementById('ventaVendedor').value = '';
             document.getElementById('ventaModelo').value = '';
@@ -400,7 +429,7 @@
                 return; 
             }
             if (prod.stock < cant) { 
-                alert("❌ Stock insuficiente en inventario para este préstamo."); 
+                alert("❌ Stock insuficiente para este préstamo."); 
                 return; 
             }
 
@@ -421,7 +450,7 @@
             };
 
             enviarANube(payload);
-            alert(`🤝 Consignación registrada.\nStock rebajado en la fila ${prod.filaExcel}.`);
+            alert(`🤝 Consignación registrada.\nInventario actualizado en la fila ${prod.filaExcel}.`);
             document.getElementById('consCliente').value = '';
             document.getElementById('consModelo').value = '';
             document.getElementById('consCantidad').value = 1;
@@ -461,6 +490,7 @@
             }
         }
 
+        // Petición HTTP POST enviada al Web App de Apps Script
         function enviarANube(data) {
             if (!URL_API_GLOBAL || URL_API_GLOBAL.includes("AQUÍ_PEGA")) return;
             fetch(URL_API_GLOBAL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
@@ -501,17 +531,12 @@
             });
         }
 
-        // Renderizado del Inventario Maestro para la Pestaña del Dueño
         function renderizarInventarioDueno() {
-            const cont = document.getElementById('listaInventarioDueno'); 
-            if (!cont) return; 
-            cont.innerHTML = '';
-            
+            const cont = document.getElementById('listaInventarioDueno'); if (!cont) return; cont.innerHTML = '';
             if (inventarioProductos.length === 0) {
-                cont.innerHTML = `<div class="text-center text-[#5B6472] text-sm italic py-10">Cargando inventario desde Google Sheets…</div>`;
+                cont.innerHTML = `<div class="text-center text-[#5B6472] text-sm italic py-10">Cargando inventario…</div>`;
                 return;
             }
-            
             inventarioProductos.forEach((p) => {
                 const div = document.createElement('div');
                 div.className = 'rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-4 flex items-center justify-between gap-3';
@@ -533,10 +558,7 @@
 
         function cambiarPestana(pestana) {
             if (pestana === 'dueno' || pestana === 'reportes') {
-                if (prompt("🔑 PRIVADO - Ingrese PIN del Administrador:") !== PIN_SECRETO) { 
-                    alert("PIN inválido."); 
-                    return; 
-                }
+                if (prompt("🔑 PRIVADO - Ingrese PIN del Administrador:") !== PIN_SECRETO) { alert("PIN inválido."); return; }
             }
             ['vendedor', 'consignacion', 'dueno', 'reportes'].forEach(id => {
                 document.getElementById('seccion-' + id).classList.add('hidden');
