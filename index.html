@@ -2,30 +2,18 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <!-- Configuración para asegurar que ocupe toda la pantalla del teléfono sin barras blancas ni recortes -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0F1115">
     <title>MooN ERP - Tech Mobiles</title>
 
-    <!-- ========================================================= -->
-    <!-- 1. METADATOS PWA PARA iOS (iPhone / iPad / Safari)       -->
-    <!-- ========================================================= -->
-    <!-- Habilita el funcionamiento en pantalla completa sin barra de Safari -->
+    <!-- METADATOS PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <!-- Estilo de la barra superior en iPhone para integrarse al diseño oscuro -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Nombre del acceso directo en el iPhone -->
     <meta name="apple-mobile-web-app-title" content="MooN ERP">
-    <!-- Icono para la pantalla de inicio de iOS (Generado dinámicamente con SVG de alta resolución) -->
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' width='512' height='512'%3E%3Crect width='512' height='512' rx='128' fill='%230F1115'/%3E%3Cpath d='M380 300A160 160 0 1 1 180 100a120 120 0 0 0 200 200Z' fill='%236EE7F9'/%3E%3C/svg%3E">
-
-    <!-- ========================================================= -->
-    <!-- 2. MANIFIESTO EN LÍNEA PARA ANDROID / CHROME             -->
-    <!-- (Permite omitir la creación de un archivo manifest.json separado) -->
-    <!-- ========================================================= -->
     <link rel="manifest" href='data:application/manifest+json,{"name":"MooN ERP - Tech Mobiles","short_name":"MooN ERP","start_url":".","display":"standalone","background_color":"#0F1115","theme_color":"#0F1115","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 512 512%27 width=%27512%27 height=%27512%27%3E%3Crect width=%27512%27 height=%27512%27 rx=%27128%27 fill=%27%230F1115%27/%3E%3Cpath d=%27M380 300A160 160 0 1 1 180 100a120 120 0 0 0 200 200Z%27 fill=%27%236EE7F9%27/%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml"}]}'>
 
-    <!-- FUENTES Y CSS EXISTENTES DEL SISTEMA -->
+    <!-- FUENTES Y CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -37,7 +25,6 @@
         .font-data { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
         input, select { -webkit-user-select: text; user-select: text; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { opacity: 1; }
-        select { -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238B95A7' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.9rem center; }
         .safe-bottom { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
         .safe-top { padding-top: max(0.5rem, env(safe-area-inset-top)); }
         ::-webkit-scrollbar { display: none; }
@@ -49,7 +36,7 @@
 </head>
 <body class="bg-[#0F1115] text-[#EDEFF3] min-h-screen pb-24">
 
-    <!-- ENCABEZADO -->
+    <!-- ENCABEZADO DE NAVEGACIÓN -->
     <header class="sticky top-0 z-40 safe-top bg-[#0F1115]/90 backdrop-blur-md border-b border-[#242933]">
         <div class="max-w-lg mx-auto px-4 pb-3 flex items-center justify-between gap-3">
             <div class="flex items-center gap-2.5">
@@ -69,18 +56,13 @@
 
     <main class="max-w-lg mx-auto px-4 pt-4">
 
-        <!-- VENDEDOR -->
+        <!-- SECCIÓN VENDEDOR -->
         <section id="seccion-vendedor" class="space-y-4">
             <div>
-<!-- CAMPO CON BUSCADOR RÁPIDO DE MODELOS -->
-<div>
-    <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo (Escribe para buscar rápido)</label>
-    <input type="text" id="ventaModelo" list="opcionesModelosVenta" oninput="forzarAutofillYRecalcular()" placeholder="Escribe el modelo (ej: iPhone 13)..." autocomplete="off"
-        class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF] placeholder:text-[#5B6472]">
-    
-    <!-- Lista de sugerencias automáticas dinámicas -->
-    <datalist id="opcionesModelosVenta"></datalist>
-</div>
+                <h2 class="font-display font-bold text-lg text-[#F1F5F9]">Registrar venta</h2>
+                <p class="text-xs text-[#8B95A7] mt-0.5">El precio se calcula con costo × tipo de cambio.</p>
+            </div>
+
             <form onsubmit="registrarVenta(event)" class="space-y-3">
                 <div>
                     <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Vendedor</label>
@@ -88,10 +70,12 @@
                         class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] placeholder:text-[#5B6472] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
                 </div>
 
+                <!-- BUSCADOR RÁPIDO DE MODELOS -->
                 <div>
-                    <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo (desde Google Sheets)</label>
-                    <select id="ventaModelo" onchange="forzarAutofillYRecalcular()"
-                        class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]"></select>
+                    <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo (Escribe para buscar rápido)</label>
+                    <input type="text" id="ventaModelo" list="opcionesModelosVenta" oninput="forzarAutofillYRecalcular()" placeholder="Escribe el modelo (ej: iPhone 13)..." autocomplete="off" required
+                        class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF] placeholder:text-[#5B6472]">
+                    <datalist id="opcionesModelosVenta"></datalist>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
@@ -128,15 +112,10 @@
                         <span class="text-[10px] font-bold text-[#8B95A7] uppercase block mb-1">Total</span>
                         <span id="txtTotalCobrar" class="font-display font-bold text-lg text-[#F1F5F9] font-data">0.00</span>
                     </div>
-<!-- CAMPO CON BUSCADOR RÁPIDO PARA CONSIGNACIÓN -->
-<div>
-    <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo del stock</label>
-    <input type="text" id="consModelo" list="opcionesModelosConsignacion" placeholder="Escribe el modelo..." autocomplete="off"
-        class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#9B8CFF] placeholder:text-[#5B6472]">
-    
-    <!-- Lista de sugerencias automáticas para consignaciones -->
-    <datalist id="opcionesModelosConsignacion"></datalist>
-</div>
+                    <div class="px-2">
+                        <span class="text-[10px] font-bold text-[#4C8DFF] uppercase block mb-1">Ganancia</span>
+                        <span id="txtGananciaPura" class="font-display font-bold text-lg text-[#4C8DFF] font-data">0.00</span>
+                    </div>
                     <div class="pl-2">
                         <span class="text-[10px] font-bold text-[#34D399] uppercase block mb-1">Comisión</span>
                         <span id="txtComisionVendedor" class="font-display font-bold text-lg text-[#34D399] font-data">0.00</span>
@@ -149,7 +128,7 @@
             </form>
         </section>
 
-        <!-- CONSIGNACIONES -->
+        <!-- SECCIÓN CONSIGNACIONES -->
         <section id="seccion-consignacion" class="hidden space-y-4">
             <div>
                 <h2 class="font-display font-bold text-lg text-[#F1F5F9]">Consignaciones y préstamos</h2>
@@ -164,7 +143,9 @@
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo del stock</label>
-                    <select id="consModelo" class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#9B8CFF]"></select>
+                    <input type="text" id="consModelo" list="opcionesModelosConsignacion" placeholder="Escribe el modelo..." autocomplete="off" required
+                        class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#9B8CFF] placeholder:text-[#5B6472]">
+                    <datalist id="opcionesModelosConsignacion"></datalist>
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Cantidad a prestar</label>
@@ -182,16 +163,16 @@
             </div>
         </section>
 
-        <!-- DUEÑO -->
+        <!-- SECCIÓN DUEÑO -->
         <section id="seccion-dueno" class="hidden space-y-4">
             <div>
                 <h2 class="font-display font-bold text-lg text-[#F1F5F9]">Inventario maestro</h2>
-                <p class="text-xs text-[#8B95A7] mt-0.5">Para editar costos o sumar modelos nuevos, agrégalos como filas en la pestaña "Inventario" de tu Google Sheets y vuelve a cargar esta página.</p>
+                <p class="text-xs text-[#8B95A7] mt-0.5">Para editar costos o sumar modelos nuevos, agrégalos en tu Google Sheets y vuelve a cargar esta página.</p>
             </div>
             <div id="listaInventarioDueno" class="space-y-2.5"></div>
         </section>
 
-        <!-- REPORTES -->
+        <!-- SECCIÓN REPORTES -->
         <section id="seccion-reportes" class="hidden space-y-4">
             <h2 class="font-display font-bold text-lg text-[#F1F5F9]">Reportes</h2>
 
@@ -217,7 +198,7 @@
         </section>
     </main>
 
-    <!-- BARRA DE NAVEGACIÓN INFERIOR -->
+    <!-- NAVEGACIÓN INFERIOR -->
     <nav class="fixed bottom-0 inset-x-0 z-50 bg-[#12151C]/95 backdrop-blur-md border-t border-[#242933] safe-bottom">
         <div class="max-w-lg mx-auto grid grid-cols-4 px-1 pt-1.5">
             <button onclick="cambiarPestana('vendedor')" id="btn-vendedor" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#4C8DFF]">
@@ -236,7 +217,7 @@
     </nav>
 
     <script>
-        // URL DE GOOGLE APPS SCRIPT VINCULADA
+        // URL DEL WEB APP EJECUTABLE DE GOOGLE APPS SCRIPT
         const URL_API_GLOBAL = "https://script.google.com/macros/s/AKfycbyUK60B1sJHiiJMyu7SPE4l_FlRJw8jCOYSyKMHHS0hiXGuA-9-MMpn2jAHJpjBc8fa8g/exec";
 
         let inventarioProductos = [];
@@ -247,11 +228,12 @@
 
         const fmt = (n) => (Number(n) || 0).toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+        // Carga inicial del inventario desde Google Sheets
         function cargarInventarioDesdeGoogle() {
             const status = document.getElementById('statusConexion');
             if (!URL_API_GLOBAL || URL_API_GLOBAL.includes("AQUÍ_PEGA")) {
                 status.className = "shrink-0 bg-red-500/15 text-red-400 px-2.5 py-1 rounded-full text-[10px] font-bold font-data border border-red-500/20";
-                status.textContent = "Falta configurar URL";
+                status.textContent = "Falta URL";
                 return;
             }
 
@@ -267,59 +249,54 @@
                     document.getElementById('iconoLuna').classList.add('moon-synced');
                 })
                 .catch(error => {
-                    console.error("Error al leer base de datos central:", error);
+                    console.error("Error al conectar con Google Sheets:", error);
                     status.className = "shrink-0 bg-red-500/15 text-red-400 px-2.5 py-1 rounded-full text-[10px] font-bold font-data border border-red-500/20";
                     status.textContent = "Error de red";
                 });
         }
 
-        function cambiarPestana(pestana) {
-            if (pestana === 'dueno' || pestana === 'reportes') {
-                if (prompt("🔑 PRIVADO - Ingrese PIN del Administrador:") !== PIN_SECRETO) { alert("PIN inválido. Acceso denegado."); return; }
-            }
-            ['vendedor', 'consignacion', 'dueno', 'reportes'].forEach(id => {
-                document.getElementById('seccion-' + id).classList.add('hidden');
-                document.getElementById('btn-' + id).classList.remove('text-[#4C8DFF]');
-                document.getElementById('btn-' + id).classList.add('text-[#5B6472]');
-            });
-            document.getElementById('seccion-' + pestana).classList.remove('hidden');
-            document.getElementById('btn-' + pestana).classList.remove('text-[#5B6472]');
-            document.getElementById('btn-' + pestana).classList.add('text-[#4C8DFF]');
+        // Actualiza las opciones sugeridas del autocompletado
+        function actualizarSelectoresDeProductos() {
+            const dataListVenta = document.getElementById('opcionesModelosVenta');
+            const dataListCons = document.getElementById('opcionesModelosConsignacion');
+            if (!dataListVenta || !dataListCons) return;
 
-            if (pestana === 'consignacion') renderizerConsignaciones();
-            if (pestana === 'dueno') renderizarInventarioDueno();
-            if (pestana === 'reportes') actualizarTablaYKPIs();
+            dataListVenta.innerHTML = '';
+            dataListCons.innerHTML = '';
+
+            if (inventarioProductos.length === 0) return;
+
+            inventarioProductos.forEach((p) => {
+                if (p.stock > 0) {
+                    let optionVenta = document.createElement('option');
+                    optionVenta.value = p.modelo;
+                    optionVenta.label = `Stock: ${p.stock} u. | Suc: ${p.sucursal}`;
+                    dataListVenta.appendChild(optionVenta);
+
+                    let optionCons = document.createElement('option');
+                    optionCons.value = p.modelo;
+                    optionCons.label = `Stock: ${p.stock} u. | Suc: ${p.sucursal}`;
+                    dataListCons.appendChild(optionCons);
+                }
+            });
         }
 
-        function actualizarSelectoresDeProductos() {
-            const vM = document.getElementById('ventaModelo'); const cM = document.getElementById('consModelo');
-            if (!vM || !cM) return; vM.innerHTML = ''; cM.innerHTML = '';
-
-            if (inventarioProductos.length === 0) {
-                vM.innerHTML = '<option>Cargando inventario…</option>';
-                cM.innerHTML = '<option>Cargando inventario…</option>';
-                return;
-            }
-
-            inventarioProductos.forEach((p, i) => {
-                let text = `${p.modelo} (Stock: ${p.stock} · ${p.sucursal})`;
-                let o1 = document.createElement('option'); o1.value = p.modelo; o1.textContent = text;
-                o1.setAttribute('data-costo', p.costoUsd); o1.setAttribute('data-sucursal', p.sucursal); o1.setAttribute('data-indice', i);
-                if (p.stock <= 0) o1.disabled = true;
-                vM.appendChild(o1);
-
-                let o2 = document.createElement('option'); o2.value = p.modelo; o2.textContent = text; o2.setAttribute('data-indice', i);
-                if (p.stock <= 0) o2.disabled = true;
-                cM.appendChild(o2);
-            });
+        function forzarAutofillYRecalcular() {
+            document.getElementById('ventaPrecioCobrado').dataset.manual = "false";
             actualizarPreciosVenta(false);
         }
 
-        function forzarAutofillYRecalcular() { document.getElementById('ventaPrecioCobrado').dataset.manual = "false"; actualizarPreciosVenta(false); }
-
+        // Cálculo dinámico de totales, ganancias y comisiones
         function actualizarPreciosVenta(manual = false) {
-            const sel = document.getElementById('ventaModelo'); if (!sel || !sel.options[sel.selectedIndex] || !sel.options[sel.selectedIndex].dataset.costo) return;
-            const costo = parseFloat(sel.options[sel.selectedIndex].getAttribute('data-costo'));
+            const inputModelo = document.getElementById('ventaModelo');
+            if (!inputModelo) return;
+
+            const nombreModeloIngresado = inputModelo.value.trim();
+            const productoSelected = inventarioProductos.find(p => p.modelo.toLowerCase() === nombreModeloIngresado.toLowerCase());
+
+            if (!productoSelected) return;
+
+            const costo = parseFloat(productoSelected.costoUsd) || 0;
             const cant = parseInt(document.getElementById('ventaCantidad').value) || 0;
             const tc = parseFloat(document.getElementById('ventaTipoCambio').value) || 0;
             const inp = document.getElementById('ventaPrecioCobrado');
@@ -336,16 +313,29 @@
             document.getElementById('txtComisionVendedor').textContent = fmt(com);
         }
 
+        // Registro de venta y envío POST a Google Sheets
         function registrarVenta(e) {
             e.preventDefault();
-            const sel = document.getElementById('ventaModelo');
-            if (!sel.options[sel.selectedIndex] || !sel.options[sel.selectedIndex].dataset.indice) { alert("⚠️ Todavía no hay productos cargados desde Google Sheets."); return; }
-            const idx = parseInt(sel.options[sel.selectedIndex].getAttribute('data-indice'));
-            const cant = parseInt(document.getElementById('ventaCantidad').value);
-            const productoSelected = inventarioProductos[idx];
+            const inputModelo = document.getElementById('ventaModelo');
+            const nombreModelo = inputModelo.value.trim();
+            
+            const productoSelected = inventarioProductos.find(p => p.modelo.toLowerCase() === nombreModelo.toLowerCase());
 
-            if (!document.getElementById('ventaVendedor').value.trim()) { alert("⚠️ Ingresa el nombre del vendedor."); return; }
-            if (productoSelected.stock < cant) { alert(`❌ Operación rechazada: solo hay ${productoSelected.stock} unidades de este modelo.`); return; }
+            if (!productoSelected) { 
+                alert("⚠️ Selecciona un modelo válido de la lista."); 
+                return; 
+            }
+
+            const cant = parseInt(document.getElementById('ventaCantidad').value);
+
+            if (!document.getElementById('ventaVendedor').value.trim()) { 
+                alert("⚠️ Ingresa el nombre del vendedor."); 
+                return; 
+            }
+            if (productoSelected.stock < cant) { 
+                alert(`❌ Operación rechazada: solo hay ${productoSelected.stock} unidades de este modelo.`); 
+                return; 
+            }
 
             productoSelected.stock -= cant;
             let total = parseFloat(document.getElementById('txtTotalCobrar').textContent.replace(/,/g, ''));
@@ -356,7 +346,7 @@
                 tipoOperacion: "VENTA",
                 filaExcel: productoSelected.filaExcel,
                 vendedor: document.getElementById('ventaVendedor').value.trim(),
-                modelo: sel.value,
+                modelo: productoSelected.modelo,
                 sucursal: productoSelected.sucursal,
                 tipo: document.getElementById('ventaTipo').value,
                 cantidad: cant,
@@ -364,12 +354,22 @@
                 gananciaRegistrada: gan
             };
 
-            baseDeDatosVentas.push({ vendedor: payload.vendedor, modelo: payload.modelo, sucursal: payload.sucursal, tipo: payload.tipo, cantidad: cant, totalCobrado: total, gananciaRegistrada: gan, comision: com });
+            baseDeDatosVentas.push({ 
+                vendedor: payload.vendedor, 
+                modelo: payload.modelo, 
+                sucursal: payload.sucursal, 
+                tipo: payload.tipo, 
+                cantidad: cant, 
+                totalCobrado: total, 
+                gananciaRegistrada: gan, 
+                comision: com 
+            });
 
             enviarANube(payload);
-            alert(`💰 Venta registrada.\nSe descontará stock en la fila ${productoSelected.filaExcel} de tu Google Sheets.`);
+            alert(`💰 Venta registrada con éxito.\nSe actualizará la fila ${productoSelected.filaExcel} en Google Sheets.`);
 
             document.getElementById('ventaVendedor').value = '';
+            document.getElementById('ventaModelo').value = '';
             document.getElementById('ventaCantidad').value = 1;
             forzarAutofillYRecalcular();
             actualizarSelectoresDeProductos();
@@ -377,16 +377,30 @@
 
         function registrarConsignacion(e) {
             e.preventDefault();
-            const sel = document.getElementById('consModelo');
-            if (!sel.options[sel.selectedIndex] || !sel.options[sel.selectedIndex].dataset.indice) { alert("⚠️ Todavía no hay productos cargados desde Google Sheets."); return; }
-            const idx = parseInt(sel.options[sel.selectedIndex].getAttribute('data-indice'));
+            const inputModelo = document.getElementById('consModelo');
+            const nombreModelo = inputModelo.value.trim();
+
+            const prod = inventarioProductos.find(p => p.modelo.toLowerCase() === nombreModelo.toLowerCase());
+
+            if (!prod) { 
+                alert("⚠️ Selecciona un modelo válido de la lista."); 
+                return; 
+            }
+
             const cant = parseInt(document.getElementById('consCantidad').value);
-            const prod = inventarioProductos[idx];
-            if (!document.getElementById('consCliente').value.trim()) { alert("⚠️ Ingresa el responsable."); return; }
-            if (prod.stock < cant) { alert("❌ Stock insuficiente en la nube para este préstamo."); return; }
+            if (!document.getElementById('consCliente').value.trim()) { 
+                alert("⚠️ Ingresa el responsable."); 
+                return; 
+            }
+            if (prod.stock < cant) { 
+                alert("❌ Stock insuficiente para este préstamo."); 
+                return; 
+            }
 
             prod.stock -= cant;
             let fecha = new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const idx = inventarioProductos.indexOf(prod);
 
             const nuevaCons = {
                 id: Date.now(), fecha: fecha, cliente: document.getElementById('consCliente').value.trim(),
@@ -400,10 +414,12 @@
             };
 
             enviarANube(payload);
-            alert(`🤝 Consignación registrada.\nInventario rebajado en la fila ${prod.filaExcel}.`);
+            alert(`🤝 Consignación registrada.\nInventario actualizado en la fila ${prod.filaExcel}.`);
             document.getElementById('consCliente').value = '';
+            document.getElementById('consModelo').value = '';
             document.getElementById('consCantidad').value = 1;
-            actualizarSelectoresDeProductos(); renderizerConsignaciones();
+            actualizarSelectoresDeProductos(); 
+            renderizerConsignaciones();
         }
 
         function alternarEstadoConsignacion(id) {
@@ -423,31 +439,32 @@
 
         function devolverEquiposAInventario(id) {
             const c = baseDeDatosConsignaciones.find(x => x.id === id);
-            if (confirm(`¿Confirmas la recepción física y reintegración de ${c.cantidad} unidades al inventario?`)) {
+            if (confirm(`¿Confirmas la devolución física de ${c.cantidad} unidades al inventario?`)) {
                 inventarioProductos[c.idxOrig].stock += c.cantidad;
 
                 const payload = {
                     tipoOperacion: "CONSIGNACION", subTipo: "DEVOLUCION", filaExcel: c.filaExcel, fecha: c.fecha,
-                    cliente: c.cliente, modelo: c.modelo, cantidad: c.cantidad, sucursal: c.sucursal, estado: "Devuelto e Inyectado a Stock"
+                    cliente: c.cliente, modelo: c.modelo, cantidad: c.cantidad, sucursal: c.sucursal, estado: "Devuelto"
                 };
 
                 enviarANube(payload);
                 baseDeDatosConsignaciones = baseDeDatosConsignaciones.filter(x => x.id !== id);
-                alert(`🔙 Equipos reintegrados en la fila ${c.filaExcel} de Google Sheets.`);
+                alert(`🔙 Equipos reintegrados en la fila ${c.filaExcel}.`);
                 actualizarSelectoresDeProductos(); renderizerConsignaciones();
             }
         }
 
+        // Petición HTTP POST enviada al Web App de Apps Script
         function enviarANube(data) {
             if (!URL_API_GLOBAL || URL_API_GLOBAL.includes("AQUÍ_PEGA")) return;
             fetch(URL_API_GLOBAL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-                .catch(e => console.error("Fallo crítico en la sincronización ascendente:", e));
+                .catch(e => console.error("Error al sincronizar con la nube:", e));
         }
 
         function renderizerConsignaciones() {
             const cont = document.getElementById('listaConsignaciones'); if (!cont) return; cont.innerHTML = '';
             if (baseDeDatosConsignaciones.length === 0) {
-                cont.innerHTML = `<div class="text-center text-[#5B6472] text-sm italic py-10">Aún no hay consignaciones registradas en esta sesión.</div>`;
+                cont.innerHTML = `<div class="text-center text-[#5B6472] text-sm italic py-10">Sin consignaciones activas en esta sesión.</div>`;
                 return;
             }
             baseDeDatosConsignaciones.forEach(c => {
@@ -503,13 +520,31 @@
             });
         }
 
+        function cambiarPestana(pestana) {
+            if (pestana === 'dueno' || pestana === 'reportes') {
+                if (prompt("🔑 PRIVADO - Ingrese PIN del Administrador:") !== PIN_SECRETO) { alert("PIN inválido."); return; }
+            }
+            ['vendedor', 'consignacion', 'dueno', 'reportes'].forEach(id => {
+                document.getElementById('seccion-' + id).classList.add('hidden');
+                document.getElementById('btn-' + id).classList.remove('text-[#4C8DFF]');
+                document.getElementById('btn-' + id).classList.add('text-[#5B6472]');
+            });
+            document.getElementById('seccion-' + pestana).classList.remove('hidden');
+            document.getElementById('btn-' + pestana).classList.remove('text-[#5B6472]');
+            document.getElementById('btn-' + pestana).classList.add('text-[#4C8DFF]');
+
+            if (pestana === 'consignacion') renderizerConsignaciones();
+            if (pestana === 'dueno') renderizarInventarioDueno();
+            if (pestana === 'reportes') actualizarTablaYKPIs();
+        }
+
         function actualizarTablaYKPIs() {
             const cont = document.getElementById('listaReportes'); if (!cont) return; cont.innerHTML = '';
             if (baseDeDatosVentas.length === 0) {
                 document.getElementById('kpiVentasTotales').textContent = "0.00";
                 document.getElementById('kpiGananciaTotal').textContent = "0.00";
                 document.getElementById('kpiComisionesTotales').textContent = "0.00";
-                cont.innerHTML = `<div class="text-center text-[#5B6472] text-sm italic py-10">Sin ventas registradas en esta sesión. Tu Google Sheets guarda el histórico completo.</div>`;
+                cont.innerHTML = `<div class="text-center text-[#5B6472] text-sm italic py-10">Sin ventas registradas en esta sesión.</div>`;
                 return;
             }
             let b = 0, g = 0, comi = 0;
@@ -539,12 +574,9 @@
             cargarInventarioDesdeGoogle();
         });
 
-        // =========================================================
-        // 3. REGISTRO DEL SERVICE WORKER (Para instalación App)
-        // =========================================================
+        // SERVICE WORKER PARA CAPACIDADES PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // Generación de Service Worker virtual dinámico
                 const swCode = `
                     self.addEventListener('install', e => self.skipWaiting());
                     self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
