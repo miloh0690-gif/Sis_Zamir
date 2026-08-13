@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <!-- Configuración para asegurar que ocupe toda la pantalla del teléfono sin barras blancas ni recortes -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0F1115">
+    <title>MooN ERP - Tech Mobiles</title>
+
+    <!-- ========================================================= -->
+    <!-- 1. METADATOS PWA PARA iOS (iPhone / iPad / Safari)       -->
+    <!-- ========================================================= -->
+    <!-- Habilita el funcionamiento en pantalla completa sin barra de Safari -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- Estilo de la barra superior en iPhone para integrarse al diseño oscuro -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Nombre del acceso directo en el iPhone -->
+    <meta name="apple-mobile-web-app-title" content="MooN ERP">
+    <!-- Icono para la pantalla de inicio de iOS (Generado dinámicamente con SVG de alta resolución) -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' width='512' height='512'%3E%3Crect width='512' height='512' rx='128' fill='%230F1115'/%3E%3Cpath d='M380 300A160 160 0 1 1 180 100a120 120 0 0 0 200 200Z' fill='%236EE7F9'/%3E%3C/svg%3E">
+
+    <!-- ========================================================= -->
+    <!-- 2. MANIFIESTO EN LÍNEA PARA ANDROID / CHROME             -->
+    <!-- (Permite omitir la creación de un archivo manifest.json separado) -->
+    <!-- ========================================================= -->
+    <link rel="manifest" href='data:application/manifest+json,{"name":"MooN ERP - Tech Mobiles","short_name":"MooN ERP","start_url":".","display":"standalone","background_color":"#0F1115","theme_color":"#0F1115","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 512 512%27 width=%27512%27 height=%27512%27%3E%3Crect width=%27512%27 height=%27512%27 rx=%27128%27 fill=%27%230F1115%27/%3E%3Cpath d=%27M380 300A160 160 0 1 1 180 100a120 120 0 0 0 200 200Z%27 fill=%27%236EE7F9%27/%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml"}]}'>
+
+    <!-- FUENTES Y CSS EXISTENTES DEL SISTEMA -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        :root { color-scheme: dark; }
+        html, body { background:#0F1115; }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+        .font-data { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+        input, select { -webkit-user-select: text; user-select: text; }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { opacity: 1; }
+        select { -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238B95A7' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.9rem center; }
+        .safe-bottom { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+        .safe-top { padding-top: max(0.5rem, env(safe-area-inset-top)); }
+        ::-webkit-scrollbar { display: none; }
+        .tap { transition: transform .12s ease, opacity .12s ease; }
+        .tap:active { transform: scale(0.97); opacity: 0.9; }
+        @keyframes moonGlow { 0%,100% { filter: drop-shadow(0 0 3px rgba(110,231,249,.4)); } 50% { filter: drop-shadow(0 0 9px rgba(110,231,249,.85)); } }
+        .moon-synced { animation: moonGlow 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-[#0F1115] text-[#EDEFF3] min-h-screen pb-24">
+
+    <!-- ENCABEZADO -->
+    <header class="sticky top-0 z-40 safe-top bg-[#0F1115]/90 backdrop-blur-md border-b border-[#242933]">
+        <div class="max-w-lg mx-auto px-4 pb-3 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+                <svg id="iconoLuna" width="26" height="26" viewBox="0 0 24 24" fill="none" class="shrink-0">
+                    <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.7 6.7 0 0 0 10.5 10.5Z" fill="#6EE7F9" fill-opacity="0.9"/>
+                </svg>
+                <div class="leading-tight">
+                    <h1 class="font-display font-bold text-[15px] tracking-tight text-[#F1F5F9]">MooN Tech Mobiles</h1>
+                    <p class="text-[10px] text-[#8B95A7] font-data">ERP · Google Sheets</p>
+                </div>
+            </div>
+            <div id="statusConexion" class="shrink-0 bg-amber-500/15 text-amber-400 px-2.5 py-1 rounded-full text-[10px] font-bold font-data border border-amber-500/20">
+                Conectando…
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-lg mx-auto px-4 pt-4">
+
+        <!-- VENDEDOR -->
+        <section id="seccion-vendedor" class="space-y-4">
+            <div>
+                <h2 class="font-display font-bold text-lg text-[#F1F5F9]">Registrar venta</h2>
+                <p class="text-xs text-[#8B95A7] mt-0.5">El precio se calcula con costo × tipo de cambio, sin margen agregado. Ajusta el precio cobrado a mano si quieres cobrar distinto.</p>
+            </div>
+
+            <form onsubmit="registrarVenta(event)" class="space-y-3">
+                <div>
+                    <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Vendedor</label>
+                    <input type="text" id="ventaVendedor" required placeholder="Ej: Carlos Mendoza"
+                        class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] placeholder:text-[#5B6472] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo (desde Google Sheets)</label>
+                    <select id="ventaModelo" onchange="forzarAutofillYRecalcular()"
+                        class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]"></select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Tipo de venta</label>
+                        <select id="ventaTipo" onchange="forzarAutofillYRecalcular()"
+                            class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+                            <option value="Unidad">Unidad (minorista)</option>
+                            <option value="Mayor">Mayor (volumen)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Cantidad</label>
+                        <input type="number" id="ventaCantidad" value="1" min="1" required oninput="actualizarPreciosVenta(false)"
+                            class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] font-data focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Tipo de cambio</label>
+                        <input type="number" id="ventaTipoCambio" value="6.96" step="0.01" min="0" required oninput="actualizarPreciosVenta(false)"
+                            class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] font-data focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-[#4C8DFF] uppercase tracking-wide mb-1.5">Precio cobrado (Bs)</label>
+                        <input type="number" id="ventaPrecioCobrado" step="0.01" min="0" required oninput="actualizarPreciosVenta(true)"
+                            class="w-full h-12 px-4 rounded-xl bg-[#182236] border border-[#4C8DFF]/40 text-[15px] font-data font-bold text-[#DCE9FF] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+                    </div>
+                </div>
+
+                <div class="rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-4 grid grid-cols-3 divide-x divide-[#2A2F3A]">
+                    <div class="pr-2">
+                        <span class="text-[10px] font-bold text-[#8B95A7] uppercase block mb-1">Total</span>
+                        <span id="txtTotalCobrar" class="font-display font-bold text-lg text-[#F1F5F9] font-data">0.00</span>
+                    </div>
+                    <div class="px-2">
+                        <span class="text-[10px] font-bold text-[#4C8DFF] uppercase block mb-1">Ganancia</span>
+                        <span id="txtGananciaPura" class="font-display font-bold text-lg text-[#4C8DFF] font-data">0.00</span>
+                    </div>
+                    <div class="pl-2">
+                        <span class="text-[10px] font-bold text-[#34D399] uppercase block mb-1">Comisión</span>
+                        <span id="txtComisionVendedor" class="font-display font-bold text-lg text-[#34D399] font-data">0.00</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="tap w-full bg-[#4C8DFF] text-white h-13 py-3.5 rounded-2xl font-bold text-[15px] shadow-lg shadow-[#4C8DFF]/20">
+                    Registrar venta
+                </button>
+            </form>
+        </section>
+
+        <!-- CONSIGNACIONES -->
+        <section id="seccion-consignacion" class="hidden space-y-4">
+            <div>
+                <h2 class="font-display font-bold text-lg text-[#F1F5F9]">Consignaciones y préstamos</h2>
+                <p class="text-xs text-[#8B95A7] mt-0.5">Despacha equipos y sigue el estado de cada préstamo.</p>
+            </div>
+
+            <form onsubmit="registrarConsignacion(event)" class="space-y-3 rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Persona / empresa responsable</label>
+                    <input type="text" id="consCliente" required placeholder="Ej: Promotor Juan"
+                        class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] placeholder:text-[#5B6472] focus:outline-none focus:ring-2 focus:ring-[#9B8CFF]">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo del stock</label>
+                    <select id="consModelo" class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#9B8CFF]"></select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Cantidad a prestar</label>
+                    <input type="number" id="consCantidad" value="1" min="1" required
+                        class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] font-data focus:outline-none focus:ring-2 focus:ring-[#9B8CFF]">
+                </div>
+                <button type="submit" class="tap w-full bg-[#9B8CFF] text-[#161022] h-12 rounded-2xl font-bold text-[15px]">
+                    Despachar equipo
+                </button>
+            </form>
+
+            <div>
+                <h3 class="text-xs font-bold text-[#8B95A7] uppercase tracking-wide mb-2 px-1">Equipos en tránsito</h3>
+                <div id="listaConsignaciones" class="space-y-3"></div>
+            </div>
+        </section>
+
+        <!-- DUEÑO -->
+        <section id="seccion-dueno" class="hidden space-y-4">
+            <div>
+                <h2 class="font-display font-bold text-lg text-[#F1F5F9]">Inventario maestro</h2>
+                <p class="text-xs text-[#8B95A7] mt-0.5">Para editar costos o sumar modelos nuevos, agrégalos como filas en la pestaña "Inventario" de tu Google Sheets y vuelve a cargar esta página.</p>
+            </div>
+            <div id="listaInventarioDueno" class="space-y-2.5"></div>
+        </section>
+
+        <!-- REPORTES -->
+        <section id="seccion-reportes" class="hidden space-y-4">
+            <h2 class="font-display font-bold text-lg text-[#F1F5F9]">Reportes</h2>
+
+            <div class="grid grid-cols-3 gap-2.5">
+                <div class="rounded-2xl bg-[#1B2029] border-l-4 border-[#4C8DFF] p-3.5">
+                    <span class="text-[9px] font-bold text-[#8B95A7] uppercase block">Ventas</span>
+                    <h3 id="kpiVentasTotales" class="font-display font-bold text-[#F1F5F9] mt-1 font-data text-[15px]">0.00</h3>
+                </div>
+                <div class="rounded-2xl bg-[#1B2029] border-l-4 border-[#34D399] p-3.5">
+                    <span class="text-[9px] font-bold text-[#34D399] uppercase block">Ganancia</span>
+                    <h3 id="kpiGananciaTotal" class="font-display font-bold text-[#34D399] mt-1 font-data text-[15px]">0.00</h3>
+                </div>
+                <div class="rounded-2xl bg-[#1B2029] border-l-4 border-[#FBBF24] p-3.5">
+                    <span class="text-[9px] font-bold text-[#FBBF24] uppercase block">Comisiones</span>
+                    <h3 id="kpiComisionesTotales" class="font-display font-bold text-[#FBBF24] mt-1 font-data text-[15px]">0.00</h3>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-xs font-bold text-[#8B95A7] uppercase tracking-wide mb-2 px-1">Auditoría de esta sesión</h3>
+                <div id="listaReportes" class="space-y-2.5"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- BARRA DE NAVEGACIÓN INFERIOR -->
+    <nav class="fixed bottom-0 inset-x-0 z-50 bg-[#12151C]/95 backdrop-blur-md border-t border-[#242933] safe-bottom">
+        <div class="max-w-lg mx-auto grid grid-cols-4 px-1 pt-1.5">
+            <button onclick="cambiarPestana('vendedor')" id="btn-vendedor" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#4C8DFF]">
+                <span class="text-lg">🛒</span><span class="text-[10px] font-bold">Vender</span>
+            </button>
+            <button onclick="cambiarPestana('consignacion')" id="btn-consignacion" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#5B6472]">
+                <span class="text-lg">🤝</span><span class="text-[10px] font-bold">Consignar</span>
+            </button>
+            <button onclick="cambiarPestana('dueno')" id="btn-dueno" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#5B6472]">
+                <span class="text-lg">🔑</span><span class="text-[10px] font-bold">Dueño</span>
+            </button>
+            <button onclick="cambiarPestana('reportes')" id="btn-reportes" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#5B6472]">
+                <span class="text-lg">📊</span><span class="text-[10px] font-bold">Reportes</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        // URL DE GOOGLE APPS SCRIPT VINCULADA
+        const URL_API_GLOBAL = "https://script.google.com/macros/s/AKfycbwq1LwdO__T-VaqNKhZg6mOVinGhcr0DFyWCtGbQpEKUL1S3aXrPe7Mmu1sbbXr1thw7A/exec";
+
+        let inventarioProductos = [];
+        let baseDeDatosVentas = [];
+        let baseDeDatosConsignaciones = [];
+        const PIN_SECRETO = "1234";
+        const TASA_COMISION = 0.30;
+
+        const fmt = (n) => (Number(n) || 0).toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        function cargarInventarioDesdeGoogle() {
+            const status = document.getElementById('statusConexion');
+            if (!URL_API_GLOBAL || URL_API_GLOBAL.includes("AQUÍ_PEGA")) {
+                status.className = "shrink-0 bg-red-500/15 text-red-400 px-2.5 py-1 rounded-full text-[10px] font-bold font-data border border-red-500/20";
+                status.textContent = "Falta configurar URL";
+                return;
+            }
+
+            fetch(URL_API_GLOBAL)
+                .then(response => response.json())
+                .then(data => {
+                    inventarioProductos = data;
+                    actualizarSelectoresDeProductos();
+                    renderizarInventarioDueno();
+
+                    status.className = "shrink-0 bg-emerald-500/15 text-emerald-400 px-2.5 py-1 rounded-full text-[10px] font-bold font-data border border-emerald-500/20";
+                    status.textContent = "Sincronizado";
+                    document.getElementById('iconoLuna').classList.add('moon-synced');
+                })
+                .catch(error => {
+                    console.error("Error al leer base de datos central:", error);
+                    status.className = "shrink-0 bg-red-500/15 text-red-400 px-2.5 py-1 rounded-full text-[10px] font-bold font-data border border-red-500/20";
+                    status.textContent = "Error de red";
+                });
+        }
+
+        function cambiarPestana(pestana) {
+            if (pestana === 'dueno' || pestana === 'reportes') {
+                if (prompt("🔑 PRIVADO - Ingrese PIN del Administrador:") !== PIN_SECRETO) { alert("PIN inválido. Acceso denegado."); return; }
+            }
+            ['vendedor', 'consignacion', 'dueno', 'reportes'].forEach(id => {
+                document.getElementById('seccion-' + id).classList.add('hidden');
+                document.getElementById('btn-' + id).classList.remove('text-[#4C8DFF]');
+                document.getElementById('btn-' + id).classList.add('text-[#5B6472]');
+            });
+            document.getElementById('seccion-' + pestana).classList.remove('hidden');
+            document.getElementById('btn-' + pestana).classList.remove('text-[#5B6472]');
+            document.getElementById('btn-' + pestana).classList.add('text-[#4C8DFF]');
+
+            if (pestana === 'consignacion') renderizerConsignaciones();
+            if (pestana === 'dueno') renderizarInventarioDueno();
+            if (pestana === 'reportes') actualizarTablaYKPIs();
+        }
+
+        function actualizarSelectoresDeProductos() {
+            const vM = document.getElementById('ventaModelo'); const cM = document.getElementById('consModelo');
+            if (!vM || !cM) return; vM.innerHTML = ''; cM.innerHTML = '';
+
+            if (inventarioProductos.length === 0) {
+                vM.innerHTML = '<option>Cargando inventario…</option>';
+                cM.innerHTML = '<option>Cargando inventario…</option>';
+                return;
+            }
+
+            inventarioProductos.forEach((p, i) => {
+                let text = `${p.modelo} (Stock: ${p.stock} · ${p.sucursal})`;
+                let o1 = document.createElement('option'); o1.value = p.modelo; o1.textContent = text;
+                o1.setAttribute('data-costo', p.costoUsd); o1.setAttribute('data-sucursal', p.sucursal); o1.setAttribute('data-indice', i);
+                if (p.stock <= 0) o1.disabled = true;
+                vM.appendChild(o1);
+
+                let o2 = document.createElement('option'); o2.value = p.modelo; o2.textContent = text; o2.setAttribute('data-indice', i);
+                if (p.stock <= 0) o2.disabled = true;
+                cM.appendChild(o2);
+            });
+            actualizarPreciosVenta(false);
+        }
+
+        function forzarAutofillYRecalcular() { document.getElementById('ventaPrecioCobrado').dataset.manual = "false"; actualizarPreciosVenta(false); }
+
+        function actualizarPreciosVenta(manual = false) {
+            const sel = document.getElementById('ventaModelo'); if (!sel || !sel.options[sel.selectedIndex] || !sel.options[sel.selectedIndex].dataset.costo) return;
+            const costo = parseFloat(sel.options[sel.selectedIndex].getAttribute('data-costo'));
+            const cant = parseInt(document.getElementById('ventaCantidad').value) || 0;
+            const tc = parseFloat(document.getElementById('ventaTipoCambio').value) || 0;
+            const inp = document.getElementById('ventaPrecioCobrado');
+
+            if (manual) inp.dataset.manual = "true";
+            if (inp.dataset.manual !== "true") inp.value = (costo * tc).toFixed(2);
+
+            let total = (parseFloat(inp.value) || 0) * cant;
+            let ganancia = total - (costo * tc * cant);
+            let com = ganancia > 0 ? ganancia * TASA_COMISION : 0;
+
+            document.getElementById('txtTotalCobrar').textContent = fmt(total);
+            document.getElementById('txtGananciaPura').textContent = fmt(ganancia);
+            document.getElementById('txtComisionVendedor').textContent = fmt(com);
+        }
+
+        function registrarVenta(e) {
+            e.preventDefault();
+            const sel = document.getElementById('ventaModelo');
+            if (!sel.options[sel.selectedIndex] || !sel.options[sel.selectedIndex].dataset.indice) { alert("⚠️ Todavía no hay productos cargados desde Google Sheets."); return; }
+            const idx = parseInt(sel.options[sel.selectedIndex].getAttribute('data-indice'));
+            const cant = parseInt(document.getElementById('ventaCantidad').value);
+            const productoSelected = inventarioProductos[idx];
+
+            if (!document.getElementById('ventaVendedor').value.trim()) { alert("⚠️ Ingresa el nombre del vendedor."); return; }
+            if (productoSelected.stock < cant) { alert(`❌ Operación rechazada: solo hay ${productoSelected.stock} unidades de este modelo.`); return; }
+
+            productoSelected.stock -= cant;
+            let total = parseFloat(document.getElementById('txtTotalCobrar').textContent.replace(/,/g, ''));
+            let gan = parseFloat(document.getElementById('txtGananciaPura').textContent.replace(/,/g, ''));
+            let com = parseFloat(document.getElementById('txtComisionVendedor').textContent.replace(/,/g, ''));
+
+            const payload = {
+                tipoOperacion: "VENTA",
+                filaExcel: productoSelected.filaExcel,
+                vendedor: document.getElementById('ventaVendedor').value.trim(),
+                modelo: sel.value,
+                sucursal: productoSelected.sucursal,
+                tipo: document.getElementById('ventaTipo').value,
+                cantidad: cant,
+                totalCobrado: total,
+                gananciaRegistrada: gan
+            };
+
+            baseDeDatosVentas.push({ vendedor: payload.vendedor, modelo: payload.modelo, sucursal: payload.sucursal, tipo: payload.tipo, cantidad: cant, totalCobrado: total, gananciaRegistrada: gan, comision: com });
+
+            enviarANube(payload);
+            alert(`💰 Venta registrada.\nSe descontará stock en la fila ${productoSelected.filaExcel} de tu Google Sheets.`);
+
+            document.getElementById('ventaVendedor').value = '';
+            document.getElementById('ventaCantidad').value = 1;
+            forzarAutofillYRecalcular();
+            actualizarSelectoresDeProductos();
+        }
+
+        function registrarConsignacion(e) {
+            e.preventDefault();
+            const sel = document.getElementById('consModelo');
+            if (!sel.options[sel.selectedIndex] || !sel.options[sel.selectedIndex].dataset.indice) { alert("⚠️ Todavía no hay productos cargados desde Google Sheets."); return; }
+            const idx = parseInt(sel.options[sel.selectedIndex].getAttribute('data-indice'));
+            const cant = parseInt(document.getElementById('consCantidad').value);
+            const prod = inventarioProductos[idx];
+            if (!document.getElementById('consCliente').value.trim()) { alert("⚠️ Ingresa el responsable."); return; }
+            if (prod.stock < cant) { alert("❌ Stock insuficiente en la nube para este préstamo."); return; }
+
+            prod.stock -= cant;
+            let fecha = new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const nuevaCons = {
+                id: Date.now(), fecha: fecha, cliente: document.getElementById('consCliente').value.trim(),
+                modelo: prod.modelo, sucursal: prod.sucursal, idxOrig: idx, filaExcel: prod.filaExcel, cantidad: cant, estado: "Pendiente"
+            };
+            baseDeDatosConsignaciones.push(nuevaCons);
+
+            const payload = {
+                tipoOperacion: "CONSIGNACION", subTipo: "DESPACHO", filaExcel: prod.filaExcel, fecha: fecha,
+                cliente: nuevaCons.cliente, modelo: nuevaCons.modelo, cantidad: cant, sucursal: prod.sucursal, estado: "Pendiente"
+            };
+
+            enviarANube(payload);
+            alert(`🤝 Consignación registrada.\nInventario rebajado en la fila ${prod.filaExcel}.`);
+            document.getElementById('consCliente').value = '';
+            document.getElementById('consCantidad').value = 1;
+            actualizarSelectoresDeProductos(); renderizerConsignaciones();
+        }
+
+        function alternarEstadoConsignacion(id) {
+            baseDeDatosConsignaciones = baseDeDatosConsignaciones.map(c => {
+                if (c.id === id) {
+                    c.estado = c.estado === 'Pendiente' ? 'Pagado' : 'Pendiente';
+                    const payload = {
+                        tipoOperacion: "CONSIGNACION", subTipo: "CAMBIO_ESTADO", fecha: c.fecha, cliente: c.cliente,
+                        modelo: c.modelo, cantidad: c.cantidad, sucursal: c.sucursal, estado: c.estado + " (MODIFICADO)"
+                    };
+                    enviarANube(payload);
+                }
+                return c;
+            });
+            renderizerConsignaciones();
+        }
+
+        function devolverEquiposAInventario(id) {
+            const c = baseDeDatosConsignaciones.find(x => x.id === id);
+            if (confirm(`¿Confirmas la recepción física y reintegración de ${c.cantidad} unidades al inventario?`)) {
+                inventarioProductos[c.idxOrig].stock += c.cantidad;
+
+                const payload = {
+                    tipoOperacion: "CONSIGNACION", subTipo: "DEVOLUCION", filaExcel: c.filaExcel, fecha: c.fecha,
+                    cliente: c.cliente, modelo: c.modelo, cantidad: c.cantidad, sucursal: c.sucursal, estado: "Devuelto e Inyectado a Stock"
+                };
+
+                enviarANube(payload);
+                baseDeDatosConsignaciones = baseDeDatosConsignaciones.filter(x => x.id !== id);
+                alert(`🔙 Equipos reintegrados en la fila ${c.filaExcel} de Google Sheets.`);
+                actualizarSelectoresDeProductos(); renderizerConsignaciones();
+            }
+        }
+
+        function enviarANube(data) {
+            if (!URL_API_GLOBAL || URL_API_GLOBAL.includes("AQUÍ_PEGA")) return;
+            fetch(URL_API_GLOBAL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+                .catch(e => console.error("Fallo crítico en la sincronización ascendente:", e));
+        }
+
+        function renderizerConsignaciones() {
+            const cont = document.getElementById('listaConsignaciones'); if (!cont) return; cont.innerHTML = '';
+            if (baseDeDatosConsignaciones.length === 0) {
+                cont.innerHTML = `<div class="text-center text-[#5B6472] text-sm italic py-10">Aún no hay consignaciones registradas en esta sesión.</div>`;
+                return;
+            }
+            baseDeDatosConsignaciones.forEach(c => {
+                const pagado = c.estado === 'Pagado';
+                const badge = pagado ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400';
+                const div = document.createElement('div');
+                div.className = 'rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-4 space-y-3';
+                div.innerHTML = `
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <p class="font-bold text-[#EDEFF3] text-[15px]">${c.cliente}</p>
+                            <p class="text-[11px] text-[#8B95A7] font-data mt-0.5">${c.fecha}</p>
+                        </div>
+                        <span class="shrink-0 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full ${badge}">${c.estado}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm border-t border-[#2A2F3A] pt-3">
+                        <div>
+                            <p class="text-[#EDEFF3] font-medium">${c.modelo}</p>
+                            <p class="text-[#8B95A7] text-xs mt-0.5">Suc. ${c.sucursal} · Fila ${c.filaExcel}</p>
+                        </div>
+                        <span class="font-display font-bold text-lg text-[#9B8CFF] font-data">${c.cantidad} U.</span>
+                    </div>
+                    <div class="flex gap-2 pt-1">
+                        <button onclick="alternarEstadoConsignacion(${c.id})" class="tap flex-1 h-10 rounded-xl bg-[#242933] text-xs font-bold text-[#EDEFF3]">🔄 Cambiar pago</button>
+                        <button onclick="devolverEquiposAInventario(${c.id})" class="tap flex-1 h-10 rounded-xl bg-rose-500/10 text-rose-400 text-xs font-bold">🔙 Reintegrar</button>
+                    </div>`;
+                cont.appendChild(div);
+            });
+        }
+
+        function renderizarInventarioDueno() {
+            const cont = document.getElementById('listaInventarioDueno'); if (!cont) return; cont.innerHTML = '';
+            if (inventarioProductos.length === 0) {
+                cont.innerHTML = `<div class="text-center text-[#5B6472] text-sm italic py-10">Cargando inventario…</div>`;
+                return;
+            }
+            inventarioProductos.forEach((p) => {
+                const div = document.createElement('div');
+                div.className = 'rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-4 flex items-center justify-between gap-3';
+                div.innerHTML = `
+                    <div class="min-w-0">
+                        <p class="font-bold text-[#EDEFF3] text-[15px] truncate">${p.modelo}</p>
+                        <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                            <span class="text-[10px] font-bold bg-[#242933] text-[#C4CAD4] px-2 py-0.5 rounded-full">${p.sucursal}</span>
+                            <span class="text-[10px] font-data text-[#5B6472]">Fila ${p.filaExcel}</span>
+                        </div>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <p class="font-display font-bold text-[#F1F5F9] font-data">${p.stock} u.</p>
+                        <p class="text-xs text-[#FF6B6B] font-data font-bold mt-0.5">$${p.costoUsd.toFixed(2)}</p>
+                    </div>`;
+                cont.appendChild(div);
+            });
+        }
+
+        function actualizarTablaYKPIs() {
+            const cont = document.getElementById('listaReportes'); if (!cont) return; cont.innerHTML = '';
+            if (baseDeDatosVentas.length === 0) {
+                document.getElementById('kpiVentasTotales').textContent = "0.00";
+                document.getElementById('kpiGananciaTotal').textContent = "0.00";
+                document.getElementById('kpiComisionesTotales').textContent = "0.00";
+                cont.innerHTML = `<div class="text-center text-[#5B6472] text-sm italic py-10">Sin ventas registradas en esta sesión. Tu Google Sheets guarda el histórico completo.</div>`;
+                return;
+            }
+            let b = 0, g = 0, comi = 0;
+            baseDeDatosVentas.forEach(v => {
+                b += v.totalCobrado; g += v.gananciaRegistrada; comi += v.comision;
+                const div = document.createElement('div');
+                div.className = 'rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-4';
+                div.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <p class="font-bold text-[#EDEFF3] text-[15px]">${v.vendedor}</p>
+                        <span class="text-[10px] font-bold bg-[#242933] text-[#C4CAD4] px-2 py-0.5 rounded-full">${v.tipo}</span>
+                    </div>
+                    <p class="text-xs text-[#8B95A7] mt-1">${v.modelo} · ${v.cantidad} u.</p>
+                    <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-[#2A2F3A] text-center">
+                        <div><span class="text-[9px] text-[#8B95A7] uppercase block">Total</span><span class="font-data font-bold text-[#F1F5F9]">${fmt(v.totalCobrado)}</span></div>
+                        <div><span class="text-[9px] text-[#4C8DFF] uppercase block">Ganancia</span><span class="font-data font-bold text-[#4C8DFF]">${fmt(v.gananciaRegistrada)}</span></div>
+                        <div><span class="text-[9px] text-[#34D399] uppercase block">Comisión</span><span class="font-data font-bold text-[#34D399]">${fmt(v.comision)}</span></div>
+                    </div>`;
+                cont.appendChild(div);
+            });
+            document.getElementById('kpiVentasTotales').textContent = fmt(b);
+            document.getElementById('kpiGananciaTotal').textContent = fmt(g);
+            document.getElementById('kpiComisionesTotales').textContent = fmt(comi);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            cargarInventarioDesdeGoogle();
+        });
+
+        // =========================================================
+        // 3. REGISTRO DEL SERVICE WORKER (Para instalación App)
+        // =========================================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Generación de Service Worker virtual dinámico
+                const swCode = `
+                    self.addEventListener('install', e => self.skipWaiting());
+                    self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+                    self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+                `;
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(swUrl).catch(() => {});
+            });
+        }
+    </script>
+</body>
+</html>
