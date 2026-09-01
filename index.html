@@ -30,6 +30,7 @@
         ::-webkit-scrollbar { display: none; }
         .tap { transition: transform .12s ease, opacity .12s ease; }
         .tap:active { transform: scale(0.97); opacity: 0.9; }
+        .tap:disabled { opacity: 0.5; transform: none; }
         @keyframes moonGlow { 0%,100% { filter: drop-shadow(0 0 3px rgba(110,231,249,.4)); } 50% { filter: drop-shadow(0 0 9px rgba(110,231,249,.85)); } }
         .moon-synced { animation: moonGlow 3s ease-in-out infinite; }
     </style>
@@ -89,7 +90,7 @@
                     </div>
                     <div>
                         <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Cantidad</label>
-                        <input type="number" id="ventaCantidad" value="1" min="1" required oninput="actualizarPreciosVenta(false)"
+                        <input type="number" id="ventaCantidad" value="1" min="1" step="1" required oninput="actualizarPreciosVenta(false)"
                             class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] font-data focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
                     </div>
                 </div>
@@ -97,7 +98,7 @@
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Tipo de cambio</label>
-                        <input type="number" id="ventaTipoCambio" value="6.96" step="0.01" min="0" required oninput="actualizarPreciosVenta(false)"
+                        <input type="number" id="ventaTipoCambio" value="6.96" step="0.01" min="0.01" required oninput="actualizarPreciosVenta(false)"
                             class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] font-data focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
                     </div>
                     <div>
@@ -122,7 +123,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="tap w-full bg-[#4C8DFF] text-white h-13 py-3.5 rounded-2xl font-bold text-[15px] shadow-lg shadow-[#4C8DFF]/20">
+                <button type="submit" id="btnRegistrarVenta" class="tap w-full bg-[#4C8DFF] text-white h-13 py-3.5 rounded-2xl font-bold text-[15px] shadow-lg shadow-[#4C8DFF]/20">
                     Registrar venta
                 </button>
             </form>
@@ -149,10 +150,10 @@
                 </div>
                 <div>
                     <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Cantidad a prestar</label>
-                    <input type="number" id="consCantidad" value="1" min="1" required
+                    <input type="number" id="consCantidad" value="1" min="1" step="1" required
                         class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] font-data focus:outline-none focus:ring-2 focus:ring-[#9B8CFF]">
                 </div>
-                <button type="submit" class="tap w-full bg-[#9B8CFF] text-[#161022] h-12 rounded-2xl font-bold text-[15px]">
+                <button type="submit" id="btnRegistrarConsignacion" class="tap w-full bg-[#9B8CFF] text-[#161022] h-12 rounded-2xl font-bold text-[15px]">
                     Despachar equipo
                 </button>
             </form>
@@ -222,6 +223,14 @@
         // "Nueva implementación", Google te dará una URL /exec. Reemplaza la
         // de abajo por esa URL nueva (puede ser la misma si reutilizas la
         // implementación existente, pero normalmente cambia).
+        //
+        // ⚠️ NOTA DE SEGURIDAD: esta URL y TODO este archivo son públicos y
+        // visibles para cualquiera que abra la app (ver código fuente / DevTools).
+        // Cualquiera con esta URL puede hacer POST directo al Apps Script sin pasar
+        // por esta interfaz. Cuando revisemos el Code.gs, conviene agregar un
+        // token compartido (ej. un campo "clave" en el payload) que el backend
+        // valide antes de escribir en la hoja, para que la URL sola no sea
+        // suficiente para modificar datos.
         const URL_API_GLOBAL = "https://script.google.com/macros/s/AKfycbzhxLBhg1b4qzESuXbLhccyTPHOQqttfi3Ctmjd5iWo274qSxkOKihz7SxYU8bG7A6PNw/exec";
 
         let inventarioProductos = [];
@@ -231,6 +240,27 @@
         const TASA_COMISION = 0.30;
 
         const fmt = (n) => (Number(n) || 0).toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        // Escapa texto antes de insertarlo como HTML. Los datos vienen de tu
+        // Google Sheets (modelo, sucursal, cliente, etc.) y antes se insertaban
+        // directo con innerHTML: si alguna celda de la hoja llega a tener texto
+        // con < > o comillas, podía romper el layout o ejecutar HTML/JS no
+        // deseado (XSS). Ahora todo dato dinámico pasa por aquí primero.
+        function escapeHtml(texto) {
+            const div = document.createElement('div');
+            div.textContent = String(texto ?? '');
+            return div.innerHTML;
+        }
+
+        // Guarda los últimos totales calculados como NÚMEROS (no como texto
+        // formateado). Antes, registrarVenta() releía el texto ya formateado
+        // en pantalla (ej. "1.234,56" con formato es-BO) y le quitaba las
+        // comas asumiendo formato en inglés — eso corrompe cualquier total
+        // de 1.000 Bs o más. Ahora se guarda el número real en cuanto se
+        // calcula y se usa directamente al registrar la venta.
+        let ultimoTotalCobrar = 0;
+        let ultimaGananciaPura = 0;
+        let ultimaComisionVendedor = 0;
 
         // Carga inicial del inventario desde Google Sheets
         function cargarInventarioDesdeGoogle() {
@@ -242,8 +272,12 @@
             }
 
             fetch(URL_API_GLOBAL)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) throw new Error("HTTP " + response.status);
+                    return response.json();
+                })
                 .then(data => {
+                    if (!Array.isArray(data)) throw new Error("Respuesta inesperada del servidor");
                     inventarioProductos = data;
                     actualizarSelectoresDeProductos();
                     renderizarInventarioDueno();
@@ -268,6 +302,7 @@
         }
 
         // ===== BUSCADOR DE MODELOS CON SUGERENCIAS (funciona en cualquier celular) =====
+        let temporizadorBusqueda = null;
         function renderizarSugerencias(idContenedor, idInput, callbackAlSeleccionar) {
             const cont = document.getElementById(idContenedor);
             const texto = document.getElementById(idInput).value.trim().toLowerCase();
@@ -285,8 +320,8 @@
                 const item = document.createElement('div');
                 item.className = 'px-4 py-2.5 border-b border-[#2A2F3A] last:border-b-0 active:bg-[#242933]';
                 item.innerHTML = `
-                    <p class="text-[14px] text-[#EDEFF3] font-medium">${p.modelo}</p>
-                    <p class="text-[11px] text-[#8B95A7] font-data">Stock: ${p.stock} u. · Suc: ${p.sucursal}</p>`;
+                    <p class="text-[14px] text-[#EDEFF3] font-medium">${escapeHtml(p.modelo)}</p>
+                    <p class="text-[11px] text-[#8B95A7] font-data">Stock: ${escapeHtml(p.stock)} u. · Suc: ${escapeHtml(p.sucursal)}</p>`;
                 item.addEventListener('click', () => {
                     document.getElementById(idInput).value = p.modelo;
                     cont.classList.add('hidden');
@@ -296,6 +331,15 @@
                 cont.appendChild(item);
             });
             cont.classList.remove('hidden');
+        }
+
+        // Pequeño debounce (120ms) para que buscar no recalcule/rerenderice
+        // en cada tecla si el usuario escribe rápido en un celular gama baja.
+        function conDebounce(fn) {
+            return function (...args) {
+                clearTimeout(temporizadorBusqueda);
+                temporizadorBusqueda = setTimeout(() => fn(...args), 120);
+            };
         }
 
         function onEscribirModeloVenta() {
@@ -344,39 +388,56 @@
             let ganancia = total - (costo * tc * cant);
             let com = ganancia > 0 ? ganancia * TASA_COMISION : 0;
 
+            // Guardamos los números reales, no solo el texto mostrado.
+            ultimoTotalCobrar = total;
+            ultimaGananciaPura = ganancia;
+            ultimaComisionVendedor = com;
+
             document.getElementById('txtTotalCobrar').textContent = fmt(total);
             document.getElementById('txtGananciaPura').textContent = fmt(ganancia);
             document.getElementById('txtComisionVendedor').textContent = fmt(com);
         }
 
         // Registro de venta y envío POST a Google Sheets
-        function registrarVenta(e) {
+        async function registrarVenta(e) {
             e.preventDefault();
             const inputModelo = document.getElementById('ventaModelo');
             const nombreModelo = inputModelo.value.trim();
-            
+
             const productoSelected = inventarioProductos.find(p => p.modelo.toLowerCase() === nombreModelo.toLowerCase());
 
-            if (!productoSelected) { 
-                alert("⚠️ Selecciona un modelo válido de la lista."); 
-                return; 
+            if (!productoSelected) {
+                alert("⚠️ Selecciona un modelo válido de la lista.");
+                return;
             }
 
             const cant = parseInt(document.getElementById('ventaCantidad').value);
+            if (!Number.isInteger(cant) || cant <= 0) {
+                alert("⚠️ La cantidad debe ser un número mayor a 0.");
+                return;
+            }
 
-            if (!document.getElementById('ventaVendedor').value.trim()) { 
-                alert("⚠️ Ingresa el nombre del vendedor."); 
-                return; 
+            if (!document.getElementById('ventaVendedor').value.trim()) {
+                alert("⚠️ Ingresa el nombre del vendedor.");
+                return;
             }
-            if (productoSelected.stock < cant) { 
-                alert(`❌ Operación rechazada: solo hay ${productoSelected.stock} unidades de este modelo.`); 
-                return; 
+            if (productoSelected.stock < cant) {
+                alert(`❌ Operación rechazada: solo hay ${productoSelected.stock} unidades de este modelo.`);
+                return;
             }
+            const precioCobrado = parseFloat(document.getElementById('ventaPrecioCobrado').value);
+            if (!(precioCobrado > 0)) {
+                alert("⚠️ El precio cobrado debe ser mayor a 0.");
+                return;
+            }
+
+            const btn = document.getElementById('btnRegistrarVenta');
+            btn.disabled = true; // evita doble envío por doble tap
 
             productoSelected.stock -= cant;
-            let total = parseFloat(document.getElementById('txtTotalCobrar').textContent.replace(/,/g, ''));
-            let gan = parseFloat(document.getElementById('txtGananciaPura').textContent.replace(/,/g, ''));
-            let com = parseFloat(document.getElementById('txtComisionVendedor').textContent.replace(/,/g, ''));
+            const total = ultimoTotalCobrar;
+            const gan = ultimaGananciaPura;
+            const com = ultimaComisionVendedor;
 
             const payload = {
                 tipoOperacion: "VENTA",
@@ -390,20 +451,33 @@
                 gananciaRegistrada: gan
             };
 
-            baseDeDatosVentas.push({ 
-                vendedor: payload.vendedor, 
-                modelo: payload.modelo, 
-                sucursal: payload.sucursal, 
-                tipo: payload.tipo, 
-                cantidad: cant, 
-                totalCobrado: total, 
-                gananciaRegistrada: gan, 
-                comision: com 
+            baseDeDatosVentas.push({
+                vendedor: payload.vendedor,
+                modelo: payload.modelo,
+                sucursal: payload.sucursal,
+                tipo: payload.tipo,
+                cantidad: cant,
+                totalCobrado: total,
+                gananciaRegistrada: gan,
+                comision: com
             });
 
-            enviarANube(payload);
-            alert(`💰 Venta registrada con éxito.\nSe actualizará la fila ${productoSelected.filaExcel} en Google Sheets.`);
+            const sincronizado = await enviarANube(payload);
 
+            if (sincronizado) {
+                alert(`💰 Venta registrada con éxito.\nSe actualizará la fila ${productoSelected.filaExcel} en Google Sheets.`);
+            } else {
+                // Con mode:'no-cors' no podemos leer la respuesta real del Apps
+                // Script (ver nota junto a enviarANube). Si no hay conexión
+                // avisamos aquí; si el Apps Script devuelve error, por ahora
+                // no hay forma de saberlo desde el navegador — hay que
+                // resolverlo en el Code.gs (respuesta con CORS habilitado).
+                productoSelected.stock += cant; // revertimos el descuento local
+                baseDeDatosVentas.pop();
+                alert("❌ No se pudo conectar para registrar la venta. Revisa tu internet e inténtalo de nuevo.");
+            }
+
+            btn.disabled = false;
             document.getElementById('ventaVendedor').value = '';
             document.getElementById('ventaModelo').value = '';
             document.getElementById('ventaCantidad').value = 1;
@@ -411,27 +485,34 @@
             actualizarSelectoresDeProductos();
         }
 
-        function registrarConsignacion(e) {
+        async function registrarConsignacion(e) {
             e.preventDefault();
             const inputModelo = document.getElementById('consModelo');
             const nombreModelo = inputModelo.value.trim();
 
             const prod = inventarioProductos.find(p => p.modelo.toLowerCase() === nombreModelo.toLowerCase());
 
-            if (!prod) { 
-                alert("⚠️ Selecciona un modelo válido de la lista."); 
-                return; 
+            if (!prod) {
+                alert("⚠️ Selecciona un modelo válido de la lista.");
+                return;
             }
 
             const cant = parseInt(document.getElementById('consCantidad').value);
-            if (!document.getElementById('consCliente').value.trim()) { 
-                alert("⚠️ Ingresa el responsable."); 
-                return; 
+            if (!Number.isInteger(cant) || cant <= 0) {
+                alert("⚠️ La cantidad debe ser un número mayor a 0.");
+                return;
             }
-            if (prod.stock < cant) { 
-                alert("❌ Stock insuficiente para este préstamo."); 
-                return; 
+            if (!document.getElementById('consCliente').value.trim()) {
+                alert("⚠️ Ingresa el responsable.");
+                return;
             }
+            if (prod.stock < cant) {
+                alert("❌ Stock insuficiente para este préstamo.");
+                return;
+            }
+
+            const btn = document.getElementById('btnRegistrarConsignacion');
+            btn.disabled = true;
 
             prod.stock -= cant;
             let fecha = new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -442,59 +523,96 @@
                 id: Date.now(), fecha: fecha, cliente: document.getElementById('consCliente').value.trim(),
                 modelo: prod.modelo, sucursal: prod.sucursal, idxOrig: idx, filaExcel: prod.filaExcel, cantidad: cant, estado: "Pendiente"
             };
-            baseDeDatosConsignaciones.push(nuevaCons);
 
             const payload = {
                 tipoOperacion: "CONSIGNACION", subTipo: "DESPACHO", filaExcel: prod.filaExcel, fecha: fecha,
                 cliente: nuevaCons.cliente, modelo: nuevaCons.modelo, cantidad: cant, sucursal: prod.sucursal, estado: "Pendiente"
             };
 
-            enviarANube(payload);
-            alert(`🤝 Consignación registrada.\nInventario actualizado en la fila ${prod.filaExcel}.`);
+            const sincronizado = await enviarANube(payload);
+
+            if (sincronizado) {
+                baseDeDatosConsignaciones.push(nuevaCons);
+                alert(`🤝 Consignación registrada.\nInventario actualizado en la fila ${prod.filaExcel}.`);
+            } else {
+                prod.stock += cant;
+                alert("❌ No se pudo conectar para registrar la consignación. Revisa tu internet e inténtalo de nuevo.");
+            }
+
+            btn.disabled = false;
             document.getElementById('consCliente').value = '';
             document.getElementById('consModelo').value = '';
             document.getElementById('consCantidad').value = 1;
-            actualizarSelectoresDeProductos(); 
+            actualizarSelectoresDeProductos();
             renderizerConsignaciones();
         }
 
-        function alternarEstadoConsignacion(id) {
-            baseDeDatosConsignaciones = baseDeDatosConsignaciones.map(c => {
-                if (c.id === id) {
-                    c.estado = c.estado === 'Pendiente' ? 'Pagado' : 'Pendiente';
-                    const payload = {
-                        tipoOperacion: "CONSIGNACION", subTipo: "CAMBIO_ESTADO", fecha: c.fecha, cliente: c.cliente,
-                        modelo: c.modelo, cantidad: c.cantidad, sucursal: c.sucursal, estado: c.estado + " (MODIFICADO)"
-                    };
-                    enviarANube(payload);
-                }
-                return c;
-            });
-            renderizerConsignaciones();
-        }
-
-        function devolverEquiposAInventario(id) {
+        async function alternarEstadoConsignacion(id) {
             const c = baseDeDatosConsignaciones.find(x => x.id === id);
-            if (confirm(`¿Confirmas la devolución física de ${c.cantidad} unidades al inventario?`)) {
+            if (!c) return;
+            const nuevoEstado = c.estado === 'Pendiente' ? 'Pagado' : 'Pendiente';
+            const payload = {
+                tipoOperacion: "CONSIGNACION", subTipo: "CAMBIO_ESTADO", fecha: c.fecha, cliente: c.cliente,
+                modelo: c.modelo, cantidad: c.cantidad, sucursal: c.sucursal, estado: nuevoEstado + " (MODIFICADO)"
+            };
+            const sincronizado = await enviarANube(payload);
+            if (sincronizado) {
+                c.estado = nuevoEstado;
+            } else {
+                alert("❌ No se pudo actualizar el estado. Revisa tu internet e inténtalo de nuevo.");
+            }
+            renderizerConsignaciones();
+        }
+
+        async function devolverEquiposAInventario(id) {
+            const c = baseDeDatosConsignaciones.find(x => x.id === id);
+            if (!c) return;
+            if (!confirm(`¿Confirmas la devolución física de ${c.cantidad} unidades al inventario?`)) return;
+
+            const payload = {
+                tipoOperacion: "CONSIGNACION", subTipo: "DEVOLUCION", filaExcel: c.filaExcel, fecha: c.fecha,
+                cliente: c.cliente, modelo: c.modelo, cantidad: c.cantidad, sucursal: c.sucursal, estado: "Devuelto"
+            };
+
+            const sincronizado = await enviarANube(payload);
+            if (sincronizado) {
                 inventarioProductos[c.idxOrig].stock += c.cantidad;
-
-                const payload = {
-                    tipoOperacion: "CONSIGNACION", subTipo: "DEVOLUCION", filaExcel: c.filaExcel, fecha: c.fecha,
-                    cliente: c.cliente, modelo: c.modelo, cantidad: c.cantidad, sucursal: c.sucursal, estado: "Devuelto"
-                };
-
-                enviarANube(payload);
                 baseDeDatosConsignaciones = baseDeDatosConsignaciones.filter(x => x.id !== id);
                 alert(`🔙 Equipos reintegrados en la fila ${c.filaExcel}.`);
-                actualizarSelectoresDeProductos(); renderizerConsignaciones();
+                actualizarSelectoresDeProductos();
+            } else {
+                alert("❌ No se pudo registrar la devolución. Revisa tu internet e inténtalo de nuevo.");
             }
+            renderizerConsignaciones();
         }
 
-        // Petición HTTP POST enviada al Web App de Apps Script
-        function enviarANube(data) {
-            if (!URL_API_GLOBAL || URL_API_GLOBAL.includes("AQUÍ_PEGA")) return;
-            fetch(URL_API_GLOBAL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-                .catch(e => console.error("Error al sincronizar con la nube:", e));
+        // Petición HTTP POST enviada al Web App de Apps Script.
+        //
+        // ⚠️ NOTA IMPORTANTE: sigue usando mode:'no-cors' porque así estaba
+        // publicado el Apps Script. Con no-cors el navegador NO nos deja leer
+        // el contenido ni el código de estado de la respuesta — solo sabemos
+        // si hubo un fallo de RED (sin internet, URL caída), pero no si el
+        // Apps Script realmente procesó bien el dato o devolvió un error.
+        // Por eso el "sincronizado: true" de abajo es optimista: significa
+        // "se envió", no "se guardó correctamente en la hoja".
+        // Para saber de verdad si se guardó, el Code.gs necesita devolver
+        // una respuesta con cabeceras CORS habilitadas (doGet/doPost con
+        // ContentService y permisos correctos) y aquí quitar 'no-cors' —
+        // eso lo dejamos para cuando revisemos el Code.gs.
+        async function enviarANube(data) {
+            if (!URL_API_GLOBAL || URL_API_GLOBAL.includes("AQUÍ_PEGA")) return false;
+            try {
+                await fetch(URL_API_GLOBAL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                return true;
+            } catch (error) {
+                console.error("Error al sincronizar con la nube:", error);
+                return false;
+            }
         }
 
         function renderizerConsignaciones() {
@@ -511,17 +629,17 @@
                 div.innerHTML = `
                     <div class="flex items-start justify-between gap-2">
                         <div>
-                            <p class="font-bold text-[#EDEFF3] text-[15px]">${c.cliente}</p>
-                            <p class="text-[11px] text-[#8B95A7] font-data mt-0.5">${c.fecha}</p>
+                            <p class="font-bold text-[#EDEFF3] text-[15px]">${escapeHtml(c.cliente)}</p>
+                            <p class="text-[11px] text-[#8B95A7] font-data mt-0.5">${escapeHtml(c.fecha)}</p>
                         </div>
-                        <span class="shrink-0 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full ${badge}">${c.estado}</span>
+                        <span class="shrink-0 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full ${badge}">${escapeHtml(c.estado)}</span>
                     </div>
                     <div class="flex items-center justify-between text-sm border-t border-[#2A2F3A] pt-3">
                         <div>
-                            <p class="text-[#EDEFF3] font-medium">${c.modelo}</p>
-                            <p class="text-[#8B95A7] text-xs mt-0.5">Suc. ${c.sucursal} · Fila ${c.filaExcel}</p>
+                            <p class="text-[#EDEFF3] font-medium">${escapeHtml(c.modelo)}</p>
+                            <p class="text-[#8B95A7] text-xs mt-0.5">Suc. ${escapeHtml(c.sucursal)} · Fila ${escapeHtml(c.filaExcel)}</p>
                         </div>
-                        <span class="font-display font-bold text-lg text-[#9B8CFF] font-data">${c.cantidad} U.</span>
+                        <span class="font-display font-bold text-lg text-[#9B8CFF] font-data">${escapeHtml(c.cantidad)} U.</span>
                     </div>
                     <div class="flex gap-2 pt-1">
                         <button onclick="alternarEstadoConsignacion(${c.id})" class="tap flex-1 h-10 rounded-xl bg-[#242933] text-xs font-bold text-[#EDEFF3]">🔄 Cambiar pago</button>
@@ -542,15 +660,15 @@
                 div.className = 'rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-4 flex items-center justify-between gap-3';
                 div.innerHTML = `
                     <div class="min-w-0">
-                        <p class="font-bold text-[#EDEFF3] text-[15px] truncate">${p.modelo}</p>
+                        <p class="font-bold text-[#EDEFF3] text-[15px] truncate">${escapeHtml(p.modelo)}</p>
                         <div class="flex items-center gap-2 mt-1.5 flex-wrap">
-                            <span class="text-[10px] font-bold bg-[#242933] text-[#C4CAD4] px-2 py-0.5 rounded-full">${p.sucursal}</span>
-                            <span class="text-[10px] font-data text-[#5B6472]">Fila ${p.filaExcel}</span>
+                            <span class="text-[10px] font-bold bg-[#242933] text-[#C4CAD4] px-2 py-0.5 rounded-full">${escapeHtml(p.sucursal)}</span>
+                            <span class="text-[10px] font-data text-[#5B6472]">Fila ${escapeHtml(p.filaExcel)}</span>
                         </div>
                     </div>
                     <div class="text-right shrink-0">
-                        <p class="font-display font-bold text-[#F1F5F9] font-data">${p.stock} u.</p>
-                        <p class="text-xs text-[#FF6B6B] font-data font-bold mt-0.5">$${p.costoUsd.toFixed(2)}</p>
+                        <p class="font-display font-bold text-[#F1F5F9] font-data">${escapeHtml(p.stock)} u.</p>
+                        <p class="text-xs text-[#FF6B6B] font-data font-bold mt-0.5">$${escapeHtml((Number(p.costoUsd) || 0).toFixed(2))}</p>
                     </div>`;
                 cont.appendChild(div);
             });
@@ -558,6 +676,18 @@
 
         function cambiarPestana(pestana) {
             if (pestana === 'dueno' || pestana === 'reportes') {
+                // ⚠️ Este PIN es solo una barrera de interfaz, NO seguridad
+                // real: cualquiera que abra el código fuente o la consola del
+                // navegador puede ver "1234" o llamar a cambiarPestana('dueno')
+                // directamente sin que se lo pidan. Además, los costos
+                // (costoUsd) ya viajan al celular de CUALQUIER usuario desde
+                // el primer fetch al Apps Script, PIN o no PIN — están en la
+                // pestaña de Red (Network) del navegador aunque la sección
+                // esté oculta. Si el costo/margen debe ser confidencial de
+                // verdad para los vendedores, hay que separarlo en el Code.gs:
+                // un endpoint público sin costoUsd para "Vender/Consignar", y
+                // uno protegido (con token, no solo PIN visual) para "Dueño".
+                // Lo vemos cuando revisemos el Code.gs.
                 if (prompt("🔑 PRIVADO - Ingrese PIN del Administrador:") !== PIN_SECRETO) { alert("PIN inválido."); return; }
             }
             ['vendedor', 'consignacion', 'dueno', 'reportes'].forEach(id => {
@@ -590,10 +720,10 @@
                 div.className = 'rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-4';
                 div.innerHTML = `
                     <div class="flex items-center justify-between">
-                        <p class="font-bold text-[#EDEFF3] text-[15px]">${v.vendedor}</p>
-                        <span class="text-[10px] font-bold bg-[#242933] text-[#C4CAD4] px-2 py-0.5 rounded-full">${v.tipo}</span>
+                        <p class="font-bold text-[#EDEFF3] text-[15px]">${escapeHtml(v.vendedor)}</p>
+                        <span class="text-[10px] font-bold bg-[#242933] text-[#C4CAD4] px-2 py-0.5 rounded-full">${escapeHtml(v.tipo)}</span>
                     </div>
-                    <p class="text-xs text-[#8B95A7] mt-1">${v.modelo} · ${v.cantidad} u.</p>
+                    <p class="text-xs text-[#8B95A7] mt-1">${escapeHtml(v.modelo)} · ${escapeHtml(v.cantidad)} u.</p>
                     <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-[#2A2F3A] text-center">
                         <div><span class="text-[9px] text-[#8B95A7] uppercase block">Total</span><span class="font-data font-bold text-[#F1F5F9]">${fmt(v.totalCobrado)}</span></div>
                         <div><span class="text-[9px] text-[#4C8DFF] uppercase block">Ganancia</span><span class="font-data font-bold text-[#4C8DFF]">${fmt(v.gananciaRegistrada)}</span></div>
