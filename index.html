@@ -17,6 +17,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
     <style>
         :root { color-scheme: dark; }
         html, body { background:#0F1115; }
@@ -71,12 +72,21 @@
                         class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] placeholder:text-[#5B6472] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
                 </div>
 
-                <!-- BUSCADOR RÁPIDO DE MODELOS -->
+                <!-- BUSCADOR RÁPIDO DE MODELOS CON IA -->
                 <div class="relative">
-                    <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo (Escribe para buscar rápido)</label>
-                    <input type="text" id="ventaModelo" oninput="onEscribirModeloVenta()" onfocus="onEscribirModeloVenta()" placeholder="Escribe el modelo (ej: iPhone 13)..." autocomplete="off" required
-                        class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF] placeholder:text-[#5B6472]">
-                    <div id="sugerenciasVenta" class="hidden absolute left-0 right-0 z-30 mt-1 bg-[#1B2029] border border-[#2A2F3A] rounded-xl max-h-60 overflow-y-auto shadow-2xl"></div>
+                   <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo (toca para seleccionar todo, escribe para buscar)</label>
+                   <div class="relative">
+                       <input type="text" id="ventaModelo" oninput="onEscribirModeloVenta()" onfocus="onFocoModeloVenta(event)" placeholder="Escribe el modelo (ej: iPhone 13)..." autocomplete="off" required
+                       class="w-full h-12 pl-4 pr-10 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF] placeholder:text-[#5B6472]">
+                       <button type="button" onclick="limpiarBusquedaModelo('ventaModelo')" class="tap absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-[#5B6472] active:text-[#EDEFF3]" aria-label="Borrar búsqueda">✕</button>
+                   </div>
+                   <div id="sugerenciasVenta" class="hidden absolute left-0 right-0 z-30 mt-1 bg-[#1B2029] border border-[#2A2F3A] rounded-xl max-h-60 overflow-y-auto shadow-2xl"></div>
+
+                   <!-- BOTÓN Y RESULTADO DE IA -->
+                   <button type="button" onclick="ejecutarConsultaIA()" class="tap mt-2 w-full bg-[#182236] text-[#4C8DFF] border border-[#4C8DFF]/40 h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2">
+                       ✨ Consultar ficha técnica y argumentos con IA
+                   </button>
+                   <div id="resultadoIA" class="mt-2 hidden"></div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
@@ -143,9 +153,12 @@
                         class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] placeholder:text-[#5B6472] focus:outline-none focus:ring-2 focus:ring-[#9B8CFF]">
                 </div>
                 <div class="relative">
-                    <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo del stock</label>
-                    <input type="text" id="consModelo" oninput="onEscribirModeloConsignacion()" onfocus="onEscribirModeloConsignacion()" placeholder="Escribe el modelo..." autocomplete="off" required
-                        class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#9B8CFF] placeholder:text-[#5B6472]">
+                    <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo del stock (toca para seleccionar todo)</label>
+                    <div class="relative">
+                        <input type="text" id="consModelo" oninput="onEscribirModeloConsignacion()" onfocus="onFocoModeloConsignacion(event)" placeholder="Escribe el modelo..." autocomplete="off" required
+                            class="w-full h-12 pl-4 pr-10 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#9B8CFF] placeholder:text-[#5B6472]">
+                        <button type="button" onclick="limpiarBusquedaModelo('consModelo')" class="tap absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-[#5B6472] active:text-[#EDEFF3]" aria-label="Borrar búsqueda">✕</button>
+                    </div>
                     <div id="sugerenciasConsignacion" class="hidden absolute left-0 right-0 z-30 mt-1 bg-[#1B2029] border border-[#2A2F3A] rounded-xl max-h-60 overflow-y-auto shadow-2xl"></div>
                 </div>
                 <div>
@@ -218,19 +231,51 @@
     </nav>
 
     <script>
+        // CONFIGURACIÓN DE IA (GEMINI)
+        const GEMINI_API_KEY = "AQ.Ab8RN6KVkKQtmOgSVy0tj12XUMxuG3TY78WByIAi8FFEO2Tj2Q"; 
+
+        function ejecutarConsultaIA() {
+            const modelo = document.getElementById('ventaModelo').value.trim();
+            if (!modelo) {
+                alert("⚠️ Ingresa o selecciona un modelo primero.");
+                return;
+            }
+            consultarBeneficiosIA(modelo);
+        }
+
+        async function consultarBeneficiosIA(modelo) {
+            const contenedorResultado = document.getElementById('resultadoIA');
+            contenedorResultado.classList.remove('hidden');
+            contenedorResultado.innerHTML = "⏳ Buscando ficha técnica y beneficios en internet...";
+
+            const promptText = `Actúa como un experto en ventas de teléfonos móviles. 
+            Busca información en internet sobre el modelo: "${modelo}".
+            Proporciona:
+            1. Especificaciones clave técnicas (Procesador, Cámaras, Batería, Pantalla).
+            2. 3 Beneficios comerciales claros para convencer a un comprador.
+            3. Asegúrate de verificar los datos en la web.`;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: promptText }] }],
+                        tools: [{ google_search: {} }] 
+                    })
+                });
+
+                const data = await response.json();
+                const respuestaTexto = data.candidates?.[0]?.content?.parts?.[0]?.text || "No se obtuvieron resultados.";
+                
+                contenedorResultado.innerHTML = `<div class="p-4 bg-[#1B2029] rounded-xl border border-[#4C8DFF]/30 text-sm whitespace-pre-line">${respuestaTexto}</div>`;
+            } catch (error) {
+                console.error("Error al consultar la IA:", error);
+                contenedorResultado.innerHTML = "<div class='p-3 bg-red-500/10 text-red-400 rounded-xl text-xs'>❌ No se pudo obtener la información. Revisa tu conexión o API Key.</div>";
+            }
+        }
+
         // URL DEL WEB APP EJECUTABLE DE GOOGLE APPS SCRIPT
-        // ⚠️ IMPORTANTE: después de pegar el nuevo Code.gs y publicarlo como
-        // "Nueva implementación", Google te dará una URL /exec. Reemplaza la
-        // de abajo por esa URL nueva (puede ser la misma si reutilizas la
-        // implementación existente, pero normalmente cambia).
-        //
-        // ⚠️ NOTA DE SEGURIDAD: esta URL y TODO este archivo son públicos y
-        // visibles para cualquiera que abra la app (ver código fuente / DevTools).
-        // Cualquiera con esta URL puede hacer POST directo al Apps Script sin pasar
-        // por esta interfaz. Cuando revisemos el Code.gs, conviene agregar un
-        // token compartido (ej. un campo "clave" en el payload) que el backend
-        // valide antes de escribir en la hoja, para que la URL sola no sea
-        // suficiente para modificar datos.
         const URL_API_GLOBAL = "https://script.google.com/macros/s/AKfycbzhxLBhg1b4qzESuXbLhccyTPHOQqttfi3Ctmjd5iWo274qSxkOKihz7SxYU8bG7A6PNw/exec";
 
         let inventarioProductos = [];
@@ -241,28 +286,23 @@
 
         const fmt = (n) => (Number(n) || 0).toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        // Escapa texto antes de insertarlo como HTML. Los datos vienen de tu
-        // Google Sheets (modelo, sucursal, cliente, etc.) y antes se insertaban
-        // directo con innerHTML: si alguna celda de la hoja llega a tener texto
-        // con < > o comillas, podía romper el layout o ejecutar HTML/JS no
-        // deseado (XSS). Ahora todo dato dinámico pasa por aquí primero.
         function escapeHtml(texto) {
             const div = document.createElement('div');
             div.textContent = String(texto ?? '');
             return div.innerHTML;
         }
 
-        // Guarda los últimos totales calculados como NÚMEROS (no como texto
-        // formateado). Antes, registrarVenta() releía el texto ya formateado
-        // en pantalla (ej. "1.234,56" con formato es-BO) y le quitaba las
-        // comas asumiendo formato en inglés — eso corrompe cualquier total
-        // de 1.000 Bs o más. Ahora se guarda el número real en cuanto se
-        // calcula y se usa directamente al registrar la venta.
         let ultimoTotalCobrar = 0;
         let ultimaGananciaPura = 0;
         let ultimaComisionVendedor = 0;
 
-        // Carga inicial del inventario desde Google Sheets
+        const CLAVE_CACHE_INVENTARIO = 'moonerp_inventario_cache_v1';
+
+        // Carga inicial del inventario desde Google Sheets.
+        // Estrategia "mostrar caché primero, actualizar después": si hay un
+        // inventario guardado de la última vez, se pinta al instante para que
+        // la app se sienta rápida al entrar, y mientras tanto se pide la versión
+        // fresca al Apps Script en segundo plano.
         function cargarInventarioDesdeGoogle() {
             const status = document.getElementById('statusConexion');
             if (!URL_API_GLOBAL || URL_API_GLOBAL.includes("AQUÍ_PEGA")) {
@@ -271,14 +311,37 @@
                 return;
             }
 
-            fetch(URL_API_GLOBAL)
+            try {
+                const cacheado = localStorage.getItem(CLAVE_CACHE_INVENTARIO);
+                if (cacheado) {
+                    const datosCache = JSON.parse(cacheado);
+                    if (Array.isArray(datosCache) && datosCache.length > 0) {
+                        inventarioProductos = datosCache;
+                        actualizarSelectoresDeProductos();
+                        renderizarInventarioDueno();
+                        status.className = "shrink-0 bg-amber-500/15 text-amber-400 px-2.5 py-1 rounded-full text-[10px] font-bold font-data border border-amber-500/20";
+                        status.textContent = "Actualizando…";
+                    }
+                }
+            } catch (e) {
+                console.warn("No se pudo leer la caché de inventario:", e);
+            }
+
+            // Límite de 15s: si el Apps Script tarda demasiado, se avisa en vez
+            // de dejar la app "colgada" esperando indefinidamente.
+            const controlador = new AbortController();
+            const limiteTiempo = setTimeout(() => controlador.abort(), 15000);
+
+            fetch(URL_API_GLOBAL, { signal: controlador.signal })
                 .then(response => {
+                    clearTimeout(limiteTiempo);
                     if (!response.ok) throw new Error("HTTP " + response.status);
                     return response.json();
                 })
                 .then(data => {
                     if (!Array.isArray(data)) throw new Error("Respuesta inesperada del servidor");
                     inventarioProductos = data;
+                    try { localStorage.setItem(CLAVE_CACHE_INVENTARIO, JSON.stringify(data)); } catch (e) { /* almacenamiento lleno u otro problema, se ignora */ }
                     actualizarSelectoresDeProductos();
                     renderizarInventarioDueno();
 
@@ -287,21 +350,25 @@
                     document.getElementById('iconoLuna').classList.add('moon-synced');
                 })
                 .catch(error => {
+                    clearTimeout(limiteTiempo);
                     console.error("Error al conectar con Google Sheets:", error);
-                    status.className = "shrink-0 bg-red-500/15 text-red-400 px-2.5 py-1 rounded-full text-[10px] font-bold font-data border border-red-500/20";
-                    status.textContent = "Error de red";
+                    if (inventarioProductos.length > 0) {
+                        // Ya se mostró algo desde caché: se avisa pero se deja seguir trabajando.
+                        status.className = "shrink-0 bg-amber-500/15 text-amber-400 px-2.5 py-1 rounded-full text-[10px] font-bold font-data border border-amber-500/20";
+                        status.textContent = error.name === 'AbortError' ? "Sin respuesta (caché)" : "Sin conexión (caché)";
+                    } else {
+                        status.className = "shrink-0 bg-red-500/15 text-red-400 px-2.5 py-1 rounded-full text-[10px] font-bold font-data border border-red-500/20";
+                        status.textContent = error.name === 'AbortError' ? "Tardó demasiado" : "Error de red";
+                    }
                 });
         }
 
-        // Ya no se necesita <datalist> (no funciona bien en iPhone / apps agregadas
-        // a la pantalla de inicio). Se mantiene la función solo para no romper
-        // otras llamadas existentes en el código.
         function actualizarSelectoresDeProductos() {
             onEscribirModeloVenta();
             onEscribirModeloConsignacion();
         }
 
-        // ===== BUSCADOR DE MODELOS CON SUGERENCIAS (funciona en cualquier celular) =====
+        // ===== BUSCADOR DE MODELOS CON SUGERENCIAS =====
         let temporizadorBusqueda = null;
         function renderizarSugerencias(idContenedor, idInput, callbackAlSeleccionar) {
             const cont = document.getElementById(idContenedor);
@@ -318,7 +385,7 @@
             cont.innerHTML = '';
             coincidencias.forEach(p => {
                 const item = document.createElement('div');
-                item.className = 'px-4 py-2.5 border-b border-[#2A2F3A] last:border-b-0 active:bg-[#242933]';
+                item.className = 'px-4 py-2.5 border-b border-[#2A2F3A] last:border-b-0 active:bg-[#242933] cursor-pointer';
                 item.innerHTML = `
                     <p class="text-[14px] text-[#EDEFF3] font-medium">${escapeHtml(p.modelo)}</p>
                     <p class="text-[11px] text-[#8B95A7] font-data">Stock: ${escapeHtml(p.stock)} u. · Suc: ${escapeHtml(p.sucursal)}</p>`;
@@ -333,15 +400,6 @@
             cont.classList.remove('hidden');
         }
 
-        // Pequeño debounce (120ms) para que buscar no recalcule/rerenderice
-        // en cada tecla si el usuario escribe rápido en un celular gama baja.
-        function conDebounce(fn) {
-            return function (...args) {
-                clearTimeout(temporizadorBusqueda);
-                temporizadorBusqueda = setTimeout(() => fn(...args), 120);
-            };
-        }
-
         function onEscribirModeloVenta() {
             renderizarSugerencias('sugerenciasVenta', 'ventaModelo', forzarAutofillYRecalcular);
             forzarAutofillYRecalcular();
@@ -351,7 +409,30 @@
             renderizarSugerencias('sugerenciasConsignacion', 'consModelo', null);
         }
 
-        // Cierra los menús de sugerencias al tocar fuera de ellos
+        // Al tocar el campo (sin escribir todavía): selecciona todo el texto para
+        // poder reemplazarlo de inmediato, y solo muestra sugerencias — sin recalcular
+        // precios, para no perder un precio manual ya cargado.
+        function onFocoModeloVenta(event) {
+            event.target.select();
+            renderizarSugerencias('sugerenciasVenta', 'ventaModelo', forzarAutofillYRecalcular);
+        }
+
+        function onFocoModeloConsignacion(event) {
+            event.target.select();
+            renderizarSugerencias('sugerenciasConsignacion', 'consModelo', null);
+        }
+
+        // Botón "✕": borra el buscador de un toque para pasar rápido a otro modelo.
+        function limpiarBusquedaModelo(idInput) {
+            const input = document.getElementById(idInput);
+            input.value = '';
+            input.focus();
+            const idSugerencias = idInput === 'ventaModelo' ? 'sugerenciasVenta' : 'sugerenciasConsignacion';
+            document.getElementById(idSugerencias).classList.add('hidden');
+            document.getElementById(idSugerencias).innerHTML = '';
+            if (idInput === 'ventaModelo') resetearPreciosVenta();
+        }
+
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#ventaModelo') && !e.target.closest('#sugerenciasVenta')) {
                 document.getElementById('sugerenciasVenta').classList.add('hidden');
@@ -366,7 +447,6 @@
             actualizarPreciosVenta(false);
         }
 
-        // Cálculo dinámico de totales, ganancias y comisiones
         function actualizarPreciosVenta(manual = false) {
             const inputModelo = document.getElementById('ventaModelo');
             if (!inputModelo) return;
@@ -374,21 +454,31 @@
             const nombreModeloIngresado = inputModelo.value.trim();
             const productoSelected = inventarioProductos.find(p => p.modelo.toLowerCase() === nombreModeloIngresado.toLowerCase());
 
-            if (!productoSelected) return;
+            // Si el texto no coincide con ningún producto del inventario (todavía
+            // se está escribiendo, o se borró la búsqueda), no dejar en pantalla
+            // el Total/Ganancia del producto anterior: eso es lo que hacía parecer
+            // que la multiplicación "fallaba". Se limpia a 0 hasta elegir un modelo válido.
+            if (!productoSelected) {
+                resetearPreciosVenta();
+                return;
+            }
 
             const costo = parseFloat(productoSelected.costoUsd) || 0;
-            const cant = parseInt(document.getElementById('ventaCantidad').value) || 0;
+            const cantRaw = document.getElementById('ventaCantidad').value;
+            const cant = Number.isFinite(parseInt(cantRaw, 10)) ? Math.max(0, parseInt(cantRaw, 10)) : 0;
             const tc = parseFloat(document.getElementById('ventaTipoCambio').value) || 0;
             const inp = document.getElementById('ventaPrecioCobrado');
 
             if (manual) inp.dataset.manual = "true";
             if (inp.dataset.manual !== "true") inp.value = (costo * tc).toFixed(2);
 
-            let total = (parseFloat(inp.value) || 0) * cant;
-            let ganancia = total - (costo * tc * cant);
-            let com = ganancia > 0 ? ganancia * TASA_COMISION : 0;
+            // "Precio cobrado" es el precio POR UNIDAD; el total se obtiene
+            // multiplicando ese precio unitario por la cantidad.
+            const precioUnitario = parseFloat(inp.value) || 0;
+            const total = precioUnitario * cant;
+            const ganancia = total - (costo * tc * cant);
+            const com = ganancia > 0 ? ganancia * TASA_COMISION : 0;
 
-            // Guardamos los números reales, no solo el texto mostrado.
             ultimoTotalCobrar = total;
             ultimaGananciaPura = ganancia;
             ultimaComisionVendedor = com;
@@ -398,7 +488,19 @@
             document.getElementById('txtComisionVendedor').textContent = fmt(com);
         }
 
-        // Registro de venta y envío POST a Google Sheets
+        // Limpia el bloque de precios (Total / Ganancia / Comisión) y el campo
+        // de precio cobrado, para cuando no hay un modelo válido seleccionado.
+        function resetearPreciosVenta() {
+            const inp = document.getElementById('ventaPrecioCobrado');
+            if (inp) { inp.value = ''; inp.dataset.manual = 'false'; }
+            ultimoTotalCobrar = 0;
+            ultimaGananciaPura = 0;
+            ultimaComisionVendedor = 0;
+            document.getElementById('txtTotalCobrar').textContent = fmt(0);
+            document.getElementById('txtGananciaPura').textContent = fmt(0);
+            document.getElementById('txtComisionVendedor').textContent = fmt(0);
+        }
+
         async function registrarVenta(e) {
             e.preventDefault();
             const inputModelo = document.getElementById('ventaModelo');
@@ -432,7 +534,7 @@
             }
 
             const btn = document.getElementById('btnRegistrarVenta');
-            btn.disabled = true; // evita doble envío por doble tap
+            btn.disabled = true;
 
             productoSelected.stock -= cant;
             const total = ultimoTotalCobrar;
@@ -467,12 +569,7 @@
             if (sincronizado) {
                 alert(`💰 Venta registrada con éxito.\nSe actualizará la fila ${productoSelected.filaExcel} en Google Sheets.`);
             } else {
-                // Con mode:'no-cors' no podemos leer la respuesta real del Apps
-                // Script (ver nota junto a enviarANube). Si no hay conexión
-                // avisamos aquí; si el Apps Script devuelve error, por ahora
-                // no hay forma de saberlo desde el navegador — hay que
-                // resolverlo en el Code.gs (respuesta con CORS habilitado).
-                productoSelected.stock += cant; // revertimos el descuento local
+                productoSelected.stock += cant;
                 baseDeDatosVentas.pop();
                 alert("❌ No se pudo conectar para registrar la venta. Revisa tu internet e inténtalo de nuevo.");
             }
@@ -586,19 +683,6 @@
             renderizerConsignaciones();
         }
 
-        // Petición HTTP POST enviada al Web App de Apps Script.
-        //
-        // ⚠️ NOTA IMPORTANTE: sigue usando mode:'no-cors' porque así estaba
-        // publicado el Apps Script. Con no-cors el navegador NO nos deja leer
-        // el contenido ni el código de estado de la respuesta — solo sabemos
-        // si hubo un fallo de RED (sin internet, URL caída), pero no si el
-        // Apps Script realmente procesó bien el dato o devolvió un error.
-        // Por eso el "sincronizado: true" de abajo es optimista: significa
-        // "se envió", no "se guardó correctamente en la hoja".
-        // Para saber de verdad si se guardó, el Code.gs necesita devolver
-        // una respuesta con cabeceras CORS habilitadas (doGet/doPost con
-        // ContentService y permisos correctos) y aquí quitar 'no-cors' —
-        // eso lo dejamos para cuando revisemos el Code.gs.
         async function enviarANube(data) {
             if (!URL_API_GLOBAL || URL_API_GLOBAL.includes("AQUÍ_PEGA")) return false;
             try {
@@ -676,18 +760,6 @@
 
         function cambiarPestana(pestana) {
             if (pestana === 'dueno' || pestana === 'reportes') {
-                // ⚠️ Este PIN es solo una barrera de interfaz, NO seguridad
-                // real: cualquiera que abra el código fuente o la consola del
-                // navegador puede ver "1234" o llamar a cambiarPestana('dueno')
-                // directamente sin que se lo pidan. Además, los costos
-                // (costoUsd) ya viajan al celular de CUALQUIER usuario desde
-                // el primer fetch al Apps Script, PIN o no PIN — están en la
-                // pestaña de Red (Network) del navegador aunque la sección
-                // esté oculta. Si el costo/margen debe ser confidencial de
-                // verdad para los vendedores, hay que separarlo en el Code.gs:
-                // un endpoint público sin costoUsd para "Vender/Consignar", y
-                // uno protegido (con token, no solo PIN visual) para "Dueño".
-                // Lo vemos cuando revisemos el Code.gs.
                 if (prompt("🔑 PRIVADO - Ingrese PIN del Administrador:") !== PIN_SECRETO) { alert("PIN inválido."); return; }
             }
             ['vendedor', 'consignacion', 'dueno', 'reportes'].forEach(id => {
