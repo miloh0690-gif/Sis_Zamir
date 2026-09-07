@@ -76,9 +76,9 @@
                 <div class="relative">
                    <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo (toca para seleccionar todo, escribe para buscar)</label>
                    <div class="relative">
-                       <input type="text" id="ventaModelo" oninput="onEscribirModeloVenta()" onfocus="onFocoModeloVenta(event)" placeholder="Escribe el modelo (ej: iPhone 13)..." autocomplete="off" required
+                       <input type="text" id="ventaModelo" oninput="onEscribirModeloVenta()" onfocus="this.select(); onEscribirModeloVenta();" placeholder="Escribe el modelo (ej: iPhone 13)..." autocomplete="off" required
                        class="w-full h-12 pl-4 pr-10 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF] placeholder:text-[#5B6472]">
-                       <button type="button" onclick="limpiarBusquedaModelo('ventaModelo')" class="tap absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-[#5B6472] active:text-[#EDEFF3]" aria-label="Borrar búsqueda">✕</button>
+                       <button type="button" onclick="document.getElementById('ventaModelo').value=''; onEscribirModeloVenta();" class="tap absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-[#5B6472] active:text-[#EDEFF3]" aria-label="Borrar búsqueda">✕</button>
                    </div>
                    <div id="sugerenciasVenta" class="hidden absolute left-0 right-0 z-30 mt-1 bg-[#1B2029] border border-[#2A2F3A] rounded-xl max-h-60 overflow-y-auto shadow-2xl"></div>
 
@@ -155,9 +155,9 @@
                 <div class="relative">
                     <label class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo del stock (toca para seleccionar todo)</label>
                     <div class="relative">
-                        <input type="text" id="consModelo" oninput="onEscribirModeloConsignacion()" onfocus="onFocoModeloConsignacion(event)" placeholder="Escribe el modelo..." autocomplete="off" required
+                        <input type="text" id="consModelo" oninput="onEscribirModeloConsignacion()" onfocus="this.select(); onEscribirModeloConsignacion();" placeholder="Escribe el modelo..." autocomplete="off" required
                             class="w-full h-12 pl-4 pr-10 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#9B8CFF] placeholder:text-[#5B6472]">
-                        <button type="button" onclick="limpiarBusquedaModelo('consModelo')" class="tap absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-[#5B6472] active:text-[#EDEFF3]" aria-label="Borrar búsqueda">✕</button>
+                        <button type="button" onclick="document.getElementById('consModelo').value=''; onEscribirModeloConsignacion();" class="tap absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-[#5B6472] active:text-[#EDEFF3]" aria-label="Borrar búsqueda">✕</button>
                     </div>
                     <div id="sugerenciasConsignacion" class="hidden absolute left-0 right-0 z-30 mt-1 bg-[#1B2029] border border-[#2A2F3A] rounded-xl max-h-60 overflow-y-auto shadow-2xl"></div>
                 </div>
@@ -230,6 +230,7 @@
         </div>
     </nav>
 
+    <!-- SCRIPT JS INTEGRADO -->
     <script>
         // CONFIGURACIÓN DE IA (GEMINI)
         const GEMINI_API_KEY = "AQ.Ab8RN6KVkKQtmOgSVy0tj12XUMxuG3TY78WByIAi8FFEO2Tj2Q"; 
@@ -246,32 +247,64 @@
         async function consultarBeneficiosIA(modelo) {
             const contenedorResultado = document.getElementById('resultadoIA');
             contenedorResultado.classList.remove('hidden');
-            contenedorResultado.innerHTML = "⏳ Buscando ficha técnica y beneficios en internet...";
+            contenedorResultado.innerHTML = `
+                <div class="p-4 bg-[#1B2029] rounded-xl border border-[#4C8DFF]/30 text-xs text-[#8B95A7] flex items-center gap-2">
+                    <span class="animate-spin">⏳</span> Analizando ficha técnica y argumentos para <strong>${escapeHtml(modelo)}</strong>...
+                </div>`;
 
-            const promptText = `Actúa como un experto en ventas de teléfonos móviles. 
-            Busca información en internet sobre el modelo: "${modelo}".
-            Proporciona:
-            1. Especificaciones clave técnicas (Procesador, Cámaras, Batería, Pantalla).
-            2. 3 Beneficios comerciales claros para convencer a un comprador.
-            3. Asegúrate de verificar los datos en la web.`;
+            const promptText = `Actúa como un experto asesor de ventas de teléfonos móviles. 
+Proporciona la siguiente información estructurada para el modelo: "${modelo}":
+
+1. 📱 ESPECIFICACIONES CLAVE:
+   - Procesador
+   - Pantalla
+   - Cámaras
+   - Batería y Carga
+
+2. 🚀 3 ARGUMENTOS DE VENTA (Puntos fuertes para convencer al cliente):
+   - Argumento 1
+   - Argumento 2
+   - Argumento 3`;
 
             try {
+                // Se utiliza el endpoint estándar de Gemini 1.5 Flash sin la herramienta google_search obligatoria de pago
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: promptText }] }],
-                        tools: [{ google_search: {} }] 
+                        contents: [{ parts: [{ text: promptText }] }]
                     })
                 });
 
                 const data = await response.json();
-                const respuestaTexto = data.candidates?.[0]?.content?.parts?.[0]?.text || "No se obtuvieron resultados.";
-                
-                contenedorResultado.innerHTML = `<div class="p-4 bg-[#1B2029] rounded-xl border border-[#4C8DFF]/30 text-sm whitespace-pre-line">${respuestaTexto}</div>`;
+
+                if (data.error) {
+                    contenedorResultado.innerHTML = `
+                        <div class="p-3 bg-red-500/10 text-red-400 rounded-xl text-xs border border-red-500/20">
+                            ❌ Error de API: ${escapeHtml(data.error.message)}
+                        </div>`;
+                    return;
+                }
+
+                const respuestaTexto = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (respuestaTexto) {
+                    contenedorResultado.innerHTML = `
+                        <div class="p-4 bg-[#1B2029] rounded-xl border border-[#4C8DFF]/40 text-xs leading-relaxed text-[#EDEFF3] whitespace-pre-line shadow-lg">
+                            ${escapeHtml(respuestaTexto)}
+                        </div>`;
+                } else {
+                    contenedorResultado.innerHTML = `
+                        <div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl text-xs border border-amber-500/20">
+                            ⚠️ No se obtuvo respuesta del modelo para este dispositivo. Intenta especificando la marca (ej: Xiaomi Redmi Note 13).
+                        </div>`;
+                }
             } catch (error) {
                 console.error("Error al consultar la IA:", error);
-                contenedorResultado.innerHTML = "<div class='p-3 bg-red-500/10 text-red-400 rounded-xl text-xs'>❌ No se pudo obtener la información. Revisa tu conexión o API Key.</div>";
+                contenedorResultado.innerHTML = `
+                    <div class="p-3 bg-red-500/10 text-red-400 rounded-xl text-xs border border-red-500/20">
+                        ❌ Error de conexión al consultar la IA. Verifica tu conexión a internet o la validez de tu clave API.
+                    </div>`;
             }
         }
 
@@ -296,13 +329,7 @@
         let ultimaGananciaPura = 0;
         let ultimaComisionVendedor = 0;
 
-        const CLAVE_CACHE_INVENTARIO = 'moonerp_inventario_cache_v1';
-
-        // Carga inicial del inventario desde Google Sheets.
-        // Estrategia "mostrar caché primero, actualizar después": si hay un
-        // inventario guardado de la última vez, se pinta al instante para que
-        // la app se sienta rápida al entrar, y mientras tanto se pide la versión
-        // fresca al Apps Script en segundo plano.
+        // Carga inicial del inventario desde Google Sheets
         function cargarInventarioDesdeGoogle() {
             const status = document.getElementById('statusConexion');
             if (!URL_API_GLOBAL || URL_API_GLOBAL.includes("AQUÍ_PEGA")) {
@@ -311,37 +338,14 @@
                 return;
             }
 
-            try {
-                const cacheado = localStorage.getItem(CLAVE_CACHE_INVENTARIO);
-                if (cacheado) {
-                    const datosCache = JSON.parse(cacheado);
-                    if (Array.isArray(datosCache) && datosCache.length > 0) {
-                        inventarioProductos = datosCache;
-                        actualizarSelectoresDeProductos();
-                        renderizarInventarioDueno();
-                        status.className = "shrink-0 bg-amber-500/15 text-amber-400 px-2.5 py-1 rounded-full text-[10px] font-bold font-data border border-amber-500/20";
-                        status.textContent = "Actualizando…";
-                    }
-                }
-            } catch (e) {
-                console.warn("No se pudo leer la caché de inventario:", e);
-            }
-
-            // Límite de 15s: si el Apps Script tarda demasiado, se avisa en vez
-            // de dejar la app "colgada" esperando indefinidamente.
-            const controlador = new AbortController();
-            const limiteTiempo = setTimeout(() => controlador.abort(), 15000);
-
-            fetch(URL_API_GLOBAL, { signal: controlador.signal })
+            fetch(URL_API_GLOBAL)
                 .then(response => {
-                    clearTimeout(limiteTiempo);
                     if (!response.ok) throw new Error("HTTP " + response.status);
                     return response.json();
                 })
                 .then(data => {
                     if (!Array.isArray(data)) throw new Error("Respuesta inesperada del servidor");
                     inventarioProductos = data;
-                    try { localStorage.setItem(CLAVE_CACHE_INVENTARIO, JSON.stringify(data)); } catch (e) { /* almacenamiento lleno u otro problema, se ignora */ }
                     actualizarSelectoresDeProductos();
                     renderizarInventarioDueno();
 
@@ -350,16 +354,9 @@
                     document.getElementById('iconoLuna').classList.add('moon-synced');
                 })
                 .catch(error => {
-                    clearTimeout(limiteTiempo);
                     console.error("Error al conectar con Google Sheets:", error);
-                    if (inventarioProductos.length > 0) {
-                        // Ya se mostró algo desde caché: se avisa pero se deja seguir trabajando.
-                        status.className = "shrink-0 bg-amber-500/15 text-amber-400 px-2.5 py-1 rounded-full text-[10px] font-bold font-data border border-amber-500/20";
-                        status.textContent = error.name === 'AbortError' ? "Sin respuesta (caché)" : "Sin conexión (caché)";
-                    } else {
-                        status.className = "shrink-0 bg-red-500/15 text-red-400 px-2.5 py-1 rounded-full text-[10px] font-bold font-data border border-red-500/20";
-                        status.textContent = error.name === 'AbortError' ? "Tardó demasiado" : "Error de red";
-                    }
+                    status.className = "shrink-0 bg-red-500/15 text-red-400 px-2.5 py-1 rounded-full text-[10px] font-bold font-data border border-red-500/20";
+                    status.textContent = "Error de red";
                 });
         }
 
@@ -369,7 +366,6 @@
         }
 
         // ===== BUSCADOR DE MODELOS CON SUGERENCIAS =====
-        let temporizadorBusqueda = null;
         function renderizarSugerencias(idContenedor, idInput, callbackAlSeleccionar) {
             const cont = document.getElementById(idContenedor);
             const texto = document.getElementById(idInput).value.trim().toLowerCase();
@@ -409,30 +405,6 @@
             renderizarSugerencias('sugerenciasConsignacion', 'consModelo', null);
         }
 
-        // Al tocar el campo (sin escribir todavía): selecciona todo el texto para
-        // poder reemplazarlo de inmediato, y solo muestra sugerencias — sin recalcular
-        // precios, para no perder un precio manual ya cargado.
-        function onFocoModeloVenta(event) {
-            event.target.select();
-            renderizarSugerencias('sugerenciasVenta', 'ventaModelo', forzarAutofillYRecalcular);
-        }
-
-        function onFocoModeloConsignacion(event) {
-            event.target.select();
-            renderizarSugerencias('sugerenciasConsignacion', 'consModelo', null);
-        }
-
-        // Botón "✕": borra el buscador de un toque para pasar rápido a otro modelo.
-        function limpiarBusquedaModelo(idInput) {
-            const input = document.getElementById(idInput);
-            input.value = '';
-            input.focus();
-            const idSugerencias = idInput === 'ventaModelo' ? 'sugerenciasVenta' : 'sugerenciasConsignacion';
-            document.getElementById(idSugerencias).classList.add('hidden');
-            document.getElementById(idSugerencias).innerHTML = '';
-            if (idInput === 'ventaModelo') resetearPreciosVenta();
-        }
-
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#ventaModelo') && !e.target.closest('#sugerenciasVenta')) {
                 document.getElementById('sugerenciasVenta').classList.add('hidden');
@@ -454,30 +426,19 @@
             const nombreModeloIngresado = inputModelo.value.trim();
             const productoSelected = inventarioProductos.find(p => p.modelo.toLowerCase() === nombreModeloIngresado.toLowerCase());
 
-            // Si el texto no coincide con ningún producto del inventario (todavía
-            // se está escribiendo, o se borró la búsqueda), no dejar en pantalla
-            // el Total/Ganancia del producto anterior: eso es lo que hacía parecer
-            // que la multiplicación "fallaba". Se limpia a 0 hasta elegir un modelo válido.
-            if (!productoSelected) {
-                resetearPreciosVenta();
-                return;
-            }
+            if (!productoSelected) return;
 
             const costo = parseFloat(productoSelected.costoUsd) || 0;
-            const cantRaw = document.getElementById('ventaCantidad').value;
-            const cant = Number.isFinite(parseInt(cantRaw, 10)) ? Math.max(0, parseInt(cantRaw, 10)) : 0;
+            const cant = parseInt(document.getElementById('ventaCantidad').value) || 0;
             const tc = parseFloat(document.getElementById('ventaTipoCambio').value) || 0;
             const inp = document.getElementById('ventaPrecioCobrado');
 
             if (manual) inp.dataset.manual = "true";
             if (inp.dataset.manual !== "true") inp.value = (costo * tc).toFixed(2);
 
-            // "Precio cobrado" es el precio POR UNIDAD; el total se obtiene
-            // multiplicando ese precio unitario por la cantidad.
-            const precioUnitario = parseFloat(inp.value) || 0;
-            const total = precioUnitario * cant;
-            const ganancia = total - (costo * tc * cant);
-            const com = ganancia > 0 ? ganancia * TASA_COMISION : 0;
+            let total = (parseFloat(inp.value) || 0) * cant;
+            let ganancia = total - (costo * tc * cant);
+            let com = ganancia > 0 ? ganancia * TASA_COMISION : 0;
 
             ultimoTotalCobrar = total;
             ultimaGananciaPura = ganancia;
@@ -486,19 +447,6 @@
             document.getElementById('txtTotalCobrar').textContent = fmt(total);
             document.getElementById('txtGananciaPura').textContent = fmt(ganancia);
             document.getElementById('txtComisionVendedor').textContent = fmt(com);
-        }
-
-        // Limpia el bloque de precios (Total / Ganancia / Comisión) y el campo
-        // de precio cobrado, para cuando no hay un modelo válido seleccionado.
-        function resetearPreciosVenta() {
-            const inp = document.getElementById('ventaPrecioCobrado');
-            if (inp) { inp.value = ''; inp.dataset.manual = 'false'; }
-            ultimoTotalCobrar = 0;
-            ultimaGananciaPura = 0;
-            ultimaComisionVendedor = 0;
-            document.getElementById('txtTotalCobrar').textContent = fmt(0);
-            document.getElementById('txtGananciaPura').textContent = fmt(0);
-            document.getElementById('txtComisionVendedor').textContent = fmt(0);
         }
 
         async function registrarVenta(e) {
@@ -812,7 +760,6 @@
             cargarInventarioDesdeGoogle();
         });
 
-        // SERVICE WORKER PARA CAPACIDADES PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
