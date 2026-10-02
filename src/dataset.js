@@ -4,85 +4,89 @@
 // alojado en GitHub. Son datos ya estructurados (no hay que limpiar HTML),
 // con apertura por lente, zoom optico, imagen y enlaces de origen.
 //
-// Si el modelo no aparece se cae al scraper de src/specs.js. Entre las dos
-// cubren practicamente todo.
+// El problema: los productos de la tienda se llaman "IPHONE 17 PRO 256
+// CHIP" y "REDMI NOTE 15 PRO 5G 512/8". Ese nombre no existe en el
+// dataset, y ademas los archivos del dataset tienen nombres imposibles de
+// adivinar ("xiaomi-redmi-a7-4g-3gb-64gb-4g-lte"). Adivinar el nombre
+// daba 1 de 40 aciertos.
 //
-// Resolucion del archivo: categoria + marca + anio + slug.
-//   - La categoria decide la carpeta: smartphone, tablet o laptop.
-//   - La marca se detecta por sinonimos, porque en una tienda los
-//     productos vienen por linea y no por marca: "REDMI A7 64/4" es
-//     Xiaomi, "BLACK SHARK" es Nubia, "POVA" es Tecno, "PAD 7" es Xiaomi,
-//     "TAB A9" es Samsung.
-//   - El slug se adivina quitando primero los sufijos de memoria y
-//     almacenamiento (256/8, 512GB, 8.7"), y despues los modificadores
-//     del final (PRO, MAX, 5G, +...). Se generan varias candidatas, de la
-//     mas especifica a la mas corta.
+// La solucion es INDEXAR la marca. Con un arbol recursivo por marca hacen
+// falta solo 2 llamadas (una para localizar la carpeta de la marca y otra
+// para el arbol completo), no 14, y se cachean en memoria. Luego se busca
+// por tokens completos, sin comparar subcadenas: comparar subcadenas hace
+// que "17" case dentro de "10176" y "redmi 17" devuelva el Redmi 9.
 //
-// Se prueban primero los intentos directos contra raw.githubusercontent.com,
-// que no tiene rate limit. Solo si fallan todos se usa la API de GitHub
-// para listar el directorio, y ahi se respeta un presupuesto local de
-// peticiones por hora porque el limite sin token es de 60.
+// Se intenta primero el nombre directo contra raw.githubusercontent.com,
+// que no tiene limite. El indice solo se construye si eso no basta.
 
 const REPO = process.env.DATASET_REPO || 'GetTechAPI/TechAPI';
 const REF = process.env.DATASET_REF || 'develop';
-const API_BASE = 'https://api.github.com/repos/' + REPO + '/contents/data';
+const API_GIT = 'https://api.github.com/repos/' + REPO + '/git/trees/';
 const RAW_BASE = 'https://raw.githubusercontent.com/' + REPO + '/' + REF + '/data';
 
 const TOKEN = String(process.env.GITHUB_TOKEN || '').trim();
-const TIMEOUT_MS = 20000;
+const TIMEOUT_MS = 25000;
 const ANIOS_REVISAR = 13;
-const PRESUPUESTO_API_POR_HORA = Number(process.env.DATASET_API_POR_HORA) || 45;
+const PRESUPUESTO_API_POR_HORA = Number(process.env.DATASET_API_POR_HORA) || 900;
 
 const CATEGORIAS = ['smartphone', 'tablet', 'laptop'];
 
-// Orden importa: se evalua de arriba hacia abajo y gana la primera
-// marca que coincida.
+// Palabras que describen la unidad concreta y no el modelo.
+const RUIDO_ARCHIVO = new Set([
+  'scrapegsma', 'gsma', 'global', 'dual', 'sim', 'lte', 'td', 'new',
+  '3g', '4g', '5g', '3gb', '4gb', '6gb', '8gb', '12gb', '16gb', '32gb',
+  '64gb', '128gb', '256gb', '512gb', '1tb', '2tb', 'ram', 'rom', 'ch',
+]);
+
+// Modificadores del final: se prueban con y sin ellos.
+const MODIFICADORES = new Set([
+  'pro', 'pro+', 'max', 'ultra', 'mini', 'plus', '5g', '4g', '3g', 'wifi',
+  'chip', 'fusion', 'air', 'new', 'global', 'dual', 'sim', 'lite', 'fe',
+]);
+
+// Orden importa: gana la primera marca que coincida.
 const MARCAS = [
-  ['apple', ['iphone', 'ipad', 'macbook', 'mac book', 'ipod']],
-  ['xiaomi', ['redmi pad', 'xiaomi pad', 'redmi', 'poco', 'xiaomi', 'mi pad']],
+  ['apple', ['iphone', 'ipad', 'macbook', 'mac book']],
+  ['xiaomi', ['redmi pad', 'xiaomi pad', 'redmi', 'poco', 'xiaomi']],
   ['nubia', ['black shark', 'redmagic', 'red magic', 'nubia']],
   ['tecno', ['pova', 'tecno', 'camon', 'spark']],
   ['samsung', ['samsung', 'galaxy', 'tab']],
   ['honor', ['honor']],
-  ['motorola', ['motorola', 'moto', 'moto g']],
+  ['motorola', ['motorola', 'moto']],
   ['realme', ['realme']],
   ['infinix', ['infinix']],
   ['cubot', ['cubot']],
-  ['zte', ['zte', 'nubia z']],
+  ['zte', ['zte']],
   ['tcl', ['tcl']],
   ['meizu', ['meizu']],
-  ['oppo', ['oppo', 'find x']],
-  ['oneplus', ['oneplus', 'one plus']],
+  ['oppo', ['oppo']],
+  ['oneplus', ['oneplus']],
   ['vivo', ['vivo', 'iqoo']],
   ['itel', ['itel']],
-  ['google', ['pixel', 'google']],
+  ['google', ['pixel']],
   ['nokia', ['nokia']],
   ['lg', ['lg']],
   ['sony', ['sony', 'xperia']],
   ['htc', ['htc']],
   ['alcatel', ['alcatel']],
-  ['nothing', ['nothing phone', 'nothing']],
+  ['nothing', ['nothing']],
   ['blackberry', ['blackberry']],
-  ['lenovo', ['lenovo', 'ideapad', 'thinkpad', 'legion']],
-  ['asus', ['asus', 'zenfone', 'rog phone']],
-  ['hmd', ['hmd', 'nokia g', 'nokia c']],
-  ['hmd', ['nokia']],
-  ['asus', ['transcend']],
-  ['tough', ['tough']],
-  ['xiaomi', ['pad']],
-  ['infinix', ['hot', 'smart', 'zero', 'note 30', 'note 40']],
+  ['lenovo', ['lenovo', 'ideapad', 'thinkpad']],
+  ['asus', ['asus', 'zenfone']],
+  ['hmd', ['hmd']],
 ];
 
-// Palabras que se pueden quitar del final del nombre sin romper la
-// identidad del modelo. "NOTE" NO va aqui: "Redmi Note 15" es el nombre.
-const MODIFICADORES = new Set([
-  'pro+', 'pro', 'max', 'ultra', 'mini', 'plus', '5g', '4g', '3g',
-  'wifi', 'chip', 'fusion', 'air', 'new', 'global', 'dual', 'sim',
-  'refresh', 'prime', 'neo', 'gt', 'se',
+// Alias que forman parte del nombre real del archivo, asi que no se quitan:
+// el dataset guarda "redmi-a7", no "a7".
+const ALIAS_DENTRO_DEL_SLUG = new Set([
+  'redmi', 'redmi pad', 'xiaomi pad', 'poco', 'tab', 'galaxy', 'moto',
+  'pova', 'spark', 'camon', 'iphone', 'ipad', 'macbook', 'pixel',
 ]);
 
 const cacheFicha = new Map();
-const cacheDir = new Map();
+const cacheMarca = new Map();
+const shasCategoria = {};
+let shasMarca = {};
 let apiUsadas = 0;
 let apiVentana = Date.now();
 
@@ -114,28 +118,21 @@ function clave(modelo) {
 }
 
 function unicos(lista) {
-  const vistos = new Set();
+  const vistos = {};
   const salida = [];
   for (const v of lista) {
-    if (!v) continue;
-    if (vistos.has(v)) continue;
-    vistos.add(v);
+    if (!v || vistos[v]) continue;
+    vistos[v] = true;
     salida.push(v);
   }
   return salida;
 }
 
-/**
- * "REDMI A7 64/4" -> "redmi a7"
- * "TAB A11 8.7 WIFI 64/4" -> "tab a11"
- * "IPAD AIR 11 M4 256" -> "ipad air 11 m4"
- */
 function limpiarSufijos(texto) {
-  return String(texto || '')
-    .replace(/\b\d+\s*\/\s*\d+\b/g, ' ')
-    .replace(/\b\d+\s*(gb|tb|mb)\b/g, ' ')
+  return String(texto === '')
+    .replace(/(\d+)\s*\/\s*\d+\b/g, ' ')
+    .replace(/\b\d+\s*(gb|tb)\b/g, ' ')
     .replace(/\b\d+[.,]\d+\b/g, ' ')
-    .replace(/\b\d+\s*(inch|pulg|pol)\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -152,20 +149,6 @@ function palabraEnTexto(texto, palabra) {
   return /[\s]/.test(antes) && /[\s]/.test(despues);
 }
 
-function detectarCategoria(texto) {
-  const n = normalizar(texto);
-  if (palabraEnTexto(n, 'macbook') || palabraEnTexto(n, 'notebook') ||
-      palabraEnTexto(n, 'laptop') || palabraEnTexto(n, 'ideapad') ||
-      palabraEnTexto(n, 'thinkpad') || palabraEnTexto(n, 'chromebook')) {
-    return 'laptop';
-  }
-  if (palabraEnTexto(n, 'ipad') || palabraEnTexto(n, 'tab') ||
-      palabraEnTexto(n, 'pad') || palabraEnTexto(n, 'matepad')) {
-    return 'tablet';
-  }
-  return 'smartphone';
-}
-
 function detectarMarca(texto) {
   const n = normalizar(texto);
   for (const par of MARCAS) {
@@ -176,6 +159,24 @@ function detectarMarca(texto) {
   return '';
 }
 
+function detectarCategoria(texto) {
+  const n = normalizar(texto);
+  if (
+    palabraEnTexto(n, 'macbook') || palabraEnTexto(n, 'notebook') ||
+    palabraEnTexto(n, 'laptop') || palabraEnTexto(n, 'ideapad') ||
+    palabraEnTexto(n, 'thinkpad')
+  ) {
+    return 'laptop';
+  }
+  if (
+    palabraEnTexto(n, 'ipad') || palabraEnTexto(n, 'tab') ||
+    palabraEnTexto(n, 'pad')
+  ) {
+    return 'tablet';
+  }
+  return 'smartphone';
+}
+
 function quitarMarca(texto, marca) {
   const n = normalizar(texto);
   if (!marca) return n;
@@ -183,13 +184,12 @@ function quitarMarca(texto, marca) {
     if (par[0] !== marca) continue;
     for (const alias of par[1]) {
       if (palabraEnTexto(n, alias)) {
+        if (ALIAS_DENTRO_DEL_SLUG.has(alias)) return n;
         return n.replace(alias, ' ').replace(/\s+/g, ' ').trim();
       }
     }
   }
-  if (n.indexOf(marca + ' ') === 0) {
-    return n.slice(marca.length + 1).trim();
-  }
+  if (n.indexOf(marca + ' ') === 0) return n.slice(marca.length + 1).trim();
   return n;
 }
 
@@ -205,24 +205,14 @@ function anioEnElNombre(texto) {
   return m ? m[1] : null;
 }
 
-/**
- * Escala de candidatas, de la mas especifica a la mas corta:
- *   "REDMI NOTE 15 PRO + 5G 256/8"
- *     -> redmi-note-15-pro-5g
- *     -> redmi-note-15-pro
- *     -> redmi-note-15
- */
 function adivinarSlugs(modelo, marca) {
   const crudo = normalizar(modelo);
   const limpio = limpiarSufijos(crudo) || crudo;
-
-  const raices = unicos([quitarMarca(limpio, marca), limpio, crudo].filter(Boolean));
+  const raiz = quitarMarca(limpio, marca);
   const salida = [];
-
-  for (const raiz of raices) {
-    salida.push(norm(raiz));
-
-    const partes = raiz.split(' ').filter(Boolean);
+  for (const base of unicos([raiz, limpio, crudo])) {
+    salida.push(norm(base));
+    const partes = base.split(' ').filter(Boolean);
     for (let i = partes.length; i >= 1; i--) {
       const ultimo = String(partes[i - 1]).replace(/\+/g, '');
       if (!MODIFICADORES.has(ultimo)) continue;
@@ -230,15 +220,53 @@ function adivinarSlugs(modelo, marca) {
       if (resto.length) salida.push(norm(resto.join(' ')));
     }
   }
-
   return unicos(salida);
 }
 
-async function pedirJson(url, cabeceras) {
+/**
+ * Juegos de tokens a buscar en el indice, del mas estricto al mas laxo.
+ * "redmi note 15 pro 5g" -> [redmi,note,15,pro,5g], [redmi,note,15,pro],
+ * [redmi,note,15]
+ */
+function juegosDeTokens(modelo, marca) {
+  const base = quitarMarca(limpiarSufijos(normalizar(modelo)), marca);
+  const palabras = base.split(' ').filter(Boolean);
+  const juegos = [];
+  const anadir = (arr) => {
+    if (!arr.length) return;
+    const k = arr.join('|');
+    for (const j of juegos) if (j.join('|') === k) return;
+    juegos.push(arr);
+  };
+
+  anadir(palabras);
+
+  const pila = palabras.slice();
+  for (let i = 0; i < 3; i++) {
+    if (pila.length <= 1) break;
+    const ultimo = pila[pila.length - 1];
+    if (!MODIFICADORES.has(ultimo) && !/^\d+$/.test(ultimo)) break;
+    pila.pop();
+    anadir(pila);
+  }
+
+  // Un numero suelto al final suele ser el tamano de pantalla.
+  if (pila.length > 1 && /^\d+$/.test(pila[pila.length - 1])) {
+    anadir(pila.slice(0, -1));
+  }
+
+  return juegos;
+}
+
+async function pedirJson(url) {
   const controlador = new AbortController();
   const temporizador = setTimeout(() => controlador.abort(), TIMEOUT_MS);
   try {
-    const r = await fetch(url, { headers: cabeceras || {}, redirect: 'follow', signal: controlador.signal });
+    const r = await fetch(url, {
+      headers: cabecerasApi(),
+      redirect: 'follow',
+      signal: controlador.signal,
+    });
     if (!r.ok) return null;
     return await r.json();
   } catch (e) {
@@ -246,6 +274,12 @@ async function pedirJson(url, cabeceras) {
   } finally {
     clearTimeout(temporizador);
   }
+}
+
+function cabecerasApi() {
+  const h = { Accept: 'application/vnd.github+json', 'User-Agent': 'moon-erp' };
+  if (TOKEN) h.Authorization = 'Bearer ' + TOKEN;
+  return h;
 }
 
 function gastarApi() {
@@ -259,47 +293,134 @@ function gastarApi() {
   return true;
 }
 
-function cabecerasApi() {
-  const h = { Accept: 'application/vnd.github+json', 'User-Agent': 'moon-erp' };
-  if (TOKEN) h.Authorization = 'Bearer ' + TOKEN;
-  return h;
+async function fetchSpec(categoria, marca, anio, archivo) {
+  const url = RAW_BASE + '/' + categoria + '/' + marca + '/' + anio + '/' + archivo;
+  const r = await fetch(url, { redirect: 'follow' });
+  if (!r.ok) return null;
+  return await r.json();
 }
 
-async function fetchSpec(categoria, marca, anio, slug) {
-  return pedirJson(RAW_BASE + '/' + categoria + '/' + marca + '/' + anio + '/' + slug + '.json', {});
-}
-
-async function buscarEnDirectorio(categoria, marca, slugs) {
-  if (!gastarApi()) return null;
-
-  const raiz = await pedirJson(API_BASE + '/' + categoria + '/' + marca, cabecerasApi());
-  if (!Array.isArray(raiz)) return null;
-
-  const anios = raiz
-    .filter((e) => e && e.type === 'dir' && /^\d{4}$/.test(e.name))
-    .map((e) => e.name)
-    .sort((a, b) => Number(b) - Number(a));
-
-  for (const anio of anios) {
-    const k = categoria + '/' + marca + '/' + anio;
-    if (cacheDir.has(k)) continue;
-    if (!gastarApi()) return null;
-    const archivos = await pedirJson(API_BASE + '/' + categoria + '/' + marca + '/' + anio, cabecerasApi());
-    cacheDir.set(k, Array.isArray(archivos) ? archivos : []);
+async function shaCategoria(categoria) {
+  if (Object.prototype.hasOwnProperty.call(shasCategoria, categoria)) {
+    return shasCategoria[categoria];
   }
+  if (!gastarApi()) return null;
+  const raiz = await pedirJson(API_GIT + REF);
+  if (!raiz) return null;
+  const data = (raiz.tree || []).find((e) => e.path === 'data');
+  if (!data) return null;
+  if (!gastarApi()) return null;
+  const sub = await pedirJson(API_GIT + data.sha);
+  if (!sub) return null;
+  const cat = (sub.tree || []).find((e) => e.path === categoria);
+  shasCategoria[categoria] = cat ? cat.sha : null;
+  return shasCategoria[categoria];
+}
 
-  for (const anio of anios) {
-    const archivos = cacheDir.get(categoria + '/' + marca + '/' + anio) || [];
-    for (const archivo of archivos) {
-      if (!archivo || archivo.type !== 'file') continue;
-      const slug = String(archivo.name).replace(/\.json$/i, '');
-      for (const buscado of slugs) {
-        if (slug === buscado || slug.indexOf(buscado) === 0 || buscado.indexOf(slug) === 0) {
-          const spec = await fetchSpec(categoria, marca, anio, slug);
-          if (spec) return spec;
-        }
+async function shaMarca(categoria, marca) {
+  const k = categoria + '/' + marca;
+  if (Object.prototype.hasOwnProperty.call(shasMarca, k)) return shasMarca[k];
+  const catSha = await shaCategoria(categoria);
+  if (!catSha) {
+    shasMarca[k] = null;
+    return null;
+  }
+  if (!gastarApi()) return null;
+  const r = await pedirJson(API_GIT + catSha);
+  if (!r) return null;
+  const m = (r.tree || []).find((e) => e.path === marca);
+  shasMarca[k] = m ? m.sha : null;
+  return shasMarca[k];
+}
+
+/**
+ * Indice completo de una marca: una sola llamada. Queda cacheado en
+ * memoria mientras la instancia de Render siga viva.
+ */
+async function indexarMarca(categoria, marca) {
+  const k = categoria + '/' + marca;
+  if (cacheMarca.has(k)) return cacheMarca.get(k);
+
+  const sha = await shaMarca(categoria, marca);
+  if (!sha) {
+    cacheMarca.set(k, []);
+    return [];
+  }
+  if (!gastarApi()) return cacheMarca.get(k) || [];
+
+  const r = await pedirJson(API_GIT + sha + '?recursive=1');
+  const lista = [];
+  if (r && Array.isArray(r.tree)) {
+    for (const e of r.tree) {
+      if (!e.path || e.path.slice(-5) !== '.json') continue;
+      const partes = e.path.split('/');
+      if (partes.length < 2) continue;
+      lista.push({ anio: partes[partes.length - 2], archivo: partes[partes.length - 1] });
+    }
+  }
+  cacheMarca.set(k, lista);
+  return lista;
+}
+
+function tokensDe(archivo) {
+  return String(archivo || '')
+    .replace(/\.json$/i, '')
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+}
+
+function mejorArchivo(indice, buscados) {
+  let mejor = null;
+  let mejorPunt = null;
+
+  for (const item of indice) {
+    const crudos = tokensDe(item.archivo);
+    if (crudos.length === 0) continue;
+
+    const set = {};
+    let extras = 0;
+    for (const t of crudos) {
+      if (RUIDO_ARCHIVO.has(t)) continue;
+      set[t] = true;
+      extras++;
+    }
+
+    let cumple = true;
+    for (const b of buscados) {
+      if (!set[b]) {
+        cumple = false;
+        break;
       }
     }
+    if (!cumple) continue;
+
+    const sobrantes = extras - buscados.length;
+    let punt = -sobrantes * 2 - crudos.length * 0.15;
+
+    // el anio mas reciente gana los empates
+    const anio = Number(item.anio);
+    if (anio >= 2000) punt += Math.min(anio - 2000, 26) * 0.35;
+
+    if (mejorPunt === null || punt > mejorPunt) {
+      mejorPunt = punt;
+      mejor = item;
+    }
+  }
+
+  return mejor;
+}
+
+async function buscarConIndice(categoria, marca, juegos) {
+  const indice = await indexarMarca(categoria, marca);
+  if (!indice || !indice.length) return null;
+
+  for (const buscados of juegos) {
+    const hit = mejorArchivo(indice, buscados);
+    if (!hit) continue;
+    const json = await fetchSpec(categoria, marca, hit.anio, hit.archivo);
+    const ficha = json ? mapear(json) : null;
+    if (ficha) return ficha;
   }
   return null;
 }
@@ -439,8 +560,8 @@ async function buscarFicha(modelo) {
   const slugs = adivinarSlugs(modelo, marca);
   if (!slugs.length) return null;
 
-  const categoriaDetectada = detectarCategoria(modelo);
-  const categorias = unicos([categoriaDetectada].concat(CATEGORIAS));
+  const detectada = detectarCategoria(modelo);
+  const categorias = unicos([detectada].concat(CATEGORIAS));
 
   const anios = aniosPosibles();
   const anio = anioEnElNombre(modelo);
@@ -452,11 +573,11 @@ async function buscarFicha(modelo) {
     }
   }
 
-  // 1) Intentos directos (raw, sin limite).
+  // 1) Nombre directo (raw, sin limite de API).
   for (const categoria of categorias) {
     for (const slug of slugs) {
       for (const a of anios) {
-        const json = await fetchSpec(categoria, marca, a, slug);
+        const json = await fetchSpec(categoria, marca, a, slug + '.json');
         if (!json) continue;
         const ficha = mapear(json);
         if (ficha) {
@@ -467,14 +588,14 @@ async function buscarFicha(modelo) {
     }
   }
 
-  // 2) Listar directorios (presupuesto local por hora).
+  // 2) Indice de la marca (2 llamadas, cacheado). Necesita GITHUB_TOKEN.
+  const juegos = juegosDeTokens(modelo, marca);
   for (const categoria of categorias) {
-    const json = await buscarEnDirectorio(categoria, marca, slugs);
-    if (!json) continue;
-    const ficha = mapear(json);
-    if (!ficha) continue;
-    cacheFicha.set(k, { ficha: ficha });
-    return { ficha: ficha, cache: false };
+    const ficha = await buscarConIndice(categoria, marca, juegos);
+    if (ficha) {
+      cacheFicha.set(k, { ficha: ficha });
+      return { ficha: ficha, cache: false };
+    }
   }
 
   return null;
@@ -487,5 +608,5 @@ module.exports = {
   detectarMarca: detectarMarca,
   detectarCategoria: detectarCategoria,
   adivinarSlugs: adivinarSlugs,
-  limpiarSufijos: limpiarSufijos,
+  juegosDeTokens: juegosDeTokens,
 };
