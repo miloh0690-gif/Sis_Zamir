@@ -1,7 +1,5 @@
 'use strict';
 
-const crypto = require('node:crypto');
-
 const MODELO = (process.env.GEMINI_MODEL || 'gemini-3.5-flash').trim();
 const LIMITE_POR_MIN = Math.max(1, Number(process.env.AI_RATE_LIMIT_POR_MIN) || 6);
 const VIGENCIA_CACHE_MS = 6 * 60 * 60 * 1000;
@@ -84,19 +82,20 @@ function limpiarGolpes() {
 
 setInterval(limpiarGolpes, 60000).unref();
 
-function prompt(modelo) {
+function construirPrompt(modelo) {
   return [
-    'Eres un asesor tecnico expertо en telefonia movil.',
-    'Devuelve SOLO informacion verificable del modelo exacto. No inventes datos.',
+    'Eres un asesor tecnico experto en telefonia movil.',
+    'Devuelve solo informacion verificable del modelo exacto. No inventes datos.',
     'Si un dato no lo conoces con certeza, escribe "No verificado" en ese campo.',
     'Responde en espanol, de forma breve y comercial, usando el esquema indicado.',
     '',
     'Modelo consultado: "' + modelo + '"',
     '',
-    'Requisitos de los 3 argumentos de venta:',
-    '- Deben ser concretos y verificables,critico para clientes queiky comparan marcas.',
-    '- Cada uno en una frase corta.',
-    '- Nada deokemon "gran camara" o "mucha bateria" sin numero.',
+    'Reglas para los 3 argumentos de venta:',
+    '- Deben ser concretos y verificables, porque el cliente compara marcas.',
+    '- Cada argumento en una frase corta.',
+    '- Nada de afirmaciones vacias como "gran camara" o "mucha bateria" sin numeros.',
+    '- Si el modelo no existe o es ambiguo, indicalo en el campo resumen.',
   ].join('\n');
 }
 
@@ -116,7 +115,7 @@ async function consultarFicha(modelo) {
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
       signal: controlador.signal,
       body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt(modelo) }] }],
+        contents: [{ role: 'user', parts: [{ text: construirPrompt(modelo) }] }],
         generationConfig: {
           responseMimeType: 'application/json',
           responseSchema: ESQUEMA,
@@ -141,8 +140,8 @@ async function consultarFicha(modelo) {
     }
 
     const candidato = datos && datos.candidates && datos.candidates[0];
-    const parte = candidato && candidato.content && candidato.content.parts && candidato.content.parts[0];
-    const bruto = parte && parte.text;
+    const partes = candidato && candidato.content && candidato.content.parts;
+    const bruto = partes && partes[0] && partes[0].text;
     if (!bruto) {
       const error = new Error('Gemini no devolvio contenido para ese modelo.');
       error.codigo = 502;
