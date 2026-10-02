@@ -75,7 +75,7 @@
                     <div class="relative">
                         <input type="text" id="ventaModelo" placeholder="Escribe el modelo (ej: iPhone 13)…" autocomplete="off" required
                             class="w-full h-12 pl-4 pr-10 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF] placeholder:text-[#5B6472]">
-                        <button type="button" id="btnLimpiarModelo" class="tap absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-[#5B6472] active:text-[#EDEFF3]" aria-label="Borrar búsqueda">✕</button>
+                        <button type="button" id="btnLimpiarModelo" class="tap absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-[#5B6472] active:text-[#EDEFF3]" aria-label="Borrar busqueda">✕</button>
                     </div>
                     <div id="sugerenciasVenta" class="hidden absolute left-0 right-0 z-30 mt-1 bg-[#1B2029] border border-[#2A2F3A] rounded-xl max-h-60 overflow-y-auto shadow-2xl"></div>
 
@@ -109,7 +109,7 @@
                     </div>
                     <div>
                         <label for="ventaPrecioCobrado" class="block text-[11px] font-bold text-[#4C8DFF] uppercase tracking-wide mb-1.5">Precio unitario (Bs)</label>
-                        <input type="number" id="ventaPrecioCobrado" step="0.01" min="0" placeholder="Automático"
+                        <input type="number" id="ventaPrecioCobrado" step="0.01" min="0" placeholder="Automatico"
                             class="w-full h-12 px-4 rounded-xl bg-[#182236] border border-[#4C8DFF]/40 text-[15px] font-data font-bold campo-calculado focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
                     </div>
                 </div>
@@ -159,7 +159,7 @@
                     <div class="relative">
                         <input type="text" id="consModelo" placeholder="Escribe el modelo…" autocomplete="off" required
                             class="w-full h-12 pl-4 pr-10 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#9B8CFF] placeholder:text-[#5B6472]">
-                        <button type="button" id="btnLimpiarCons" class="tap absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-[#5B6472] active:text-[#EDEFF3]" aria-label="Borrar búsqueda">✕</button>
+                        <button type="button" id="btnLimpiarCons" class="tap absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-[#5B6472] active:text-[#EDEFF3]" aria-label="Borrar busqueda">✕</button>
                     </div>
                     <div id="sugerenciasConsignacion" class="hidden absolute left-0 right-0 z-30 mt-1 bg-[#1B2029] border border-[#2A2F3A] rounded-xl max-h-60 overflow-y-auto shadow-2xl"></div>
                 </div>
@@ -229,7 +229,9 @@
                 <button type="button" id="btnCerrarSesion2" class="tap w-full h-10 rounded-xl bg-[#242933] text-xs font-bold text-[#EDEFF3]">Cerrar sesión</button>
             </div>
 
+            <div id="avisosReportes"></div>
             <div id="resumenExtra" class="grid grid-cols-3 gap-2.5"></div>
+
             <div>
                 <h3 class="text-xs font-bold text-[#8B95A7] uppercase tracking-wide mb-2 px-1">Ventas registradas</h3>
                 <div id="listaReportes" class="space-y-2.5"></div>
@@ -239,16 +241,16 @@
 
     <nav class="fixed bottom-0 inset-x-0 z-50 bg-[#12151C]/95 backdrop-blur-md border-t border-[#242933] safe-bottom">
         <div class="max-w-lg mx-auto grid grid-cols-4 px-1 pt-1.5">
-            <button type="button" data-pestana="vendedor" id="btn-vendedor" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#4C8DFF]">
+            <button type="button" id="btn-vendedor" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#4C8DFF]">
                 <span class="text-lg">🛒</span><span class="text-[10px] font-bold">Vender</span>
             </button>
-            <button type="button" data-pestana="consignacion" id="btn-consignacion" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#5B6472]">
+            <button type="button" id="btn-consignacion" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#5B6472]">
                 <span class="text-lg">🤝</span><span class="text-[10px] font-bold">Consignar</span>
             </button>
-            <button type="button" data-pestana="dueno" id="btn-dueno" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#5B6472]">
+            <button type="button" id="btn-dueno" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#5B6472]">
                 <span class="text-lg">🔑</span><span class="text-[10px] font-bold">Dueño</span>
             </button>
-            <button type="button" data-pestana="reportes" id="btn-reportes" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#5B6472]">
+            <button type="button" id="btn-reportes" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#5B6472]">
                 <span class="text-lg">📊</span><span class="text-[10px] font-bold">Reportes</span>
             </button>
         </div>
@@ -275,15 +277,16 @@
 
         const ESTADO = {
             productos: [],
+            consignaciones: [],
             config: null,
             autenticado: false,
             pestana: 'vendedor',
             precioManual: false,
-            ultimoModeloResuelto: '',
             temporizador: null,
-            fichaModelo: '',
-            ultimaVenta: null,
+            reporteActual: null,
         };
+
+        const PESTANAS = ['vendedor', 'consignacion', 'dueno', 'reportes'];
 
         const $ = (id) => document.getElementById(id);
 
@@ -296,7 +299,7 @@
         }
 
         function normalizar(texto) {
-            return String(texto || '')
+            return String(texto === undefined || texto === null ? '' : texto)
                 .normalize('NFD')
                 .replace(/[\u0300-\u036f]/g, '')
                 .toLowerCase()
@@ -305,10 +308,10 @@
         }
 
         async function api(ruta, opciones) {
-            const config = Object.assign({ headers: {} }, opciones || {});
+            const config = Object.assign({}, opciones || {});
             config.headers = Object.assign({}, config.headers);
             if (config.cuerpo !== undefined) {
-                config.method = config.method || 'POST';
+                config.method = 'POST';
                 config.headers['Content-Type'] = 'application/json';
                 config.body = JSON.stringify(config.cuerpo);
             }
@@ -329,12 +332,12 @@
         }
 
         function estadoConexion(clase, texto, sincronizado) {
-            const nodo = $('statusConexion');
             const colores = {
                 ok: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20',
                 error: 'bg-red-500/15 text-red-400 border border-red-500/20',
                 aviso: 'bg-amber-500/15 text-amber-400 border border-amber-500/20',
             };
+            const nodo = $('statusConexion');
             nodo.className = 'shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold font-data ' + colores[clase];
             nodo.textContent = texto;
             if (sincronizado) $('iconoLuna').classList.add('moon-synced');
@@ -411,17 +414,14 @@
 
             if (!ESTADO.precioManual) {
                 $('ventaPrecioCobrado').value = c.precioUnitarioBs.toFixed(2);
-                $('ventaPrecioCobrado').classList.add('campo-calculado');
-                $('ventaPrecioCobrado').classList.remove('campo-manual');
             }
         }
 
-        function marcarManual(valor) {
+        function marcarManual() {
             ESTADO.precioManual = true;
             $('avisoPrecio').classList.remove('hidden');
             $('ventaPrecioCobrado').classList.add('campo-manual');
             $('ventaPrecioCobrado').classList.remove('campo-calculado');
-            $('ventaPrecioCobrado').value = valor;
         }
 
         function volverAAutomatico() {
@@ -437,26 +437,26 @@
             ESTADO.temporizador = setTimeout(pedirPreview, 250);
         }
 
-        async function pedirPreview() {
-            const modelo = $('ventaModelo').value.trim();
-            if (!modelo) {
-                ESTADO.ultimoModeloResuelto = '';
-                limpiarPanelPrecio();
-                return;
-            }
-
-            const cuerpo = {
-                modelo: modelo,
+        function cuerpoVenta() {
+            return {
+                modelo: $('ventaModelo').value.trim(),
                 tipo: $('ventaTipo').value,
                 cantidad: $('ventaCantidad').value,
                 tipoCambio: $('ventaTipoCambio').value,
                 precioManualBs: ESTADO.precioManual ? $('ventaPrecioCobrado').value : null,
             };
+        }
+
+        async function pedirPreview() {
+            const cuerpo = cuerpoVenta();
+            if (!cuerpo.modelo) {
+                limpiarPanelPrecio();
+                return;
+            }
 
             try {
                 const datos = await api('/api/ventas/preview', { cuerpo: cuerpo });
                 if (!datos.encontrado) {
-                    ESTADO.ultimoModeloResuelto = '';
                     limpiarPanelPrecio(
                         datos.motivo === 'vacio'
                             ? 'Selecciona un modelo del inventario.'
@@ -466,11 +466,10 @@
                     return;
                 }
                 $('detallePrecio').classList.remove('text-rose-400');
-                ESTADO.ultimoModeloResuelto = datos.modelo;
                 pintarCalculo(datos);
             } catch (e) {
-                ESTADO.ultimoModeloResuelto = '';
                 limpiarPanelPrecio(e.message);
+                $('detallePrecio').classList.add('text-rose-400');
             }
         }
 
@@ -479,25 +478,16 @@
         async function registrarVenta(evento) {
             evento.preventDefault();
             const boton = $('btnRegistrarVenta');
+            const cuerpo = cuerpoVenta();
+            cuerpo.vendedor = $('ventaVendedor').value.trim();
+
             boton.disabled = true;
-
-            const cuerpo = {
-                vendedor: $('ventaVendedor').value.trim(),
-                modelo: $('ventaModelo').value.trim(),
-                tipo: $('ventaTipo').value,
-                cantidad: $('ventaCantidad').value,
-                tipoCambio: $('ventaTipoCambio').value,
-                precioManualBs: ESTADO.precioManual ? $('ventaPrecioCobrado').value : null,
-            };
-
             try {
                 const datos = await api('/api/ventas', { cuerpo: cuerpo });
-                ESTADO.ultimaVenta = datos.venta;
                 const c = datos.calculo;
                 let mensaje =
                     'Venta registrada.\n\n' +
-                    'Modelo: ' + cuerpo.modelo + '\n' +
-                    'Cantidad: ' + c.cantidad + '\n' +
+                    'Modelo: ' + c.cantidad + ' x ' + datos.venta.modelo + '\n' +
                     'Total: ' + fmt(c.totalCobradoBs) + ' Bs\n' +
                     'Ganancia: ' + fmt(c.gananciaBs) + ' Bs\n' +
                     'Comisión: ' + fmt(c.comisionBs) + ' Bs';
@@ -512,6 +502,8 @@
                 $('ventaCantidad').value = 1;
                 ESTADO.precioManual = false;
                 $('avisoPrecio').classList.add('hidden');
+                $('ventaPrecioCobrado').classList.add('campo-calculado');
+                $('ventaPrecioCobrado').classList.remove('campo-manual');
                 $('fichaPanel').classList.add('hidden');
                 limpiarPanelPrecio();
                 cerrarSugerencias();
@@ -530,14 +522,16 @@
             cont.innerHTML = '<div class="text-center text-[#5B6472] text-sm italic py-10">Cargando…</div>';
             try {
                 const datos = await api('/api/consignaciones');
-                renderConsignaciones(datos.consignaciones || []);
+                ESTADO.consignaciones = datos.consignaciones || [];
+                renderConsignaciones();
             } catch (e) {
                 cont.innerHTML = '<div class="text-center text-rose-400 text-sm py-10">' + escapeHtml(e.message) + '</div>';
             }
         }
 
-        function renderConsignaciones(lista) {
+        function renderConsignaciones() {
             const cont = $('listaConsignaciones');
+            const lista = ESTADO.consignaciones;
             cont.innerHTML = '';
             if (!lista.length) {
                 cont.innerHTML = '<div class="text-center text-[#5B6472] text-sm italic py-10">No hay consignaciones activas.</div>';
@@ -568,24 +562,18 @@
                 boton.addEventListener('click', async () => {
                     const id = boton.dataset.id;
                     const accion = boton.dataset.accion;
+                    const actual = ESTADO.consignaciones.find((x) => String(x.id) === id);
                     boton.disabled = true;
                     try {
                         if (accion === 'estado') {
-                            const pendientes = Array.from(cont.querySelectorAll('span')).map((s) => s.textContent);
-                            void pendientes;
-                            const actual = Array.from(document.querySelectorAll('#listaConsignaciones > div')).find((d) =>
-                                d.querySelector('button[data-id="' + id + '"]')
-                            );
-                            void actual;
-                            const estadoActual = pedirEstadoActual(id);
-                            const nuevo = estadoActual === 'Pagado' ? 'Pendiente' : 'Pagado';
+                            const nuevo = actual && actual.estado === 'Pagado' ? 'Pendiente' : 'Pagado';
                             await api('/api/consignaciones/estado', { cuerpo: { id: id, estado: nuevo } });
                         } else {
                             if (!confirm('¿Confirmas la devolución física de estos equipos al inventario?')) return;
                             await api('/api/consignaciones/devolver', { cuerpo: { id: id } });
                         }
                         await cargarConsignaciones();
-                        await cargarInventario(false);
+                        await cargarInventario();
                     } catch (e) {
                         alert('❌ ' + e.message);
                     } finally {
@@ -593,10 +581,6 @@
                     }
                 });
             });
-        }
-
-        function pedirEstadoActual(id) {
-            return ESTADO.consignacionesPorId && ESTADO.consignacionesPorId[id] ? ESTADO.consignacionesPorId[id] : 'Pendiente';
         }
 
         async function registrarConsignacion(evento) {
@@ -680,7 +664,8 @@
 
             html += '<div class="flex items-start justify-between gap-2">' +
                 '<p class="font-display font-bold text-[#F1F5F9] text-sm">' + escapeHtml(ficha.nombre || '') + '</p>' +
-                (desdeCache ? '<span class="text-[9px] font-bold uppercase bg-[#242933] text-[#8B95A7] px-2 py-0.5 rounded-full shrink-0">cache</span>' : '') +
+                '<button type="button" id="btnCerrarFicha" class="tap text-[9px] font-bold uppercase bg-[#242933] text-[#8B95A7] px-2 py-1 rounded-full shrink-0">' +
+                (desdeCache ? 'cache · cerrar' : 'cerrar') + '</button>' +
                 '</div>';
 
             if (ficha.resumen) {
@@ -688,10 +673,10 @@
             }
 
             html += '<div class="grid grid-cols-2 gap-x-3 gap-y-2.5 border-t border-[#2A2F3A] pt-3">';
-            ETIQUETAS_FICHA.forEach(([clave, etiqueta]) => {
-                if (!ficha[clave]) return;
-                html += '<div><span class="text-[9px] font-bold text-[#8B95A7] uppercase block">' + etiqueta + '</span>' +
-                    '<span class="text-[12px] text-[#EDEFF3] leading-snug">' + escapeHtml(ficha[clave]) + '</span></div>';
+            ETIQUETAS_FICHA.forEach((par) => {
+                if (!ficha[par[0]]) return;
+                html += '<div><span class="text-[9px] font-bold text-[#8B95A7] uppercase block">' + par[1] + '</span>' +
+                    '<span class="text-[12px] text-[#EDEFF3] leading-snug">' + escapeHtml(ficha[par[0]]) + '</span></div>';
             });
             html += '</div>';
 
@@ -707,9 +692,9 @@
             return html;
         }
 
-        // ---------- INVENTARIO / DUEÑO ----------
+        // ---------- INVENTARIO ----------
 
-        async function cargarInventario(forzar) {
+        async function cargarInventario() {
             try {
                 const datos = await api('/api/inventario');
                 ESTADO.productos = datos.productos || [];
@@ -745,19 +730,22 @@
 
         // ---------- REPORTES ----------
 
-        async function cargarReportes() {
-            const cont = $('listaReportes');
-            cont.innerHTML = '<div class="text-center text-[#5B6472] text-sm italic py-10">Calculando…</div>';
+        function filtrosActuales() {
             const parametros = new URLSearchParams();
             if ($('repDesde').value) parametros.set('desde', $('repDesde').value);
             if ($('repHasta').value) parametros.set('hasta', $('repHasta').value);
             if ($('repVendedor').value.trim()) parametros.set('vendedor', $('repVendedor').value.trim());
+            return parametros;
+        }
 
+        async function cargarReportes() {
+            const cont = $('listaReportes');
+            cont.innerHTML = '<div class="text-center text-[#5B6472] text-sm italic py-10">Calculando…</div>';
             try {
-                const datos = await api('/api/reportes?' + parametros.toString());
-                ESTADO.ultimaVenta = null;
+                const datos = await api('/api/reportes?' + filtrosActuales().toString());
                 ESTADO.reporteActual = datos;
                 const r = datos.resumen;
+
                 $('kpiVentasTotales').textContent = fmt(r.totalVendidoBs);
                 $('kpiGananciaTotal').textContent = fmt(r.totalGananciaBs);
                 $('kpiComisionesTotales').textContent = fmt(r.totalComisionesBs);
@@ -767,14 +755,11 @@
                     '<div class="rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-3.5"><span class="text-[9px] font-bold text-[#8B95A7] uppercase block">Ticket prom.</span><h3 class="font-display font-bold text-[#F1F5F9] mt-1 font-data text-[15px]">' + escapeHtml(fmt(r.ticketPromedioBs)) + '</h3></div>' +
                     '<div class="rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-3.5"><span class="text-[9px] font-bold text-[#8B95A7] uppercase block">Margen</span><h3 class="font-display font-bold text-[#F1F5F9] mt-1 font-data text-[15px]">' + escapeHtml(fmt(r.margenPct)) + '%</h3></div>';
 
-                if (datos.efimero) {
-                    $('resumenExtra').insertAdjacentHTML('afterend',
-                        '<div id="avisoEfimero" class="rounded-2xl bg-[#FBBF24]/10 border border-[#FBBF24]/25 p-3 text-[11px] text-[#FBBF24] leading-relaxed">' +
-                        '⚠️ El historial se guarda en la memoria del servidor y se borra cuando Render reinicia la instancia. Instala el snippet de <strong>REPORTE_VENTAS</strong> en tu Apps Script y pon <strong>REPORTES_DESDE_SHEETS=1</strong> para hacerlo permanente.</div>');
-                } else {
-                    const previo = $('avisoEfimero');
-                    if (previo) previo.remove();
-                }
+                $('avisosReportes').innerHTML = datos.efimero
+                    ? '<div class="rounded-2xl bg-[#FBBF24]/10 border border-[#FBBF24]/25 p-3 text-[11px] text-[#FBBF24] leading-relaxed">' +
+                      '⚠️ El historial vive en la memoria del servidor y se borra cuando Render reinicia la instancia. ' +
+                      'Instala el snippet <strong>REPORTE_VENTAS</strong> de tu Apps Script y pon <strong>REPORTES_DESDE_SHEETS=1</strong> en Render para hacerlo permanente.</div>'
+                    : '';
 
                 renderVentas(datos.ventas);
                 renderTablas(r);
@@ -782,6 +767,9 @@
                 $('kpiVentasTotales').textContent = '0.00';
                 $('kpiGananciaTotal').textContent = '0.00';
                 $('kpiComisionesTotales').textContent = '0.00';
+                $('resumenExtra').innerHTML = '';
+                $('avisosReportes').innerHTML = '';
+                $('tablasResumen').innerHTML = '';
                 cont.innerHTML = '<div class="text-center text-rose-400 text-sm py-10">' + escapeHtml(e.message) + '</div>';
             }
         }
@@ -810,47 +798,37 @@
         }
 
         function renderTablas(r) {
-            const existente = $('tablasResumen');
-            if (existente) existente.remove();
-            const caja = document.createElement('div');
-            caja.id = 'tablasResumen';
-            caja.className = 'space-y-3';
+            const caja = $('tablasResumen');
+            if (!caja) return;
+            caja.innerHTML = '';
 
-            const tabla = (titulo, filas, columnas) => {
-                if (!filas.length) return '';
-                let html = '<div><h3 class="text-xs font-bold text-[#8B95A7] uppercase tracking-wide mb-2 px-1">' + titulo + '</h3>' +
+            const tabla = (titulo, filas, clave, datos) => {
+                if (!filas.length) return;
+                const bloque = document.createElement('div');
+                let html = '<h3 class="text-xs font-bold text-[#8B95A7] uppercase tracking-wide mb-2 px-1">' + titulo + '</h3>' +
                     '<div class="bg-[#1B2029] border border-[#2A2F3A] rounded-2xl overflow-hidden">';
-                filas.slice(0, 15).forEach((fila, i) => {
+                filas.slice(0, 15).forEach((fila) => {
                     html += '<div class="px-4 py-2.5 border-b border-[#2A2F3A] last:border-b-0 text-xs flex items-center justify-between gap-3">' +
-                        '<span class="text-[#EDEFF3] truncate">' + escapeHtml(fila[columnas.clave]) + '</span>';
-                    columnas.datos.forEach((d) => {
-                        html += '<span class="font-data text-[#8B95A7] shrink-0">' + escapeHtml(d.etiqueta) + ' ' + escapeHtml(d.valor(fila)) + '</span>';
+                        '<span class="text-[#EDEFF3] truncate">' + escapeHtml(fila[clave]) + '</span>';
+                    datos.forEach((d) => {
+                        html += '<span class="font-data text-[#8B95A7] shrink-0">' + d.etiqueta + ' ' + escapeHtml(d.valor(fila)) + '</span>';
                     });
                     html += '</div>';
-                    void i;
                 });
-                html += '</div></div>';
-                return html;
+                html += '</div>';
+                bloque.innerHTML = html;
+                caja.appendChild(bloque);
             };
 
-            caja.innerHTML =
-                tabla('Por vendedor', r.porVendedor, {
-                    clave: 'vendedor',
-                    datos: [
-                        { etiqueta: 'un.', valor: (f) => f.unidades },
-                        { etiqueta: 'Bs', valor: (f) => fmt(f.ventasBs) },
-                        { etiqueta: 'com.', valor: (f) => fmt(f.comisionBs) },
-                    ],
-                }) +
-                tabla('Por modelo', r.porModelo, {
-                    clave: 'modelo',
-                    datos: [
-                        { etiqueta: 'un.', valor: (f) => f.unidades },
-                        { etiqueta: 'Bs', valor: (f) => fmt(f.ventasBs) },
-                    ],
-                });
-
-            $('resumenExtra').parentNode.insertBefore(caja, $('listaReportes').parentNode);
+            tabla('Por vendedor', r.porVendedor, 'vendedor', [
+                { etiqueta: 'un.', valor: (f) => f.unidades },
+                { etiqueta: 'Bs', valor: (f) => fmt(f.ventasBs) },
+                { etiqueta: 'com.', valor: (f) => fmt(f.comisionBs) },
+            ]);
+            tabla('Por modelo', r.porModelo, 'modelo', [
+                { etiqueta: 'un.', valor: (f) => f.unidades },
+                { etiqueta: 'Bs', valor: (f) => fmt(f.ventasBs) },
+            ]);
         }
 
         function exportarCsv() {
@@ -892,12 +870,11 @@
         }
 
         async function entrar() {
-            const pin = $('inputPin').value.trim();
             try {
-                await api('/api/auth/login', { cuerpo: { pin: pin } });
+                await api('/api/auth/login', { cuerpo: { pin: $('inputPin').value.trim() } });
                 ESTADO.autenticado = true;
                 cerrarLogin();
-                await cargarInventario(true);
+                await cargarInventario();
                 cambiarPestana(ESTADO.pestana);
             } catch (e) {
                 $('loginError').textContent = e.message;
@@ -913,7 +890,6 @@
             }
             ESTADO.autenticado = false;
             ESTADO.productos = [];
-            alert('Sesión cerrada.');
             location.reload();
         }
 
@@ -927,8 +903,6 @@
         }
 
         // ---------- NAVEGACION ----------
-
-        const PESTANAS = ['vendedor', 'consignacion', 'dueno', 'reportes'];
 
         async function cambiarPestana(pestana) {
             if ((pestana === 'dueno' || pestana === 'reportes') && !ESTADO.autenticado) {
@@ -957,7 +931,11 @@
         function conectarEventos() {
             const inputModelo = $('ventaModelo');
             inputModelo.addEventListener('input', () => {
-                renderSugerencias('sugerenciasVenta', 'ventaModelo', () => { ESTADO.precioManual = false; $('avisoPrecio').classList.add('hidden'); programarPreview(); });
+                renderSugerencias('sugerenciasVenta', 'ventaModelo', () => {
+                    ESTADO.precioManual = false;
+                    $('avisoPrecio').classList.add('hidden');
+                    programarPreview();
+                });
                 programarPreview();
             });
 
@@ -977,12 +955,11 @@
             $('ventaPrecioCobrado').addEventListener('input', () => {
                 const valor = $('ventaPrecioCobrado').value;
                 if (valor === '' || Number(valor) <= 0) {
-                    ESTADO.precioManual = false;
-                    $('avisoPrecio').classList.add('hidden');
-                    programarPreview();
+                    if (ESTADO.precioManual) volverAAutomatico();
+                    else programarPreview();
                     return;
                 }
-                marcarManual(valor);
+                marcarManual();
                 programarPreview();
             });
 
@@ -1011,11 +988,17 @@
             $('inputPin').addEventListener('keydown', (e) => { if (e.key === 'Enter') entrar(); });
             $('btnCancelarLogin').addEventListener('click', () => {
                 cerrarLogin();
-                if (ESTADO.pestana === 'vendedor') return;
-                cambiarPestana('vendedor');
+                if (ESTADO.pestana !== 'vendedor') cambiarPestana('vendedor');
             });
             $('modalLogin').addEventListener('click', (e) => {
-                if (e.target === $('modalLogin')) { cerrarLogin(); cambiarPestana('vendedor'); }
+                if (e.target === $('modalLogin)) {
+                    cerrarLogin();
+                    if (ESTADO.pestana !== 'vendedor') cambiarPestana('vendedor');
+                }
+            });
+
+            $('fichaPanel').addEventListener('click', (e) => {
+                if (e.target && e.target.id === 'btnCerrarFicha') $('fichaPanel').classList.add('hidden');
             });
 
             document.addEventListener('click', (e) => {
@@ -1025,10 +1008,6 @@
                 if (!e.target.closest('#sugerenciasConsignacion') && !e.target.closest('#consModelo') && !e.target.closest('#btnLimpiarCons')) {
                     $('sugerenciasConsignacion').classList.add('hidden');
                 }
-            });
-
-            $('fichaPanel').addEventListener('click', (e) => {
-                if (e.target && e.target.id === 'btnCerrarFicha') $('fichaPanel').classList.add('hidden');
             });
         }
 
@@ -1049,16 +1028,20 @@
                 alert('⚠️ El inventario no está configurado. El dueño debe definir SHEETS_WEBAPP_URL en Render.');
             } else {
                 try {
-                    await cargarInventario(false);
+                    await cargarInventario();
                 } catch (e) {
                     void e;
                 }
             }
 
-            $('btnFicha').disabled = !ESTADO.config.ia;
-            if (!ESTADO.config.ia) $('btnFicha').classList.add('opacity-50');
+            if (!ESTADO.config.ia) {
+                $('btnFicha').disabled = true;
+                $('btnFicha').classList.add('opacity-50');
+                $('btnFicha').classList.remove('text-[#4C8DFF]');
+                $('btnFicha').classList.add('text-[#5B6472]');
+            }
 
-            if (ESTADO.autenticado) await cargarInventario(true);
+            renderizarInventarioDueno();
         }
 
         window.addEventListener('DOMContentLoaded', iniciar);
