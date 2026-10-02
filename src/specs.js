@@ -5,12 +5,13 @@
 // El problema que resuelve este modulo: en la tienda los productos se
 // llaman "IPHONE 17 PRO 256 CHIP" o "REDMI NOTE 15 PRO 5G 512/8". Ese
 // nombre no existe en ninguna base de datos. Sin limpiarlo, el scraper
-// daba 0 aciertos sobre los 226 productos reales de la tienda. Limpiarlo
-// y probar una escalera de variantes lo subio a 13 de 50 en la misma
-// prueba, y ademas encuentra los modelos mas recientes.
+// daba 0 aciertos sobre los 226 productos reales de la tienda.
 //
-// Primero se prueba /phone?name= con cada variante; si ninguna acierta, se
-// usa /search?query= y se toma el primer resultado.
+// Se prueba /phone?name= con una escalera de variantes, de la mas fiel al
+// nombre original a la mas simple. Ademas se verifica que el modelo que
+// devuelve la base de datos sea realmente el pedido: comparar "iPhone 17
+// Pro" cuando se pidio "iPhone 17 Pro Max" es peor que no devolver nada,
+// porque el vendedor le diria esas especificaciones a un cliente.
 
 const URL_BASE = String(
   process.env.SPECS_API_URL || 'https://mobile-specs-api-sandy.vercel.app'
@@ -30,9 +31,9 @@ const RELLENO = [
   'lamborghini', 'jade', 'plata', 'oro',
 ];
 
-// Modificadores del final que a veces forman parte del nombre oficial y a
-// veces no. Se prueban con y sin ellos.
-const MODIFICADORES = ['pro', 'max', 'ultra', 'mini', 'plus', 'lite', 'fe'];
+// Se prueban con y sin ellos: a veces forman parte del nombre oficial y a
+// veces el scraper los tiene en el nombre pero no en el indice.
+const MODIFICADORES = ['5g', '4g', '3g', 'pro', 'max', 'ultra', 'mini', 'plus', 'lite', 'fe'];
 
 // Capacidades de memoria. OJO: 16 y 12 tambien son numeros de modelo
 // ("Realme 16", "Infinix Hot 12"), asi que solo se quitan a partir de 32.
@@ -101,30 +102,62 @@ function consultasPara(modelo) {
   anadir(limpio.replace(/\s+\d+$/, ''));
 
   // 4) fuera capacidades sueltas del final (>=32): "256", "512"
-  const palabras = limpio.split(' ').filter(Boolean);
+  let palabras = limpio.split(' ').filter(Boolean);
   while (palabras.length > 1 && CAPACIDADES.has(palabras[palabras.length - 1])) {
     palabras.pop();
   }
-  const sinCapacidad = palabras.join(' ');
-  anadir(sinCapacidad);
+  anadir(palabras.join(' '));
 
-  // 5) fuera uno o dos modificadores del final
-  let pila = palabras.slice();
-  for (let i = 0; i < 2; i++) {
-    if (!pila.length) break;
-    const ultimo = pila[pila.length - 1];
-    if (MODIFICADORES.indexOf(ultimo) === -1) break;
-    pila = pila.slice(0, -1);
-    anadir(pila.join(' '));
+  // 5) fuera modificadores del final, de uno en uno hacia atras.
+  //    "redmi note 15 pro 5g" -> "redmi note 15 pro" -> "redmi note 15"
+  pila: {
+    let actual = palabras.slice();
+    for (let i = 0; i < 3; i++) {
+      if (!actual.length) break;
+      const ultimo = actual[actual.length - 1];
+      if (MODIFICADORES.indexOf(ultimo) === -1) break;
+      actual = actual.slice(0, -1);
+      anadir(actual.join(' '));
+    }
   }
 
   // 6) Tab y Moto con su denominacion oficial
-  const conGalaxy = sinCapacidad.replace(/^tab\s+/, 'galaxy tab ');
-  if (conGalaxy !== sinCapacidad) anadir(conGalaxy);
-  const conMotorola = sinCapacidad.replace(/^moto\s+/, 'motorola ');
-  if (conMotorola !== sinCapacidad) anadir(conMotorola);
+  const base = palabras.join(' ');
+  const conGalaxy = base.replace(/^tab\s+/, 'galaxy tab ');
+  if (conGalaxy !== base) anadir(conGalaxy);
+  const conMotorola = base.replace(/^moto\s+/, 'motorola ');
+  if (conMotorola !== base) anadir(conMotorola);
 
   return variantes;
+}
+
+/**
+ * El numero de generacion es lo que no puede fallar: si piden "iPhone 17
+ * Pro Max" y la base devuelve "iPhone 16 Pro", la ficha es de otro
+ * telefono y hay que seguir probando.
+ */
+function generacionEsperada(consulta) {
+  const numeros = String(consulta || '').match(/\d+/g);
+  if (!numeros) return [];
+  return numeros
+    .map((n) => String(Number(n)))
+    .filter((n) => n.length >= 2);
+}
+
+function generacionDe(nombre) {
+  const numeros = String(nombre || '').match(/\d+/g);
+  if (!numeros) return [];
+  return numeros.map((n) => String(Number(n)));
+}
+
+function coincideGeneracion(consulta, nombreDevuelto) {
+  const esperadas = generacionEsperada(consulta);
+  if (!esperadas.length) return true;
+  const encontradas = generacionDe(nombreDevuelto);
+  for (const g of esperadas) {
+    if (encontradas.indexOf(g) !== -1) return true;
+  }
+  return false;
 }
 
 async function pedirJson(url) {
@@ -256,6 +289,11 @@ function mapear(bruto, consultaUsada) {
     .filter(Boolean)
     .join(' · ');
 
+  if (!chipset && !pantalla && !bateria && !camaraPrincipal) return null;
+
+  // Es la ficha de otro telefono: no la devolvemos.
+  if (!coincideGeneracion(consultaUsada, modeloCompleto)) return null;
+
   const partesResumen = [];
   if (chipset) partesResumen.push(chipset);
   if (tamanoPantalla || tipoPantalla) partesResumen.push('pantalla ' + (tamanoPantalla || tipoPantalla));
@@ -264,8 +302,6 @@ function mapear(bruto, consultaUsada) {
   if (interna) partesResumen.push(interna);
   if (almacenamiento) partesResumen.push(almacenamiento);
   if (release) partesResumen.push(release);
-
-  if (!chipset && !pantalla && !bateria && !camaraPrincipal) return null;
 
   return {
     nombre: modeloCompleto,
@@ -357,6 +393,7 @@ module.exports = {
   buscarFicha: buscarFicha,
   mapear: mapear,
   consultasPara: consultasPara,
+  coincideGeneracion: coincideGeneracion,
   normalizar: normalizar,
   limpiar: limpiar,
   urlBase: URL_BASE,
