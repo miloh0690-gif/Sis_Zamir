@@ -1,15 +1,23 @@
 'use strict';
 
-// Orquesta la ficha tecnica: los DATOS vienen de la base de datos y los
-// ARGUMENTOS de venta del modelo de lenguaje, que solo redacta sobre lo
-// que ya existe. Si Groq falla, la ficha se entrega igual sin
-// argumentos: la app nunca se queda en blanco.
+// Orquesta la ficha tecnica. Fuentes, en orden de preferencia:
+//
+//   1. src/dataset.js -> dataset abierto en GitHub. Datos estructurados y
+//      verificados, con las marcas chinas (Xiaomi, Oppo, Honor, Infinix,
+//      Vivo) que el scraper no tiene.
+//   2. src/specs.js   -> scraper de GSMArena. Respaldo para los modelos
+//      que el dataset no tiene.
+//
+// Los ARGUMENTOS DE VENTA los redacta src/ia.js (Groq) usando estas
+// specs como unico contexto, para que no invente nada. Si Groq falla, la
+// ficha se entrega igual sin argumentos: la app nunca se queda en blanco.
 
+const dataset = require('./dataset');
 const specs = require('./specs');
 const ia = require('./ia');
 
 function habilitado() {
-  return specs.habilitado();
+  return true;
 }
 
 function hayArgumentos() {
@@ -17,8 +25,33 @@ function hayArgumentos() {
 }
 
 async function fichaTecnica(modelo, ip) {
-  const resultado = await specs.buscarFicha(modelo);
-  const ficha = Object.assign({}, resultado.ficha);
+  const texto = String(modelo || '').trim();
+  if (!texto) {
+    const e = new Error('Indica el modelo a consultar.');
+    e.codigo = 400;
+    throw e;
+  }
+
+  let ficha = null;
+  let cache = false;
+  let falloDataset = null;
+
+  try {
+    const resultado = await dataset.buscarFicha(texto);
+    if (resultado) {
+      ficha = resultado.ficha;
+      cache = resultado.cache;
+    }
+  } catch (e) {
+    falloDataset = e;
+    console.error('[ficha] dataset fallo: ' + e.message);
+  }
+
+  if (!ficha) {
+    const resultado = await specs.buscarFicha(texto);
+    ficha = resultado.ficha;
+    cache = resultado.cache;
+  }
 
   ficha.puntosDeVenta = [];
 
@@ -30,7 +63,9 @@ async function fichaTecnica(modelo, ip) {
     }
   }
 
-  return { ficha: ficha, cache: resultado.cache };
+  if (falloDataset && !ficha) throw falloDataset;
+
+  return { ficha: ficha, cache: cache };
 }
 
 module.exports = {
