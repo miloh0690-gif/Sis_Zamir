@@ -91,9 +91,19 @@ function responderError(res, e) {
 }
 
 function exigirSheets(res) {
-  if (inventory.estaConfigurado()) return true;
-  res.status(503).json({ error: 'Inventario no disponible: falta SHEETS_WEBAPP_URL en el servidor.' });
-  return false;
+  if (!inventory.estaConfigurado()) {
+    res.status(503).json({
+      error: 'Inventario no disponible: falta SHEETS_WEBAPP_URL en el servidor.',
+    });
+    return false;
+  }
+  if (!inventory.tieneClave()) {
+    res.status(503).json({
+      error: 'Inventario no disponible: falta SHEETS_API_KEY en el servidor.',
+    });
+    return false;
+  }
+  return true;
 }
 
 function construirCalculo(producto, cuerpo) {
@@ -114,7 +124,9 @@ app.get('/api/health', (req, res) => {
   res.json({
     ok: true,
     hora: new Date().toISOString(),
-    sheets: inventory.estaConfigurado(),
+    sheets: inventory.completo(),
+    sheetsUrl: inventory.estaConfigurado(),
+    sheetsClave: inventory.tieneClave(),
     reportes: ledger.modo(),
     ia: ai.habilitado(),
   });
@@ -122,7 +134,9 @@ app.get('/api/health', (req, res) => {
 
 app.get('/api/config', (req, res) => {
   res.json({
-    sheets: inventory.estaConfigurado(),
+    sheets: inventory.completo(),
+    sheetsUrl: inventory.estaConfigurado(),
+    sheetsClave: inventory.tieneClave(),
     ia: ai.habilitado(),
     iaModelo: ai.habilitado() ? ai.modelo : null,
     tasaComision: TASA_COMISION,
@@ -234,6 +248,8 @@ app.post('/api/ventas', limitar(60, 60000), async (req, res) => {
       filaExcel: producto.filaExcel,
     };
 
+    // Si Apps Script rechaza (fila movida, stock racedado) esto lanza y
+    // no se toca el historial, asi que no queda una venta fantasma.
     await inventory.escribir({
       tipoOperacion: 'VENTA',
       filaExcel: producto.filaExcel,
@@ -245,6 +261,7 @@ app.post('/api/ventas', limitar(60, 60000), async (req, res) => {
       cantidad: cantidad,
       tipoCambio: calculo.tipoCambio,
       precioUnitarioBs: calculo.precioUnitarioBs,
+      costoUnitarioBs: calculo.costoUnitarioBs,
       costoTotalBs: calculo.costoTotalBs,
       totalCobrado: calculo.totalCobradoBs,
       gananciaRegistrada: calculo.gananciaBs,
@@ -305,10 +322,13 @@ app.post('/api/consignaciones', limitar(60, 60000), async (req, res) => {
       });
     }
 
+    const id = ledger.nuevoId('C');
     const fechaIso = new Date().toISOString();
+
     await inventory.escribir({
       tipoOperacion: 'CONSIGNACION',
       subTipo: 'DESPACHO',
+      id: id,
       filaExcel: producto.filaExcel,
       fecha: fechaIso,
       cliente: cliente,
@@ -322,6 +342,7 @@ app.post('/api/consignaciones', limitar(60, 60000), async (req, res) => {
     let consignacion;
     try {
       consignacion = await ledger.registrarConsignacion({
+        id: id,
         fecha: fechaIso,
         cliente: cliente,
         modelo: producto.modelo,
@@ -333,7 +354,7 @@ app.post('/api/consignaciones', limitar(60, 60000), async (req, res) => {
     } catch (e) {
       advertencia = 'Se desconto el stock pero no se guardo el registro de consignacion.';
       consignacion = {
-        id: 'tmp' + Date.now().toString(36),
+        id: id,
         fecha: fechaIso,
         cliente: cliente,
         modelo: producto.modelo,
@@ -370,19 +391,17 @@ app.post('/api/consignaciones/estado', limitar(60, 60000), async (req, res) => {
     await inventory.escribir({
       tipoOperacion: 'CONSIGNACION',
       subTipo: 'CAMBIO_ESTADO',
+      id: id,
+      filaExcel: actual.filaExcel,
       fecha: actual.fecha,
       cliente: actual.cliente,
       modelo: actual.modelo,
       cantidad: actual.cantidad,
       sucursal: actual.sucursal,
-      estado: nuevo + ' (MODIFICADO)',
+      estado: nuevo,
     });
 
-    try {
-      await ledger.actualizarConsignacion(id, { estado: nuevo });
-    } catch (e) {
-      console.error('[ledger]', e.message);
-    }
+    await ledger.actualizarConsignacion(id, { estado: nuevo });
 
     res.json({ consignacion: Object.assign({}, actual, { estado: nuevo }) });
   } catch (e) {
@@ -403,6 +422,7 @@ app.post('/api/consignaciones/devolver', limitar(60, 60000), async (req, res) =>
     await inventory.escribir({
       tipoOperacion: 'CONSIGNACION',
       subTipo: 'DEVOLUCION',
+      id: id,
       filaExcel: actual.filaExcel,
       fecha: actual.fecha,
       cliente: actual.cliente,
@@ -412,11 +432,7 @@ app.post('/api/consignaciones/devolver', limitar(60, 60000), async (req, res) =>
       estado: 'Devuelto',
     });
 
-    try {
-      await ledger.actualizarConsignacion(id, { estado: 'Devuelto' });
-    } catch (e) {
-      console.error('[ledger]', e.message);
-    }
+    await ledger.actualizarConsignacion(id, { estado: 'Devuelto' });
 
     const lista = await inventory.listar({ forzar: true });
     const producto = inventory.buscarEn(lista, actual.modelo);
@@ -462,7 +478,7 @@ app.get('/api/ficha-tecnica', limitar(30, 60000), async (req, res) => {
 app.use(express.static(path.join(__dirname, 'public'), { index: 'index.html' }));
 
 app.use((req, res) => {
-  if (req.path.startsWith('/api/')) {
+  if (req.path.indexOf('/api/') === 0) {
     return res.status(404).json({ error: 'Ruta no encontrada.' });
   }
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -480,7 +496,8 @@ app.use((err, req, res, next) => {
 
 app.listen(PUERTO, '0.0.0.0', () => {
   console.log('MooN ERP escuchando en el puerto ' + PUERTO);
-  console.log('Sheets configurado: ' + inventory.estaConfigurado());
+  console.log('Sheets URL: ' + inventory.estaConfigurado());
+  console.log('Sheets clave: ' + inventory.tieneClave());
   console.log('Reportes: ' + ledger.modo() + (ledger.esEfimero() ? ' (efimero)' : ''));
   console.log('IA habilitada: ' + ai.habilitado());
   if (!process.env.SESSION_SECRET) {
