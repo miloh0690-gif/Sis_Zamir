@@ -1,60 +1,90 @@
 'use strict';
 
 // Fuente PRINCIPAL de ficha tecnica: dataset abierto de especificaciones
-// alojado en GitHub. Datos ya estructurados (no hay que limpiar HTML),
+// alojado en GitHub. Son datos ya estructurados (no hay que limpiar HTML),
 // con apertura por lente, zoom optico, imagen y enlaces de origen.
 //
-// Se intenta primero esta, y si el modelo no aparece se cae al scraper
-// de src/specs.js. Entre las dos cubren practicamente todo.
+// Si el modelo no aparece se cae al scraper de src/specs.js. Entre las dos
+// cubren practicamente todo.
 //
-// Resolucion del archivo: marca + anio + slug. Se adivina el slug a
-// partir del nombre que escribe el vendedor y se prueban los anos
-// recientes. raw.githubusercontent.com no tiene rate limit de API, asi
-// que los intentos fallidos son baratos. Solo si eso no basta se usa la
-// API de GitHub (que si tiene limite) para listar el directorio, y ahi
-// hace falta GITHUB_TOKEN para no agotar las 60 peticiones/hora.
+// Resolucion del archivo: categoria + marca + anio + slug.
+//   - La categoria decide la carpeta: smartphone, tablet o laptop.
+//   - La marca se detecta por sinonimos, porque en una tienda los
+//     productos vienen por linea y no por marca: "REDMI A7 64/4" es
+//     Xiaomi, "BLACK SHARK" es Nubia, "POVA" es Tecno, "PAD 7" es Xiaomi,
+//     "TAB A9" es Samsung.
+//   - El slug se adivina quitando primero los sufijos de memoria y
+//     almacenamiento (256/8, 512GB, 8.7"), y despues los modificadores
+//     del final (PRO, MAX, 5G, +...). Se generan varias candidatas, de la
+//     mas especifica a la mas corta.
+//
+// Se prueban primero los intentos directos contra raw.githubusercontent.com,
+// que no tiene rate limit. Solo si fallan todos se usa la API de GitHub
+// para listar el directorio, y ahi se respeta un presupuesto local de
+// peticiones por hora porque el limite sin token es de 60.
 
-const REPO = 'GetTechAPI/TechAPI';
+const REPO = process.env.DATASET_REPO || 'GetTechAPI/TechAPI';
 const REF = process.env.DATASET_REF || 'develop';
-const API_BASE = 'https://api.github.com/repos/' + REPO + '/contents/data/smartphone';
-const RAW_BASE = 'https://raw.githubusercontent.com/' + REPO + '/' + REF + '/data/smartphone';
+const API_BASE = 'https://api.github.com/repos/' + REPO + '/contents/data';
+const RAW_BASE = 'https://raw.githubusercontent.com/' + REPO + '/' + REF + '/data';
 
 const TOKEN = String(process.env.GITHUB_TOKEN || '').trim();
 const TIMEOUT_MS = 20000;
-const ANIOS_REVISAR = 12;
+const ANIOS_REVISAR = 13;
+const PRESUPUESTO_API_POR_HORA = Number(process.env.DATASET_API_POR_HORA) || 45;
 
-const MARCAS = {
-  apple: ['apple', 'iphone', 'ipad'],
-  samsung: ['samsung', 'galaxy'],
-  xiaomi: ['xiaomi', 'redmi', 'poco'],
-  huawei: ['huawei', 'nova ', 'p smart', 'mate '],
-  honor: ['honor'],
-  motorola: ['motorola', 'moto'],
-  oppo: ['oppo'],
-  realme: ['realme'],
-  oneplus: ['oneplus', 'one plus'],
-  nokia: ['nokia'],
-  vivo: ['vivo'],
-  infinix: ['infinix'],
-  tecno: ['tecno', 'camon'],
-  itel: ['itel'],
-  asus: ['asus', 'zenfone', 'rog'],
-  google: ['google', 'pixel'],
-  zte: ['zte', 'nubia'],
-  lg: ['lg'],
-  sony: ['sony', 'xperia'],
-  htc: ['htc'],
-  alcatel: ['alcatel'],
-  nothing: ['nothing'],
-  blackberry: ['blackberry'],
-  meizu: ['meizu'],
-  lenovo: ['lenovo'],
-  tcl: ['tcl'],
-  hmd: ['hmd'],
-};
+const CATEGORIAS = ['smartphone', 'tablet', 'laptop'];
+
+// Orden importa: se evalua de arriba hacia abajo y gana la primera
+// marca que coincida.
+const MARCAS = [
+  ['apple', ['iphone', 'ipad', 'macbook', 'mac book', 'ipod']],
+  ['xiaomi', ['redmi pad', 'xiaomi pad', 'redmi', 'poco', 'xiaomi', 'mi pad']],
+  ['nubia', ['black shark', 'redmagic', 'red magic', 'nubia']],
+  ['tecno', ['pova', 'tecno', 'camon', 'spark']],
+  ['samsung', ['samsung', 'galaxy', 'tab']],
+  ['honor', ['honor']],
+  ['motorola', ['motorola', 'moto', 'moto g']],
+  ['realme', ['realme']],
+  ['infinix', ['infinix']],
+  ['cubot', ['cubot']],
+  ['zte', ['zte', 'nubia z']],
+  ['tcl', ['tcl']],
+  ['meizu', ['meizu']],
+  ['oppo', ['oppo', 'find x']],
+  ['oneplus', ['oneplus', 'one plus']],
+  ['vivo', ['vivo', 'iqoo']],
+  ['itel', ['itel']],
+  ['google', ['pixel', 'google']],
+  ['nokia', ['nokia']],
+  ['lg', ['lg']],
+  ['sony', ['sony', 'xperia']],
+  ['htc', ['htc']],
+  ['alcatel', ['alcatel']],
+  ['nothing', ['nothing phone', 'nothing']],
+  ['blackberry', ['blackberry']],
+  ['lenovo', ['lenovo', 'ideapad', 'thinkpad', 'legion']],
+  ['asus', ['asus', 'zenfone', 'rog phone']],
+  ['hmd', ['hmd', 'nokia g', 'nokia c']],
+  ['hmd', ['nokia']],
+  ['asus', ['transcend']],
+  ['tough', ['tough']],
+  ['xiaomi', ['pad']],
+  ['infinix', ['hot', 'smart', 'zero', 'note 30', 'note 40']],
+];
+
+// Palabras que se pueden quitar del final del nombre sin romper la
+// identidad del modelo. "NOTE" NO va aqui: "Redmi Note 15" es el nombre.
+const MODIFICADORES = new Set([
+  'pro+', 'pro', 'max', 'ultra', 'mini', 'plus', '5g', '4g', '3g',
+  'wifi', 'chip', 'fusion', 'air', 'new', 'global', 'dual', 'sim',
+  'refresh', 'prime', 'neo', 'gt', 'se',
+]);
 
 const cacheFicha = new Map();
 const cacheDir = new Map();
+let apiUsadas = 0;
+let apiVentana = Date.now();
 
 function habilitado() {
   return true;
@@ -74,12 +104,93 @@ function normalizar(texto) {
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
 function clave(modelo) {
   return normalizar(modelo);
+}
+
+function unicos(lista) {
+  const vistos = new Set();
+  const salida = [];
+  for (const v of lista) {
+    if (!v) continue;
+    if (vistos.has(v)) continue;
+    vistos.add(v);
+    salida.push(v);
+  }
+  return salida;
+}
+
+/**
+ * "REDMI A7 64/4" -> "redmi a7"
+ * "TAB A11 8.7 WIFI 64/4" -> "tab a11"
+ * "IPAD AIR 11 M4 256" -> "ipad air 11 m4"
+ */
+function limpiarSufijos(texto) {
+  return String(texto || '')
+    .replace(/\b\d+\s*\/\s*\d+\b/g, ' ')
+    .replace(/\b\d+\s*(gb|tb|mb)\b/g, ' ')
+    .replace(/\b\d+[.,]\d+\b/g, ' ')
+    .replace(/\b\d+\s*(inch|pulg|pol)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function palabraEnTexto(texto, palabra) {
+  const t = String(texto || '');
+  const p = String(palabra || '');
+  if (!p) return false;
+  if (t === p) return true;
+  const i = t.indexOf(p);
+  if (i < 0) return false;
+  const antes = i === 0 ? ' ' : t.charAt(i - 1);
+  const despues = i + p.length >= t.length ? ' ' : t.charAt(i + p.length);
+  return /[\s]/.test(antes) && /[\s]/.test(despues);
+}
+
+function detectarCategoria(texto) {
+  const n = normalizar(texto);
+  if (palabraEnTexto(n, 'macbook') || palabraEnTexto(n, 'notebook') ||
+      palabraEnTexto(n, 'laptop') || palabraEnTexto(n, 'ideapad') ||
+      palabraEnTexto(n, 'thinkpad') || palabraEnTexto(n, 'chromebook')) {
+    return 'laptop';
+  }
+  if (palabraEnTexto(n, 'ipad') || palabraEnTexto(n, 'tab') ||
+      palabraEnTexto(n, 'pad') || palabraEnTexto(n, 'matepad')) {
+    return 'tablet';
+  }
+  return 'smartphone';
+}
+
+function detectarMarca(texto) {
+  const n = normalizar(texto);
+  for (const par of MARCAS) {
+    for (const alias of par[1]) {
+      if (palabraEnTexto(n, alias)) return par[0];
+    }
+  }
+  return '';
+}
+
+function quitarMarca(texto, marca) {
+  const n = normalizar(texto);
+  if (!marca) return n;
+  for (const par of MARCAS) {
+    if (par[0] !== marca) continue;
+    for (const alias of par[1]) {
+      if (palabraEnTexto(n, alias)) {
+        return n.replace(alias, ' ').replace(/\s+/g, ' ').trim();
+      }
+    }
+  }
+  if (n.indexOf(marca + ' ') === 0) {
+    return n.slice(marca.length + 1).trim();
+  }
+  return n;
 }
 
 function aniosPosibles() {
@@ -89,48 +200,45 @@ function aniosPosibles() {
   return lista;
 }
 
-function detectarMarca(texto) {
-  const n = normalizar(texto);
-  for (const marca of Object.keys(MARCAS)) {
-    for (const alias of MARCAS[marca]) {
-      const a = alias.trim();
-      if (n === a || n.indexOf(a + ' ') === 0) return marca;
-    }
-  }
-  return '';
-}
-
 function anioEnElNombre(texto) {
   const m = normalizar(texto).match(/\b(20[0-2][0-9])\b/);
   return m ? m[1] : null;
 }
 
+/**
+ * Escala de candidatas, de la mas especifica a la mas corta:
+ *   "REDMI NOTE 15 PRO + 5G 256/8"
+ *     -> redmi-note-15-pro-5g
+ *     -> redmi-note-15-pro
+ *     -> redmi-note-15
+ */
 function adivinarSlugs(modelo, marca) {
-  const n = normalizar(modelo);
-  const completo = norm(n);
+  const crudo = normalizar(modelo);
+  const limpio = limpiarSufijos(crudo) || crudo;
 
-  let sinMarca = completo;
-  if (marca && n.indexOf(marca + ' ') === 0) {
-    sinMarca = norm(n.slice(marca.length + 1));
+  const raices = unicos([quitarMarca(limpio, marca), limpio, crudo].filter(Boolean));
+  const salida = [];
+
+  for (const raiz of raices) {
+    salida.push(norm(raiz));
+
+    const partes = raiz.split(' ').filter(Boolean);
+    for (let i = partes.length; i >= 1; i--) {
+      const ultimo = String(partes[i - 1]).replace(/\+/g, '');
+      if (!MODIFICADORES.has(ultimo)) continue;
+      const resto = partes.slice(0, i - 1);
+      if (resto.length) salida.push(norm(resto.join(' ')));
+    }
   }
 
-  const candidatos = [sinMarca, completo];
-
-  const anio = anioEnElNombre(n);
-  if (anio) {
-    candidatos.push(norm(n.replace(anio, ' ')));
-  }
-
-  return candidatos
-    .filter(Boolean)
-    .filter((v, i, arr) => arr.indexOf(v) === i);
+  return unicos(salida);
 }
 
-async function pedir(url, cabeceras) {
+async function pedirJson(url, cabeceras) {
   const controlador = new AbortController();
   const temporizador = setTimeout(() => controlador.abort(), TIMEOUT_MS);
   try {
-    const r = await fetch(url, { headers: cabeceras, signal: controlador.signal });
+    const r = await fetch(url, { headers: cabeceras || {}, redirect: 'follow', signal: controlador.signal });
     if (!r.ok) return null;
     return await r.json();
   } catch (e) {
@@ -140,45 +248,54 @@ async function pedir(url, cabeceras) {
   }
 }
 
+function gastarApi() {
+  const ahora = Date.now();
+  if (ahora - apiVentana > 3600000) {
+    apiVentana = ahora;
+    apiUsadas = 0;
+  }
+  if (apiUsadas >= PRESUPUESTO_API_POR_HORA) return false;
+  apiUsadas++;
+  return true;
+}
+
 function cabecerasApi() {
   const h = { Accept: 'application/vnd.github+json', 'User-Agent': 'moon-erp' };
   if (TOKEN) h.Authorization = 'Bearer ' + TOKEN;
   return h;
 }
 
-async function fetchSpec(marca, anio, slug) {
-  return pedir(RAW_BASE + '/' + marca + '/' + anio + '/' + slug + '.json', {});
+async function fetchSpec(categoria, marca, anio, slug) {
+  return pedirJson(RAW_BASE + '/' + categoria + '/' + marca + '/' + anio + '/' + slug + '.json', {});
 }
 
-/**
- * Ultimo recurso: listar el directorio del ano con la API de GitHub y
- * buscar el slug por similitud. Necesita GITHUB_TOKEN para no gastar el
- * limite de 60 peticiones/hora sin token.
- */
-async function buscarEnDirectorio(marca, slugs) {
-  const anios = await pedir(API_BASE + '/' + marca, cabecerasApi());
-  if (!Array.isArray(anios)) return null;
+async function buscarEnDirectorio(categoria, marca, slugs) {
+  if (!gastarApi()) return null;
 
-  const dirs = anios
+  const raiz = await pedirJson(API_BASE + '/' + categoria + '/' + marca, cabecerasApi());
+  if (!Array.isArray(raiz)) return null;
+
+  const anios = raiz
     .filter((e) => e && e.type === 'dir' && /^\d{4}$/.test(e.name))
     .map((e) => e.name)
     .sort((a, b) => Number(b) - Number(a));
 
-  for (const anio of dirs) {
-    const k = marca + '/' + anio;
+  for (const anio of anios) {
+    const k = categoria + '/' + marca + '/' + anio;
     if (cacheDir.has(k)) continue;
-    const archivos = await pedir(API_BASE + '/' + anio, cabecerasApi());
+    if (!gastarApi()) return null;
+    const archivos = await pedirJson(API_BASE + '/' + categoria + '/' + marca + '/' + anio, cabecerasApi());
     cacheDir.set(k, Array.isArray(archivos) ? archivos : []);
   }
 
-  for (const anio of dirs) {
-    const archivos = cacheDir.get(marca + '/' + anio) || [];
+  for (const anio of anios) {
+    const archivos = cacheDir.get(categoria + '/' + marca + '/' + anio) || [];
     for (const archivo of archivos) {
       if (!archivo || archivo.type !== 'file') continue;
       const slug = String(archivo.name).replace(/\.json$/i, '');
       for (const buscado of slugs) {
         if (slug === buscado || slug.indexOf(buscado) === 0 || buscado.indexOf(slug) === 0) {
-          const spec = await fetchSpec(marca, anio, slug);
+          const spec = await fetchSpec(categoria, marca, anio, slug);
           if (spec) return spec;
         }
       }
@@ -322,6 +439,9 @@ async function buscarFicha(modelo) {
   const slugs = adivinarSlugs(modelo, marca);
   if (!slugs.length) return null;
 
+  const categoriaDetectada = detectarCategoria(modelo);
+  const categorias = unicos([categoriaDetectada].concat(CATEGORIAS));
+
   const anios = aniosPosibles();
   const anio = anioEnElNombre(modelo);
   if (anio) {
@@ -332,29 +452,32 @@ async function buscarFicha(modelo) {
     }
   }
 
-  // 1) Adivinar slug y barrer anios (raw, sin limite de API).
-  for (const slug of slugs) {
-    for (const a of anios) {
-      const json = await fetchSpec(marca, a, slug);
-      if (!json) continue;
-      const ficha = mapear(json);
-      if (ficha) {
-        cacheFicha.set(k, { ficha: ficha });
-        return { ficha: ficha, cache: false };
+  // 1) Intentos directos (raw, sin limite).
+  for (const categoria of categorias) {
+    for (const slug of slugs) {
+      for (const a of anios) {
+        const json = await fetchSpec(categoria, marca, a, slug);
+        if (!json) continue;
+        const ficha = mapear(json);
+        if (ficha) {
+          cacheFicha.set(k, { ficha: ficha });
+          return { ficha: ficha, cache: false };
+        }
       }
     }
   }
 
-  // 2) Listar el directorio y buscar por similitud (necesita token).
-  if (!TOKEN) return null;
+  // 2) Listar directorios (presupuesto local por hora).
+  for (const categoria of categorias) {
+    const json = await buscarEnDirectorio(categoria, marca, slugs);
+    if (!json) continue;
+    const ficha = mapear(json);
+    if (!ficha) continue;
+    cacheFicha.set(k, { ficha: ficha });
+    return { ficha: ficha, cache: false };
+  }
 
-  const json = await buscarEnDirectorio(marca, slugs);
-  if (!json) return null;
-  const ficha = mapear(json);
-  if (!ficha) return null;
-
-  cacheFicha.set(k, { ficha: ficha });
-  return { ficha: ficha, cache: false };
+  return null;
 }
 
 module.exports = {
@@ -362,5 +485,7 @@ module.exports = {
   buscarFicha: buscarFicha,
   mapear: mapear,
   detectarMarca: detectarMarca,
+  detectarCategoria: detectarCategoria,
   adivinarSlugs: adivinarSlugs,
+  limpiarSufijos: limpiarSufijos,
 };
