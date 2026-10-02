@@ -53,41 +53,121 @@ function ahoraIso() {
   return new Date().toISOString();
 }
 
+function nuevoId(prefijo) {
+  return (
+    (prefijo || 'R') +
+    Date.now().toString(36) +
+    Math.floor(Math.random() * 1679616).toString(36)
+  );
+}
+
+// -----------------------------------------------------------------
+// VENTAS
+// -----------------------------------------------------------------
+
+function normalizarVenta(fila) {
+  const f = fila || {};
+  const num = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
+  return {
+    id: String(f.id || ''),
+    fecha: f.fecha ? new Date(f.fecha).toISOString() : ahoraIso(),
+    vendedor: String(f.vendedor || ''),
+    modelo: String(f.modelo || ''),
+    sucursal: String(f.sucursal || ''),
+    tipo: String(f.tipo || 'UNIDAD'),
+    cantidad: Math.floor(num(f.cantidad)) || 0,
+    tipoCambio: num(f.tipoCambio),
+    precioUnitarioBs: num(
+      f.precioUnitarioBs !== undefined ? f.precioUnitarioBs : f.precioUnitario
+    ),
+    costoTotalBs: num(f.costoTotalBs !== undefined ? f.costoTotalBs : f.costoTotal),
+    totalCobradoBs: num(
+      f.totalCobradoBs !== undefined ? f.totalCobradoBs : f.totalCobrado
+    ),
+    gananciaBs: num(
+      f.gananciaBs !== undefined ? f.gananciaBs : f.gananciaRegistrada
+    ),
+    comisionBs: num(f.comisionBs !== undefined ? f.comisionBs : f.comision),
+  };
+}
+
 function registrarVenta(registro) {
-  const completo = Object.assign({ id: 'V' + Date.now().toString(36), fecha: ahoraIso() }, registro);
+  const completo = Object.assign({ id: nuevoId('V'), fecha: ahoraIso() }, registro);
   if (USAR_SHEETS) return completo;
   leerDisco().ventas.push(completo);
   guardarDisco();
   return completo;
 }
 
-function registrarConsignacion(registro) {
-  const completo = Object.assign({ id: 'C' + Date.now().toString(36), fecha: ahoraIso() }, registro);
-  if (USAR_SHEETS) return completo;
+async function listarVentas(filtro) {
+  const f = filtro || {};
+  let ventas;
+
+  if (USAR_SHEETS) {
+    const respuesta = await inventory.escribir({ tipoOperacion: 'REPORTE_VENTAS' });
+    ventas = Array.isArray(respuesta) ? respuesta.map(normalizarVenta) : [];
+  } else {
+    ventas = leerDisco().ventas.slice();
+  }
+
+  const vendedor = normalizarTexto(f.vendedor);
+  return ventas.filter((v) => {
+    if (!enRango(v.fecha, f.desde, f.hasta)) return false;
+    if (vendedor && normalizarTexto(v.vendedor).indexOf(vendedor) === -1) return false;
+    return true;
+  });
+}
+
+// -----------------------------------------------------------------
+// CONSIGNACIONES
+// -----------------------------------------------------------------
+// El historial de consignaciones vive como registro de cambios: cada
+// evento escribe una fila con el mismo id y el lector se queda con la
+// ultima. El motor de archivo, en cambio, reemplaza en el sitio.
+
+async function registrarConsignacion(registro) {
+  const completo = Object.assign({ id: nuevoId('C'), fecha: ahoraIso() }, registro);
+  if (USAR_SHEETS) {
+    // Apps Script ya escribio la fila del evento.
+    return completo;
+  }
   leerDisco().consignaciones.push(completo);
   guardarDisco();
   return completo;
 }
 
-function actualizarConsignacion(id, cambios) {
-  if (USAR_SHEETS) return null;
+async function actualizarConsignacion(id, cambios) {
+  if (USAR_SHEETS) {
+    // Apps Script ya escribio la fila del evento.
+    return null;
+  }
   const lista = leerDisco().consignaciones;
-  const encontrada = lista.find((c) => c.id === id);
+  const encontrada = lista.find((c) => String(c.id) === id);
   if (!encontrada) return null;
   Object.assign(encontrada, cambios);
   guardarDisco();
   return encontrada;
 }
 
-function eliminarConsignacion(id) {
-  if (USAR_SHEETS) return false;
-  const datos = leerDisco();
-  const antes = datos.consignaciones.length;
-  datos.consignaciones = datos.consignaciones.filter((c) => c.id !== id);
-  if (datos.consignaciones.length === antes) return false;
-  guardarDisco();
-  return true;
+async function listarConsignaciones(filtro) {
+  const f = filtro || {};
+  let lista;
+
+  if (USAR_SHEETS) {
+    const respuesta = await inventory.escribir({
+      tipoOperacion: 'REPORTE_CONSIGNACIONES',
+    });
+    lista = Array.isArray(respuesta) ? respuesta : [];
+  } else {
+    lista = leerDisco().consignaciones.slice();
+  }
+
+  return lista.filter((c) => enRango(c.fecha, f.desde, f.hasta));
 }
+
+// -----------------------------------------------------------------
+// FILTROS Y RESUMEN
+// -----------------------------------------------------------------
 
 function diaDe(fechaIso) {
   return String(fechaIso || '').slice(0, 10);
@@ -102,77 +182,12 @@ function enRango(fechaIso, desde, hasta) {
 }
 
 function normalizarTexto(texto) {
-  return String(texto || '')
+  return String(texto === undefined || texto === null ? '' : texto)
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/\s+/g, ' ')
     .trim();
-}
-
-async function listarVentas(filtro = {}) {
-  let ventas;
-  if (USAR_SHEETS) {
-    const respuesta = await inventory.escribir({ tipoOperacion: 'REPORTE_VENTAS' });
-    ventas = Array.isArray(respuesta) ? respuesta.map(normalizarVenta) : [];
-  } else {
-    ventas = leerDisco().ventas.slice();
-  }
-
-  const vendedor = normalizarTexto(filtro.vendedor);
-  return ventas.filter((v) => {
-    if (!enRango(v.fecha, filtro.desde, filtro.hasta)) return false;
-    if (vendedor && normalizarTexto(v.vendedor).indexOf(vendedor) === -1) return false;
-    return true;
-  });
-}
-
-function normalizarVenta(fila) {
-  const f = fila || {};
-  const num = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
-  return {
-    id: String(f.id || ''),
-    fecha: f.fecha ? new Date(f.fecha).toISOString() : ahoraIso(),
-    vendedor: String(f.vendedor || ''),
-    modelo: String(f.modelo || ''),
-    sucursal: String(f.sucursal || ''),
-    tipo: String(f.tipo || 'UNIDAD'),
-    cantidad: Math.floor(num(f.cantidad)) || 0,
-    tipoCambio: num(f.tipoCambio),
-    precioUnitarioBs: num(f.precioUnitarioBs !== undefined ? f.precioUnitarioBs : f.precioUnitario),
-    costoTotalBs: num(f.costoTotalBs !== undefined ? f.costoTotalBs : f.costoTotal),
-    totalCobradoBs: num(f.totalCobradoBs !== undefined ? f.totalCobradoBs : f.totalCobrado),
-    gananciaBs: num(f.gananciaBs !== undefined ? f.gananciaBs : f.gananciaRegistrada),
-    comisionBs: num(f.comisionBs !== undefined ? f.comisionBs : f.comision),
-  };
-}
-
-async function listarConsignaciones(filtro = {}) {
-  let lista;
-  if (USAR_SHEETS) {
-    const respuesta = await inventory.escribir({ tipoOperacion: 'REPORTE_CONSIGNACIONES' });
-    lista = Array.isArray(respuesta) ? respuesta : [];
-  } else {
-    lista = leerDisco().consignaciones.slice();
-  }
-  return lista.filter((c) => enRango(c.fecha, filtro.desde, filtro.hasta));
-}
-
-function acumular(destino, clave, valores) {
-  if (!destino[clave]) {
-    destino[clave] = {
-      ventas: 0,
-      unidades: 0,
-      ganancia: 0,
-      comision: 0,
-    };
-  }
-  const fila = destino[clave];
-  fila.ventas += valores.venta;
-  fila.unidades += valores.unidades;
-  fila.ganancia += valores.ganancia;
-  fila.comision += valores.comision;
-  return fila;
 }
 
 function redondear(n) {
@@ -200,18 +215,39 @@ function calcularResumen(ventas) {
     totalComisiones += comision;
     unidades += cantidad;
 
-    const valores = { venta: cobrado, unidades: cantidad, ganancia: ganancia, comision: comision };
-    acumular(porVendedor, String(v.vendedor || 'Sin nombre'), valores);
-    acumular(porModelo, String(v.modelo || 'Sin modelo'), valores);
-    acumular(porDia, diaDe(v.fecha), valores);
+    const valores = {
+      venta: cobrado,
+      unidades: cantidad,
+      ganancia: ganancia,
+      comision: comision,
+    };
+
+    if (!porVendedor[String(v.vendedor || 'Sin nombre')]) {
+      porVendedor[String(v.vendedor || 'Sin nombre')] = { ventas: 0, unidades: 0, ganancia: 0, comision: 0 };
+    }
+    if (!porModelo[String(v.modelo || 'Sin modelo')]) {
+      porModelo[String(v.modelo || 'Sin modelo')] = { ventas: 0, unidades: 0, ganancia: 0, comision: 0 };
+    }
+    if (!porDia[diaDe(v.fecha)]) {
+      porDia[diaDe(v.fecha)] = { ventas: 0, unidades: 0, ganancia: 0, comision: 0 };
+    }
+
+    porVendedor[String(v.vendedor || 'Sin nombre')].ventas += valores.venta;
+    porVendedor[String(v.vendedor || 'Sin nombre')].unidades += valores.unidades;
+    porVendedor[String(v.vendedor || 'Sin nombre')].ganancia += valores.ganancia;
+    porVendedor[String(v.vendedor || 'Sin nombre')].comision += valores.comision;
+
+    porModelo[String(v.modelo || 'Sin modelo')].ventas += valores.venta;
+    porModelo[String(v.modelo || 'Sin modelo')].unidades += valores.unidades;
+    porModelo[String(v.modelo || 'Sin modelo')].ganancia += valores.ganancia;
+
+    porDia[diaDe(v.fecha)].ventas += valores.venta;
+    porDia[diaDe(v.fecha)].unidades += valores.unidades;
+    porDia[diaDe(v.fecha)].ganancia += valores.ganancia;
   }
 
-  const lista = (mapa, campo) =>
-    Object.keys(mapa)
-      .map((clave) =>
-        Object.assign({ clave: clave }, mapa[clave], { [campo]: clave })
-      )
-      .sort((a, b) => b.ventas - a.ventas);
+  const ordenarPorVenta = (mapa) =>
+    Object.keys(mapa).sort((a, b) => mapa[b].ventas - mapa[a].ventas);
 
   return {
     totalVendidoBs: redondear(totalVendido),
@@ -221,18 +257,18 @@ function calcularResumen(ventas) {
     cantidadVentas: ventas.length,
     ticketPromedioBs: ventas.length ? redondear(totalVendido / ventas.length) : 0,
     margenPct: totalVendido > 0 ? redondear((totalGanancia / totalVendido) * 100) : 0,
-    porVendedor: lista(porVendedor, 'vendedor').map((f) => ({
-      vendedor: f.vendedor,
-      ventasBs: redondear(f.ventas),
-      unidades: f.unidades,
-      gananciaBs: redondear(f.ganancia),
-      comisionBs: redondear(f.comision),
+    porVendedor: ordenarPorVenta(porVendedor).map((clave) => ({
+      vendedor: clave,
+      ventasBs: redondear(porVendedor[clave].ventas),
+      unidades: porVendedor[clave].unidades,
+      gananciaBs: redondear(porVendedor[clave].ganancia),
+      comisionBs: redondear(porVendedor[clave].comision),
     })),
-    porModelo: lista(porModelo, 'modelo').map((f) => ({
-      modelo: f.modelo,
-      ventasBs: redondear(f.ventas),
-      unidades: f.unidades,
-      gananciaBs: redondear(f.ganancia),
+    porModelo: ordenarPorVenta(porModelo).map((clave) => ({
+      modelo: clave,
+      ventasBs: redondear(porModelo[clave].ventas),
+      unidades: porModelo[clave].unidades,
+      gananciaBs: redondear(porModelo[clave].ganancia),
     })),
     porDia: Object.keys(porDia)
       .sort()
@@ -246,14 +282,14 @@ function calcularResumen(ventas) {
 }
 
 module.exports = {
-  modo,
-  esEfimero,
-  registrarVenta,
-  registrarConsignacion,
-  actualizarConsignacion,
-  eliminarConsignacion,
-  listarVentas,
-  listarConsignaciones,
-  calcularResumen,
-  normalizarVenta,
+  modo: modo,
+  esEfimero: esEfimero,
+  nuevoId: nuevoId,
+  registrarVenta: registrarVenta,
+  registrarConsignacion: registrarConsignacion,
+  actualizarConsignacion: actualizarConsignacion,
+  listarVentas: listarVentas,
+  listarConsignaciones: listarConsignaciones,
+  calcularResumen: calcularResumen,
+  normalizarVenta: normalizarVenta,
 };
