@@ -6,10 +6,16 @@
 //   2. src/specs.js   -> scraper de GSMArena (respaldo, cubre los ultimos)
 //
 // Antes de devolver nada se VERIFICA que la ficha sea del telefono que se
-// pidio. Sin esa comprobacion la base de datos responde con el modelo mas
-// parecido y el vendedor le dice esas especificaciones al cliente:
-// "REDMI 17 256/4" devolvia el Redmi 9 y "IPHONE 17 PRO MAX" devolvia el
-// iPhone 17 Pro. Es preferible decir "no hay ficha" antes que mentir.
+// pidio, en las dos direcciones:
+//
+//   - el pedido tiene generacion o modificador y la ficha no    -> otro tel.
+//   - la ficha tiene modificador y el pedido no pide ese        -> otro tel.
+//
+// Sin esto la base de datos responde con el modelo mas parecido y el
+// vendedor le dice esas especificaciones al cliente. Lo que se vio:
+// "REDMI 17 256/4" devolvia el Redmi 9, "IPHONE 17 PRO MAX" devolvia el
+// iPhone 17 Pro y "REALME 14 5G" devolvia el Realme 14 Pro+. Es preferible
+// decir "no hay ficha verificada" antes que mentir.
 //
 // Los ARGUMENTOS DE VENTA los redacta src/ia.js (Groq) usando esta ficha
 // como unico contexto. Si Groq falla, se entrega la ficha sin argumentos.
@@ -30,12 +36,15 @@ function hayArgumentos() {
   return ia.habilitado();
 }
 
-function palabraEn(texto, palabra) {
-  const partes = String(texto === undefined || texto === null ? '' : texto)
+function palabras(texto) {
+  return String(texto === undefined || texto === null ? '' : texto)
     .toLowerCase()
     .split(/[^a-z0-9]+/)
     .filter(Boolean);
-  return partes.indexOf(palabra) !== -1;
+}
+
+function palabraEn(texto, palabra) {
+  return palabras(texto).indexOf(palabra) !== -1;
 }
 
 function generacion(texto) {
@@ -58,6 +67,7 @@ function verificar(ficha, pedido) {
   if (!ficha.nombre) return 'la ficha no trae nombre';
 
   const nombre = ficha.nombre;
+
   const pedidoGen = generacion(pedido);
   const nombreGen = generacion(nombre);
 
@@ -71,8 +81,14 @@ function verificar(ficha, pedido) {
 
   for (let j = 0; j < ESTRICTOS.length; j++) {
     const mod = ESTRICTOS[j];
-    if (palabraEn(pedido, mod) && !palabraEn(nombre, mod)) {
+    const pedidoLoTiene = palabraEn(pedido, mod);
+    const fichaLoTiene = palabraEn(nombre, mod);
+
+    if (pedidoLoTiene && !fichaLoTiene) {
       return 'le falta "' + mod + '" (' + nombre + ')';
+    }
+    if (!pedidoLoTiene && fichaLoTiene) {
+      return 'es la version "' + mod + '" y se pidio la basica (' + nombre + ')';
     }
   }
 
