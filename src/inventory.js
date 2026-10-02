@@ -60,10 +60,6 @@ function completo() {
   return estaConfigurado() && tieneClave();
 }
 
-/**
- * Apps Script NO expone los encabezados HTTP de la peticion dentro de
- * doGet, asi que la clave compartida tiene que ir en la query string.
- */
 function construirUrl() {
   if (!API_KEY) return URL_BASE;
   return URL_BASE + (URL_BASE.indexOf('?') >= 0 ? '&' : '?') + 'key=' + encodeURIComponent(API_KEY);
@@ -71,10 +67,9 @@ function construirUrl() {
 
 function errorDeAuth() {
   const e = new Error(
-    'El Apps Script rechazo la peticion. Revisa tres cosas: (1) que hayas pegado ' +
-      'apps-script/Code.gs y lo hayas desplegado con Implementar > Nueva implementacion; ' +
-      '(2) que la propiedad SHEETS_API_KEY este guardada en el script; ' +
-      '(3) que ese mismo valor este en la variable SHEETS_API_KEY de Render.'
+    'El Apps Script no acepto la clave. La propiedad SHEETS_API_KEY del script ' +
+      'no coincide con la variable SHEETS_API_KEY de Render. Abre ' +
+      '/api/diagnostico para ver exactamente donde se rompe.'
   );
   e.codigo = 502;
   return e;
@@ -95,6 +90,30 @@ function pareceFalloDeAuth(datos, estadoHttp) {
   );
 }
 
+async function pedirJson(url, cabeceras) {
+  const controlador = new AbortController();
+  const temporizador = setTimeout(() => controlador.abort(), TIMEOUT_MS);
+  try {
+    const r = await fetch(url, {
+      headers: cabeceras || {},
+      redirect: 'follow',
+      signal: controlador.signal,
+    });
+    const texto = await r.text();
+    let datos = null;
+    if (texto.trim()) {
+      try {
+        datos = JSON.parse(texto);
+      } catch (e) {
+        datos = null;
+      }
+    }
+    return { estado: r.status, datos: datos };
+  } finally {
+    clearTimeout(temporizador);
+  }
+}
+
 async function pedirRemoto(payload) {
   if (!estaConfigurado()) {
     const e = new Error('SHEETS_WEBAPP_URL no esta configurado en el servidor.');
@@ -109,7 +128,6 @@ async function pedirRemoto(payload) {
   if (payload === null) {
     url = construirUrl();
   } else {
-    // En POST la clave viaja en el cuerpo, no en la query.
     cuerpo = JSON.stringify(Object.assign({ apiKey: API_KEY }, payload));
     cabeceras['Content-Type'] = 'application/json';
   }
@@ -227,6 +245,106 @@ function limpiarCache() {
   cache = { datos: null, expira: 0 };
 }
 
+/**
+ * Diagnostico paso a paso de la conexion con Google Sheets.
+ *
+ * Existe porque el unico dato que falta (el valor de la propiedad
+ * SHEETS_API_KEY) vive dentro de la cuenta de Google del dueno y el
+ * servidor no puede ni leerlo ni escribirlo. Con esto el dueno abre una
+ * sola URL y ve exactamente cual de los cuatro pasos se rompe.
+ */
+async function diagnostico() {
+  const pasos = [];
+
+  pasos.push({
+    paso: 1,
+    nombre: 'SHEETS_WEBAPP_URL en Render',
+    ok: estaConfigurado(),
+    detalle: estaConfigurado()
+      ? 'configurada'
+      : 'FALTA. Agregala en Render > Environment.',
+  });
+
+  pasos.push({
+    paso: 2,
+    nombre: 'SHEETS_API_KEY en Render',
+    ok: tieneClave(),
+    detalle: tieneClave()
+      ? 'definida, ' + API_KEY.length + ' caracteres'
+      : 'FALTA. Agregala en Render > Environment.',
+  });
+
+  if (!estaConfigurado()) {
+    return { ok: false, pasos: pasos, accion: 'Agrega SHEETS_WEBAPP_URL en Render.' };
+  }
+
+  try {
+    const sep = URL_BASE.indexOf('?') >= 0 ? '&' : '?';
+    const r = await pedirJson(URL_BASE + sep + 'action=SALUD', {});
+    const d = r.datos;
+    pasos.push({
+      paso: 3,
+      nombre: 'El script responde',
+      ok: Boolean(d && d.ok === true),
+      detalle:
+        d && d.ok === true
+          ? 'Code.gs desplegado, version ' + d.version
+          : 'Respuesta inesperada: ' + JSON.stringify(d).slice(0, 140),
+    });
+  } catch (e) {
+    pasos.push({
+      paso: 3,
+      nombre: 'El script responde',
+      ok: false,
+      detalle: 'No se pudo contactar: ' + e.message,
+    });
+  }
+
+  let falloClave = null;
+  try {
+    const r = await pedirJson(construirUrl(), {});
+    if (Array.isArray(r.datos)) {
+      pasos.push({
+        paso: 4,
+        nombre: 'La clave coincide con el script',
+        ok: true,
+        detalle: r.datos.length + ' productos recibidos',
+      });
+    } else {
+      falloClave = String((r.datos && r.datos.error) || 'HTTP ' + r.estado);
+      pasos.push({
+        paso: 4,
+        nombre: 'La clave coincide con el script',
+        ok: false,
+        detalle: falloClave,
+      });
+    }
+  } catch (e) {
+    pasos.push({
+      paso: 4,
+      nombre: 'La clave coincide con el script',
+      ok: false,
+      detalle: e.message,
+    });
+  }
+
+  const okTodo = pasos.every((p) => p.ok);
+
+  let accion = null;
+  if (!okTodo && pasos[1].ok && pasos[2].ok && !pasos[3].ok) {
+    accion =
+      'La propiedad SHEETS_API_KEY del script NO coincide con la de Render. ' +
+      'En Apps Script: Configuracion del proyecto > Propiedades del script > ' +
+      'SHEETS_API_KEY, y pega ALLI el mismo valor que tienes en Render. ' +
+      'No hace falta volver a desplegar. Lo mas probable es que quede la llave ' +
+      'anterior o un espacio en blanco al final.';
+  } else if (!okTodo) {
+    accion = 'Revisa los pasos marcados en rojo de arriba.';
+  }
+
+  return { ok: okTodo, pasos: pasos, accion: accion };
+}
+
 module.exports = {
   estaConfigurado: estaConfigurado,
   tieneClave: tieneClave,
@@ -238,5 +356,6 @@ module.exports = {
   normalizar: normalizar,
   escribir: escribir,
   limpiarCache: limpiarCache,
+  diagnostico: diagnostico,
   urlWebapp: URL_BASE,
 };
