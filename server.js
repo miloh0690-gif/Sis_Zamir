@@ -8,7 +8,7 @@ const express = require('express');
 const inventory = require('./src/inventory');
 const ledger = require('./src/ledger');
 const money = require('./src/money');
-const ai = require('./src/ai');
+const ficha = require('./src/ficha');
 const auth = require('./src/auth');
 
 const app = express();
@@ -128,8 +128,17 @@ app.get('/api/health', (req, res) => {
     sheetsUrl: inventory.estaConfigurado(),
     sheetsClave: inventory.tieneClave(),
     reportes: ledger.modo(),
-    ia: ai.habilitado(),
+    fichaTecnica: ficha.habilitado(),
+    argumentosVenta: ficha.hayArgumentos(),
   });
+});
+
+app.get('/api/diagnostico', async (req, res) => {
+  try {
+    res.json(await inventory.diagnostico());
+  } catch (e) {
+    responderError(res, e);
+  }
 });
 
 app.get('/api/config', (req, res) => {
@@ -137,8 +146,9 @@ app.get('/api/config', (req, res) => {
     sheets: inventory.completo(),
     sheetsUrl: inventory.estaConfigurado(),
     sheetsClave: inventory.tieneClave(),
-    ia: ai.habilitado(),
-    iaModelo: ai.habilitado() ? ai.modelo : null,
+    ia: ficha.habilitado(),
+    argumentosVenta: ficha.hayArgumentos(),
+    modeloArgs: ficha.hayArgumentos() ? ficha.modeloArgs : null,
     tasaComision: TASA_COMISION,
     descuentoMayorPct: DESCUENTO_MAYOR_PCT,
     tramosMayor: TRAMOS_MAYOR,
@@ -468,8 +478,8 @@ app.get('/api/ficha-tecnica', limitar(30, 60000), async (req, res) => {
   try {
     const modelo = texto(req.query.modelo, 120);
     if (!modelo) return res.status(400).json({ error: 'Indica el modelo a consultar.' });
-    const resultado = await ai.fichaTecnica(modelo, req.ip || 'desconocido');
-    res.json({ modelo: modelo, cache: resultado.cache, ficha: resultado.datos });
+    const resultado = await ficha.fichaTecnica(modelo, req.ip || 'desconocido');
+    res.json({ modelo: modelo, cache: resultado.cache, ficha: resultado.ficha });
   } catch (e) {
     responderError(res, e);
   }
@@ -499,7 +509,9 @@ app.listen(PUERTO, '0.0.0.0', () => {
   console.log('Sheets URL: ' + inventory.estaConfigurado());
   console.log('Sheets clave: ' + inventory.tieneClave());
   console.log('Reportes: ' + ledger.modo() + (ledger.esEfimero() ? ' (efimero)' : ''));
-  console.log('IA habilitada: ' + ai.habilitado());
+  console.log('Ficha tecnica: ' + ficha.habilitado());
+  console.log('Argumentos de venta (Groq): ' + ficha.hayArgumentos());
+  console.log('Diagnostico de Sheets: /api/diagnostico');
   if (!process.env.SESSION_SECRET) {
     console.error('AVISO: SESSION_SECRET no esta definido. Las sesiones no funcionaran.');
   }
