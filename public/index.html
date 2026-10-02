@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0F1115">
+    <title>MooN ERP - Tech Mobiles</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MooN ERP">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' width='512' height='512'%3E%3Crect width='512' height='512' rx='128' fill='%230F1115'/%3E%3Cpath d='M380 300A160 160 0 1 1 180 100a120 120 0 0 0 200 200Z' fill='%236EE7F9'/%3E%3C/svg%3E">
+    <link rel="manifest" href='data:application/manifest+json,{"name":"MooN ERP - Tech Mobiles","short_name":"MooN ERP","start_url":".","display":"standalone","background_color":"#0F1115","theme_color":"#0F1115","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 512 512%27 width=%27512%27 height=%27512%27%3E%3Crect width=%27512%27 height=%27512%27 rx=%27128%27 fill=%27%230F1115%27/%3E%3Cpath d=%27M380 300A160 160 0 1 1 180 100a120 120 0 0 0 200 200Z%27 fill=%27%236EE7F9%27/%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml"}]}'>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <style>
+        :root { color-scheme: dark; }
+        html, body { background:#0F1115; }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+        .font-data { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+        input, select { -webkit-user-select: text; user-select: text; }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { opacity: 1; }
+        .safe-bottom { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+        .safe-top { padding-top: max(0.5rem, env(safe-area-inset-top)); }
+        ::-webkit-scrollbar { display: none; }
+        .tap { transition: transform .12s ease, opacity .12s ease; }
+        .tap:active { transform: scale(0.97); opacity: 0.9; }
+        .tap:disabled { opacity: 0.5; transform: none; }
+        @keyframes moonGlow { 0%,100% { filter: drop-shadow(0 0 3px rgba(110,231,249,.4)); } 50% { filter: drop-shadow(0 0 9px rgba(110,231,249,.85)); } }
+        .moon-synced { animation: moonGlow 3s ease-in-out infinite; }
+        .campo-calculado { color:#8B95A7; }
+        .campo-manual { color:#DCE9FF; }
+    </style>
+</head>
+<body class="bg-[#0F1115] text-[#EDEFF3] min-h-screen pb-24">
+
+    <header class="sticky top-0 z-40 safe-top bg-[#0F1115]/90 backdrop-blur-md border-b border-[#242933]">
+        <div class="max-w-lg mx-auto px-4 pb-3 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+                <svg id="iconoLuna" width="26" height="26" viewBox="0 0 24 24" fill="none" class="shrink-0">
+                    <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.7 6.7 0 0 0 10.5 10.5Z" fill="#6EE7F9" fill-opacity="0.9"/>
+                </svg>
+                <div class="leading-tight">
+                    <h1 class="font-display font-bold text-[15px] tracking-tight text-[#F1F5F9]">MooN Tech Mobiles</h1>
+                    <p class="text-[10px] text-[#8B95A7] font-data">ERP · Google Sheets</p>
+                </div>
+            </div>
+            <div id="statusConexion" class="shrink-0 bg-amber-500/15 text-amber-400 px-2.5 py-1 rounded-full text-[10px] font-bold font-data border border-amber-500/20">
+                Conectando…
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-lg mx-auto px-4 pt-4">
+
+        <section id="seccion-vendedor" class="space-y-4">
+            <div>
+                <h2 class="font-display font-bold text-lg text-[#F1F5F9]">Registrar venta</h2>
+                <p class="text-xs text-[#8B95A7] mt-0.5">El precio lo calcula el servidor. Tu solo confirmas.</p>
+            </div>
+
+            <form id="formVenta" class="space-y-3">
+                <div>
+                    <label for="ventaVendedor" class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Vendedor</label>
+                    <input type="text" id="ventaVendedor" required placeholder="Ej: Carlos Mendoza" autocomplete="off"
+                        class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] placeholder:text-[#5B6472] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+                </div>
+
+                <div class="relative">
+                    <label for="ventaModelo" class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo</label>
+                    <div class="relative">
+                        <input type="text" id="ventaModelo" placeholder="Escribe el modelo (ej: iPhone 13)…" autocomplete="off" required
+                            class="w-full h-12 pl-4 pr-10 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF] placeholder:text-[#5B6472]">
+                        <button type="button" id="btnLimpiarModelo" class="tap absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-[#5B6472] active:text-[#EDEFF3]" aria-label="Borrar búsqueda">✕</button>
+                    </div>
+                    <div id="sugerenciasVenta" class="hidden absolute left-0 right-0 z-30 mt-1 bg-[#1B2029] border border-[#2A2F3A] rounded-xl max-h-60 overflow-y-auto shadow-2xl"></div>
+
+                    <button type="button" id="btnFicha" class="tap mt-2 w-full bg-[#182236] text-[#4C8DFF] border border-[#4C8DFF]/40 h-10 rounded-xl font-bold text-xs flex items-center justify-center gap-2">
+                        ✨ Ver ficha técnica
+                    </button>
+                    <div id="fichaPanel" class="mt-2 hidden"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="ventaTipo" class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Tipo de venta</label>
+                        <select id="ventaTipo"
+                            class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+                            <option value="Unidad">Unidad (minorista)</option>
+                            <option value="Mayor">Mayor (volumen)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="ventaCantidad" class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Cantidad</label>
+                        <input type="number" id="ventaCantidad" value="1" min="1" step="1" required
+                            class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] font-data focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="ventaTipoCambio" class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Tipo de cambio</label>
+                        <input type="number" id="ventaTipoCambio" value="11.75" step="0.01" min="0.01" required
+                            class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] font-data focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+                    </div>
+                    <div>
+                        <label for="ventaPrecioCobrado" class="block text-[11px] font-bold text-[#4C8DFF] uppercase tracking-wide mb-1.5">Precio unitario (Bs)</label>
+                        <input type="number" id="ventaPrecioCobrado" step="0.01" min="0" placeholder="Automático"
+                            class="w-full h-12 px-4 rounded-xl bg-[#182236] border border-[#4C8DFF]/40 text-[15px] font-data font-bold campo-calculado focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+                    </div>
+                </div>
+
+                <div id="avisoPrecio" class="hidden text-[11px] font-data text-[#FBBF24] flex items-center justify-between gap-2 bg-[#FBBF24]/10 border border-[#FBBF24]/20 rounded-xl px-3 py-2">
+                    <span>Estás usando un precio manual.</span>
+                    <button type="button" id="btnPrecioAuto" class="tap font-bold underline">Volver al automático</button>
+                </div>
+
+                <div class="rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-4 grid grid-cols-3 divide-x divide-[#2A2F3A]">
+                    <div class="pr-2">
+                        <span class="text-[10px] font-bold text-[#8B95A7] uppercase block mb-1">Total</span>
+                        <span id="txtTotalCobrar" class="font-display font-bold text-lg text-[#F1F5F9] font-data">0.00</span>
+                    </div>
+                    <div class="px-2">
+                        <span class="text-[10px] font-bold text-[#4C8DFF] uppercase block mb-1">Ganancia</span>
+                        <span id="txtGananciaPura" class="font-display font-bold text-lg text-[#4C8DFF] font-data">0.00</span>
+                    </div>
+                    <div class="pl-2">
+                        <span class="text-[10px] font-bold text-[#34D399] uppercase block mb-1">Comisión</span>
+                        <span id="txtComisionVendedor" class="font-display font-bold text-lg text-[#34D399] font-data">0.00</span>
+                    </div>
+                </div>
+
+                <p id="detallePrecio" class="text-[11px] font-data text-[#5B6472] text-center">Selecciona un modelo del inventario.</p>
+
+                <button type="submit" id="btnRegistrarVenta" class="tap w-full bg-[#4C8DFF] text-white py-3.5 rounded-2xl font-bold text-[15px] shadow-lg shadow-[#4C8DFF]/20">
+                    Registrar venta
+                </button>
+            </form>
+        </section>
+
+        <section id="seccion-consignacion" class="hidden space-y-4">
+            <div>
+                <h2 class="font-display font-bold text-lg text-[#F1F5F9]">Consignaciones y préstamos</h2>
+                <p class="text-xs text-[#8B95A7] mt-0.5">Despacha equipos y sigue el estado de cada préstamo.</p>
+            </div>
+
+            <form id="formConsignacion" class="space-y-3 rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-4">
+                <div>
+                    <label for="consCliente" class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Persona / empresa responsable</label>
+                    <input type="text" id="consCliente" required placeholder="Ej: Promotor Juan" autocomplete="off"
+                        class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] placeholder:text-[#5B6472] focus:outline-none focus:ring-2 focus:ring-[#9B8CFF]">
+                </div>
+                <div class="relative">
+                    <label for="consModelo" class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Modelo del stock</label>
+                    <div class="relative">
+                        <input type="text" id="consModelo" placeholder="Escribe el modelo…" autocomplete="off" required
+                            class="w-full h-12 pl-4 pr-10 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#9B8CFF] placeholder:text-[#5B6472]">
+                        <button type="button" id="btnLimpiarCons" class="tap absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full text-[#5B6472] active:text-[#EDEFF3]" aria-label="Borrar búsqueda">✕</button>
+                    </div>
+                    <div id="sugerenciasConsignacion" class="hidden absolute left-0 right-0 z-30 mt-1 bg-[#1B2029] border border-[#2A2F3A] rounded-xl max-h-60 overflow-y-auto shadow-2xl"></div>
+                </div>
+                <div>
+                    <label for="consCantidad" class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Cantidad a prestar</label>
+                    <input type="number" id="consCantidad" value="1" min="1" step="1" required
+                        class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] font-data focus:outline-none focus:ring-2 focus:ring-[#9B8CFF]">
+                </div>
+                <button type="submit" id="btnRegistrarConsignacion" class="tap w-full bg-[#9B8CFF] text-[#161022] h-12 rounded-2xl font-bold text-[15px]">
+                    Despachar equipo
+                </button>
+            </form>
+
+            <div>
+                <h3 class="text-xs font-bold text-[#8B95A7] uppercase tracking-wide mb-2 px-1">Equipos en tránsito</h3>
+                <div id="listaConsignaciones" class="space-y-3"></div>
+            </div>
+        </section>
+
+        <section id="seccion-dueno" class="hidden space-y-4">
+            <div>
+                <h2 class="font-display font-bold text-lg text-[#F1F5F9]">Inventario maestro</h2>
+                <p class="text-xs text-[#8B95A7] mt-0.5">Los costos y el stock viven en tu Google Sheets.</p>
+            </div>
+            <button type="button" id="btnCerrarSesion" class="tap w-full h-10 rounded-xl bg-[#242933] text-xs font-bold text-[#EDEFF3]">Cerrar sesión</button>
+            <div id="listaInventarioDueno" class="space-y-2.5"></div>
+        </section>
+
+        <section id="seccion-reportes" class="hidden space-y-4">
+            <h2 class="font-display font-bold text-lg text-[#F1F5F9]">Reportes</h2>
+
+            <div class="grid grid-cols-3 gap-2.5">
+                <div class="rounded-2xl bg-[#1B2029] border-l-4 border-[#4C8DFF] p-3.5">
+                    <span class="text-[9px] font-bold text-[#8B95A7] uppercase block">Ventas</span>
+                    <h3 id="kpiVentasTotales" class="font-display font-bold text-[#F1F5F9] mt-1 font-data text-[15px]">0.00</h3>
+                </div>
+                <div class="rounded-2xl bg-[#1B2029] border-l-4 border-[#34D399] p-3.5">
+                    <span class="text-[9px] font-bold text-[#34D399] uppercase block">Ganancia</span>
+                    <h3 id="kpiGananciaTotal" class="font-display font-bold text-[#34D399] mt-1 font-data text-[15px]">0.00</h3>
+                </div>
+                <div class="rounded-2xl bg-[#1B2029] border-l-4 border-[#FBBF24] p-3.5">
+                    <span class="text-[9px] font-bold text-[#FBBF24] uppercase block">Comisiones</span>
+                    <h3 id="kpiComisionesTotales" class="font-display font-bold text-[#FBBF24] mt-1 font-data text-[15px]">0.00</h3>
+                </div>
+            </div>
+
+            <div class="rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-4 space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="repDesde" class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Desde</label>
+                        <input type="date" id="repDesde" class="w-full h-11 px-3 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[14px] font-data focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+                    </div>
+                    <div>
+                        <label for="repHasta" class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Hasta</label>
+                        <input type="date" id="repHasta" class="w-full h-11 px-3 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[14px] font-data focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+                    </div>
+                </div>
+                <div>
+                    <label for="repVendedor" class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Vendedor</label>
+                    <input type="text" id="repVendedor" placeholder="Todos" autocomplete="off"
+                        class="w-full h-11 px-3 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[14px] placeholder:text-[#5B6472] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+                </div>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <button type="button" id="btnAplicarFiltro" class="tap h-11 rounded-xl bg-[#4C8DFF] text-white text-sm font-bold">Aplicar</button>
+                    <button type="button" id="btnExportarCsv" class="tap h-11 rounded-xl bg-[#242933] text-[#EDEFF3] text-sm font-bold">Exportar CSV</button>
+                </div>
+                <button type="button" id="btnCerrarSesion2" class="tap w-full h-10 rounded-xl bg-[#242933] text-xs font-bold text-[#EDEFF3]">Cerrar sesión</button>
+            </div>
+
+            <div id="resumenExtra" class="grid grid-cols-3 gap-2.5"></div>
+            <div>
+                <h3 class="text-xs font-bold text-[#8B95A7] uppercase tracking-wide mb-2 px-1">Ventas registradas</h3>
+                <div id="listaReportes" class="space-y-2.5"></div>
+            </div>
+        </section>
+    </main>
+
+    <nav class="fixed bottom-0 inset-x-0 z-50 bg-[#12151C]/95 backdrop-blur-md border-t border-[#242933] safe-bottom">
+        <div class="max-w-lg mx-auto grid grid-cols-4 px-1 pt-1.5">
+            <button type="button" data-pestana="vendedor" id="btn-vendedor" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#4C8DFF]">
+                <span class="text-lg">🛒</span><span class="text-[10px] font-bold">Vender</span>
+            </button>
+            <button type="button" data-pestana="consignacion" id="btn-consignacion" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#5B6472]">
+                <span class="text-lg">🤝</span><span class="text-[10px] font-bold">Consignar</span>
+            </button>
+            <button type="button" data-pestana="dueno" id="btn-dueno" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#5B6472]">
+                <span class="text-lg">🔑</span><span class="text-[10px] font-bold">Dueño</span>
+            </button>
+            <button type="button" data-pestana="reportes" id="btn-reportes" class="tap flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[#5B6472]">
+                <span class="text-lg">📊</span><span class="text-[10px] font-bold">Reportes</span>
+            </button>
+        </div>
+    </nav>
+
+    <div id="modalLogin" class="hidden fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center p-5">
+        <div class="w-full max-w-xs rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-5 space-y-4">
+            <div>
+                <h3 class="font-display font-bold text-lg text-[#F1F5F9]">Acceso privado</h3>
+                <p class="text-xs text-[#8B95A7] mt-1">Solo el dueño entra a Dueño y Reportes.</p>
+            </div>
+            <input type="password" id="inputPin" inputmode="numeric" placeholder="PIN"
+                class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] font-data focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+            <p id="loginError" class="hidden text-xs text-rose-400"></p>
+            <div class="grid grid-cols-2 gap-2.5">
+                <button type="button" id="btnCancelarLogin" class="tap h-11 rounded-xl bg-[#242933] text-sm font-bold text-[#EDEFF3]">Cancelar</button>
+                <button type="button" id="btnEntrarLogin" class="tap h-11 rounded-xl bg-[#4C8DFF] text-white text-sm font-bold">Entrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        const ESTADO = {
+            productos: [],
+            config: null,
+            autenticado: false,
+            pestana: 'vendedor',
+            precioManual: false,
+            ultimoModeloResuelto: '',
+            temporizador: null,
+            fichaModelo: '',
+            ultimaVenta: null,
+        };
+
+        const $ = (id) => document.getElementById(id);
+
+        const fmt = (n) => (Number(n) || 0).toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+        function escapeHtml(texto) {
+            const div = document.createElement('div');
+            div.textContent = String(texto === undefined || texto === null ? '' : texto);
+            return div.innerHTML;
+        }
+
+        function normalizar(texto) {
+            return String(texto || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        async function api(ruta, opciones) {
+            const config = Object.assign({ headers: {} }, opciones || {});
+            config.headers = Object.assign({}, config.headers);
+            if (config.cuerpo !== undefined) {
+                config.method = config.method || 'POST';
+                config.headers['Content-Type'] = 'application/json';
+                config.body = JSON.stringify(config.cuerpo);
+            }
+            config.credentials = 'same-origin';
+            const respuesta = await fetch(ruta, config);
+            let datos = null;
+            try {
+                datos = await respuesta.json();
+            } catch (e) {
+                datos = null;
+            }
+            if (!respuesta.ok) {
+                const error = new Error((datos && datos.error) || 'Error ' + respuesta.status);
+                error.codigo = respuesta.status;
+                throw error;
+            }
+            return datos;
+        }
+
+        function estadoConexion(clase, texto, sincronizado) {
+            const nodo = $('statusConexion');
+            const colores = {
+                ok: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20',
+                error: 'bg-red-500/15 text-red-400 border border-red-500/20',
+                aviso: 'bg-amber-500/15 text-amber-400 border border-amber-500/20',
+            };
+            nodo.className = 'shrink-0 px-2.5 py-1 rounded-full text-[10px] font-bold font-data ' + colores[clase];
+            nodo.textContent = texto;
+            if (sincronizado) $('iconoLuna').classList.add('moon-synced');
+        }
+
+        // ---------- SUGERENCIAS DE MODELO ----------
+
+        function renderSugerencias(idContenedor, idInput, alElegir) {
+            const cont = $(idContenedor);
+            const texto = normalizar($(idInput).value);
+            if (!texto) {
+                cont.classList.add('hidden');
+                cont.innerHTML = '';
+                return;
+            }
+            const coincidencias = ESTADO.productos
+                .filter((p) => p.stock > 0 && normalizar(p.modelo).indexOf(texto) !== -1)
+                .slice(0, 8);
+
+            if (coincidencias.length === 0) {
+                cont.classList.add('hidden');
+                cont.innerHTML = '';
+                return;
+            }
+
+            cont.innerHTML = '';
+            coincidencias.forEach((p) => {
+                const item = document.createElement('div');
+                item.className = 'px-4 py-2.5 border-b border-[#2A2F3A] last:border-b-0 active:bg-[#242933] cursor-pointer';
+                item.innerHTML =
+                    '<p class="text-[14px] text-[#EDEFF3] font-medium">' + escapeHtml(p.modelo) + '</p>' +
+                    '<p class="text-[11px] text-[#8B95A7] font-data">Stock: ' + escapeHtml(p.stock) + ' u. · Suc: ' + escapeHtml(p.sucursal) + '</p>';
+                item.addEventListener('click', () => {
+                    $(idInput).value = p.modelo;
+                    cont.classList.add('hidden');
+                    cont.innerHTML = '';
+                    if (alElegir) alElegir();
+                });
+                cont.appendChild(item);
+            });
+            cont.classList.remove('hidden');
+        }
+
+        function cerrarSugerencias() {
+            $('sugerenciasVenta').classList.add('hidden');
+            $('sugerenciasConsignacion').classList.add('hidden');
+        }
+
+        // ---------- PRECIO: TODO VIENE DEL SERVIDOR ----------
+
+        function limpiarPanelPrecio(mensaje) {
+            $('txtTotalCobrar').textContent = '0.00';
+            $('txtGananciaPura').textContent = '0.00';
+            $('txtComisionVendedor').textContent = '0.00';
+            $('detallePrecio').textContent = mensaje || 'Selecciona un modelo del inventario.';
+            if (!ESTADO.precioManual) $('ventaPrecioCobrado').value = '';
+        }
+
+        function pintarCalculo(datos) {
+            const c = datos.calculo;
+            $('txtTotalCobrar').textContent = fmt(c.totalCobradoBs);
+            $('txtGananciaPura').textContent = fmt(c.gananciaBs);
+            $('txtComisionVendedor').textContent = fmt(c.comisionBs);
+
+            const partes = [
+                'Stock: ' + datos.stock + ' u.',
+                'Costo unitario: ' + fmt(c.costoUnitarioBs) + ' Bs',
+                'Margen: ' + fmt(c.margenPct) + '%',
+            ];
+            if (c.descuentoAplicadoPct > 0) {
+                partes.push('Descuento mayorista: -' + fmt(c.descuentoAplicadoPct) + '%' + (c.tramoDescuento ? ' (' + c.tramoDescuento + ')' : ''));
+            }
+            $('detallePrecio').textContent = partes.join(' · ');
+
+            if (!ESTADO.precioManual) {
+                $('ventaPrecioCobrado').value = c.precioUnitarioBs.toFixed(2);
+                $('ventaPrecioCobrado').classList.add('campo-calculado');
+                $('ventaPrecioCobrado').classList.remove('campo-manual');
+            }
+        }
+
+        function marcarManual(valor) {
+            ESTADO.precioManual = true;
+            $('avisoPrecio').classList.remove('hidden');
+            $('ventaPrecioCobrado').classList.add('campo-manual');
+            $('ventaPrecioCobrado').classList.remove('campo-calculado');
+            $('ventaPrecioCobrado').value = valor;
+        }
+
+        function volverAAutomatico() {
+            ESTADO.precioManual = false;
+            $('avisoPrecio').classList.add('hidden');
+            $('ventaPrecioCobrado').classList.add('campo-calculado');
+            $('ventaPrecioCobrado').classList.remove('campo-manual');
+            programarPreview();
+        }
+
+        function programarPreview() {
+            clearTimeout(ESTADO.temporizador);
+            ESTADO.temporizador = setTimeout(pedirPreview, 250);
+        }
+
+        async function pedirPreview() {
+            const modelo = $('ventaModelo').value.trim();
+            if (!modelo) {
+                ESTADO.ultimoModeloResuelto = '';
+                limpiarPanelPrecio();
+                return;
+            }
+
+            const cuerpo = {
+                modelo: modelo,
+                tipo: $('ventaTipo').value,
+                cantidad: $('ventaCantidad').value,
+                tipoCambio: $('ventaTipoCambio').value,
+                precioManualBs: ESTADO.precioManual ? $('ventaPrecioCobrado').value : null,
+            };
+
+            try {
+                const datos = await api('/api/ventas/preview', { cuerpo: cuerpo });
+                if (!datos.encontrado) {
+                    ESTADO.ultimoModeloResuelto = '';
+                    limpiarPanelPrecio(
+                        datos.motivo === 'vacio'
+                            ? 'Selecciona un modelo del inventario.'
+                            : 'Ese modelo no está en el inventario. Selecciónalo de la lista.'
+                    );
+                    $('detallePrecio').classList.add('text-rose-400');
+                    return;
+                }
+                $('detallePrecio').classList.remove('text-rose-400');
+                ESTADO.ultimoModeloResuelto = datos.modelo;
+                pintarCalculo(datos);
+            } catch (e) {
+                ESTADO.ultimoModeloResuelto = '';
+                limpiarPanelPrecio(e.message);
+            }
+        }
+
+        // ---------- REGISTRAR VENTA ----------
+
+        async function registrarVenta(evento) {
+            evento.preventDefault();
+            const boton = $('btnRegistrarVenta');
+            boton.disabled = true;
+
+            const cuerpo = {
+                vendedor: $('ventaVendedor').value.trim(),
+                modelo: $('ventaModelo').value.trim(),
+                tipo: $('ventaTipo').value,
+                cantidad: $('ventaCantidad').value,
+                tipoCambio: $('ventaTipoCambio').value,
+                precioManualBs: ESTADO.precioManual ? $('ventaPrecioCobrado').value : null,
+            };
+
+            try {
+                const datos = await api('/api/ventas', { cuerpo: cuerpo });
+                ESTADO.ultimaVenta = datos.venta;
+                const c = datos.calculo;
+                let mensaje =
+                    'Venta registrada.\n\n' +
+                    'Modelo: ' + cuerpo.modelo + '\n' +
+                    'Cantidad: ' + c.cantidad + '\n' +
+                    'Total: ' + fmt(c.totalCobradoBs) + ' Bs\n' +
+                    'Ganancia: ' + fmt(c.gananciaBs) + ' Bs\n' +
+                    'Comisión: ' + fmt(c.comisionBs) + ' Bs';
+                if (datos.advertencia) mensaje += '\n\n⚠️ ' + datos.advertencia;
+                alert(mensaje);
+
+                const indice = ESTADO.productos.findIndex((p) => normalizar(p.modelo) === normalizar(datos.venta.modelo));
+                if (indice >= 0) ESTADO.productos[indice].stock = datos.stockRestante;
+
+                $('ventaVendedor').value = '';
+                $('ventaModelo').value = '';
+                $('ventaCantidad').value = 1;
+                ESTADO.precioManual = false;
+                $('avisoPrecio').classList.add('hidden');
+                $('fichaPanel').classList.add('hidden');
+                limpiarPanelPrecio();
+                cerrarSugerencias();
+                renderizarInventarioDueno();
+            } catch (e) {
+                alert('❌ ' + e.message);
+            } finally {
+                boton.disabled = false;
+            }
+        }
+
+        // ---------- CONSIGNACIONES ----------
+
+        async function cargarConsignaciones() {
+            const cont = $('listaConsignaciones');
+            cont.innerHTML = '<div class="text-center text-[#5B6472] text-sm italic py-10">Cargando…</div>';
+            try {
+                const datos = await api('/api/consignaciones');
+                renderConsignaciones(datos.consignaciones || []);
+            } catch (e) {
+                cont.innerHTML = '<div class="text-center text-rose-400 text-sm py-10">' + escapeHtml(e.message) + '</div>';
+            }
+        }
+
+        function renderConsignaciones(lista) {
+            const cont = $('listaConsignaciones');
+            cont.innerHTML = '';
+            if (!lista.length) {
+                cont.innerHTML = '<div class="text-center text-[#5B6472] text-sm italic py-10">No hay consignaciones activas.</div>';
+                return;
+            }
+            lista.forEach((c) => {
+                const pagado = c.estado === 'Pagado';
+                const marca = pagado ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400';
+                const div = document.createElement('div');
+                div.className = 'rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-4 space-y-3';
+                div.innerHTML =
+                    '<div class="flex items-start justify-between gap-2"><div>' +
+                    '<p class="font-bold text-[#EDEFF3] text-[15px]">' + escapeHtml(c.cliente) + '</p>' +
+                    '<p class="text-[11px] text-[#8B95A7] font-data mt-0.5">' + escapeHtml(String(c.fecha).slice(0, 16).replace('T', ' ')) + '</p>' +
+                    '</div><span class="shrink-0 text-[10px] font-bold uppercase px-2.5 py-1 rounded-full ' + marca + '">' + escapeHtml(c.estado) + '</span></div>' +
+                    '<div class="flex items-center justify-between text-sm border-t border-[#2A2F3A] pt-3"><div>' +
+                    '<p class="text-[#EDEFF3] font-medium">' + escapeHtml(c.modelo) + '</p>' +
+                    '<p class="text-[#8B95A7] text-xs mt-0.5">Suc. ' + escapeHtml(c.sucursal) + '</p>' +
+                    '</div><span class="font-display font-bold text-lg text-[#9B8CFF] font-data">' + escapeHtml(c.cantidad) + ' U.</span></div>' +
+                    '<div class="flex gap-2 pt-1">' +
+                    '<button type="button" data-accion="estado" data-id="' + escapeHtml(c.id) + '" class="tap flex-1 h-10 rounded-xl bg-[#242933] text-xs font-bold text-[#EDEFF3]">🔄 Cambiar pago</button>' +
+                    '<button type="button" data-accion="devolver" data-id="' + escapeHtml(c.id) + '" class="tap flex-1 h-10 rounded-xl bg-rose-500/10 text-rose-400 text-xs font-bold">🔙 Reintegrar</button>' +
+                    '</div>';
+                cont.appendChild(div);
+            });
+
+            cont.querySelectorAll('button[data-accion]').forEach((boton) => {
+                boton.addEventListener('click', async () => {
+                    const id = boton.dataset.id;
+                    const accion = boton.dataset.accion;
+                    boton.disabled = true;
+                    try {
+                        if (accion === 'estado') {
+                            const pendientes = Array.from(cont.querySelectorAll('span')).map((s) => s.textContent);
+                            void pendientes;
+                            const actual = Array.from(document.querySelectorAll('#listaConsignaciones > div')).find((d) =>
+                                d.querySelector('button[data-id="' + id + '"]')
+                            );
+                            void actual;
+                            const estadoActual = pedirEstadoActual(id);
+                            const nuevo = estadoActual === 'Pagado' ? 'Pendiente' : 'Pagado';
+                            await api('/api/consignaciones/estado', { cuerpo: { id: id, estado: nuevo } });
+                        } else {
+                            if (!confirm('¿Confirmas la devolución física de estos equipos al inventario?')) return;
+                            await api('/api/consignaciones/devolver', { cuerpo: { id: id } });
+                        }
+                        await cargarConsignaciones();
+                        await cargarInventario(false);
+                    } catch (e) {
+                        alert('❌ ' + e.message);
+                    } finally {
+                        boton.disabled = false;
+                    }
+                });
+            });
+        }
+
+        function pedirEstadoActual(id) {
+            return ESTADO.consignacionesPorId && ESTADO.consignacionesPorId[id] ? ESTADO.consignacionesPorId[id] : 'Pendiente';
+        }
+
+        async function registrarConsignacion(evento) {
+            evento.preventDefault();
+            const boton = $('btnRegistrarConsignacion');
+            boton.disabled = true;
+            try {
+                const datos = await api('/api/consignaciones', {
+                    cuerpo: {
+                        cliente: $('consCliente').value.trim(),
+                        modelo: $('consModelo').value.trim(),
+                        cantidad: $('consCantidad').value,
+                    },
+                });
+                let mensaje = 'Consignación registrada.';
+                if (datos.advertencia) mensaje += '\n\n⚠️ ' + datos.advertencia;
+                alert(mensaje);
+
+                const indice = ESTADO.productos.findIndex((p) => normalizar(p.modelo) === normalizar(datos.consignacion.modelo));
+                if (indice >= 0) ESTADO.productos[indice].stock = datos.stockRestante;
+
+                $('consCliente').value = '';
+                $('consModelo').value = '';
+                $('consCantidad').value = 1;
+                cerrarSugerencias();
+                await cargarConsignaciones();
+            } catch (e) {
+                alert('❌ ' + e.message);
+            } finally {
+                boton.disabled = false;
+            }
+        }
+
+        // ---------- FICHA TECNICA ----------
+
+        const ETIQUETAS_FICHA = [
+            ['marca', 'Marca'],
+            ['procesador', 'Procesador'],
+            ['pantalla', 'Pantalla'],
+            ['camaras', 'Cámaras'],
+            ['bateria', 'Batería'],
+            ['carga', 'Carga'],
+            ['ramAlmacenamiento', 'RAM / Almacenamiento'],
+            ['conectividad', 'Conectividad'],
+            ['sistema', 'Sistema'],
+        ];
+
+        async function pedirFichaTecnica() {
+            const modelo = $('ventaModelo').value.trim();
+            if (!modelo) {
+                alert('⚠️ Escribe o selecciona un modelo primero.');
+                return;
+            }
+            if (!ESTADO.config || !ESTADO.config.ia) {
+                alert('⚠️ La consulta con IA todavía no está habilitada en el servidor.');
+                return;
+            }
+
+            const panel = $('fichaPanel');
+            panel.classList.remove('hidden');
+            panel.innerHTML =
+                '<div class="p-4 bg-[#1B2029] rounded-xl border border-[#4C8DFF]/30 text-xs text-[#8B95A7] flex items-center gap-2">' +
+                '<span class="animate-spin">⏳</span> Consultando ficha técnica de <strong>' + escapeHtml(modelo) + '</strong>…</div>';
+            $('btnFicha').disabled = true;
+
+            try {
+                const datos = await api('/api/ficha-tecnica?modelo=' + encodeURIComponent(modelo));
+                panel.innerHTML = pintarFicha(datos.ficha, datos.cache);
+            } catch (e) {
+                panel.innerHTML =
+                    '<div class="p-3 bg-red-500/10 text-red-400 rounded-xl text-xs border border-red-500/20">❌ ' + escapeHtml(e.message) + '</div>';
+            } finally {
+                $('btnFicha').disabled = false;
+            }
+        }
+
+        function pintarFicha(ficha, desdeCache) {
+            if (!ficha) return '<div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl text-xs border border-amber-500/20">Sin respuesta.</div>';
+
+            let html = '<div class="rounded-xl bg-[#1B2029] border border-[#4C8DFF]/40 p-4 space-y-3">';
+
+            html += '<div class="flex items-start justify-between gap-2">' +
+                '<p class="font-display font-bold text-[#F1F5F9] text-sm">' + escapeHtml(ficha.nombre || '') + '</p>' +
+                (desdeCache ? '<span class="text-[9px] font-bold uppercase bg-[#242933] text-[#8B95A7] px-2 py-0.5 rounded-full shrink-0">cache</span>' : '') +
+                '</div>';
+
+            if (ficha.resumen) {
+                html += '<p class="text-xs text-[#C4CAD4] leading-relaxed">' + escapeHtml(ficha.resumen) + '</p>';
+            }
+
+            html += '<div class="grid grid-cols-2 gap-x-3 gap-y-2.5 border-t border-[#2A2F3A] pt-3">';
+            ETIQUETAS_FICHA.forEach(([clave, etiqueta]) => {
+                if (!ficha[clave]) return;
+                html += '<div><span class="text-[9px] font-bold text-[#8B95A7] uppercase block">' + etiqueta + '</span>' +
+                    '<span class="text-[12px] text-[#EDEFF3] leading-snug">' + escapeHtml(ficha[clave]) + '</span></div>';
+            });
+            html += '</div>';
+
+            if (Array.isArray(ficha.puntosDeVenta) && ficha.puntosDeVenta.length) {
+                html += '<div class="border-t border-[#2A2F3A] pt-3"><span class="text-[9px] font-bold text-[#34D399] uppercase block mb-1.5">Argumentos de venta</span><ol class="space-y-1">';
+                ficha.puntosDeVenta.forEach((punto, i) => {
+                    html += '<li class="text-[12px] text-[#EDEFF3] leading-snug"><span class="font-data font-bold text-[#34D399]">' + (i + 1) + '.</span> ' + escapeHtml(punto) + '</li>';
+                });
+                html += '</ol></div>';
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        // ---------- INVENTARIO / DUEÑO ----------
+
+        async function cargarInventario(forzar) {
+            try {
+                const datos = await api('/api/inventario');
+                ESTADO.productos = datos.productos || [];
+                estadoConexion('ok', 'Sincronizado', true);
+                renderizarInventarioDueno();
+            } catch (e) {
+                estadoConexion('error', 'Sin conexión', false);
+                throw e;
+            }
+        }
+
+        function renderizarInventarioDueno() {
+            const cont = $('listaInventarioDueno');
+            if (!cont) return;
+            cont.innerHTML = '';
+            if (!ESTADO.productos.length) {
+                cont.innerHTML = '<div class="text-center text-[#5B6472] text-sm italic py-10">Sin productos.</div>';
+                return;
+            }
+            ESTADO.productos.forEach((p) => {
+                const div = document.createElement('div');
+                div.className = 'rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-4 flex items-center justify-between gap-3';
+                div.innerHTML =
+                    '<div class="min-w-0"><p class="font-bold text-[#EDEFF3] text-[15px] truncate">' + escapeHtml(p.modelo) + '</p>' +
+                    '<div class="flex items-center gap-2 mt-1.5 flex-wrap">' +
+                    '<span class="text-[10px] font-bold bg-[#242933] text-[#C4CAD4] px-2 py-0.5 rounded-full">' + escapeHtml(p.sucursal) + '</span>' +
+                    '<span class="text-[10px] font-data text-[#5B6472]">Fila ' + escapeHtml(p.filaExcel) + '</span></div></div>' +
+                    '<div class="text-right shrink-0"><p class="font-display font-bold text-[#F1F5F9] font-data">' + escapeHtml(p.stock) + ' u.</p>' +
+                    '<p class="text-xs text-[#FF6B6B] font-data font-bold mt-0.5">$' + escapeHtml(fmt(p.costoUsd)) + '</p></div>';
+                cont.appendChild(div);
+            });
+        }
+
+        // ---------- REPORTES ----------
+
+        async function cargarReportes() {
+            const cont = $('listaReportes');
+            cont.innerHTML = '<div class="text-center text-[#5B6472] text-sm italic py-10">Calculando…</div>';
+            const parametros = new URLSearchParams();
+            if ($('repDesde').value) parametros.set('desde', $('repDesde').value);
+            if ($('repHasta').value) parametros.set('hasta', $('repHasta').value);
+            if ($('repVendedor').value.trim()) parametros.set('vendedor', $('repVendedor').value.trim());
+
+            try {
+                const datos = await api('/api/reportes?' + parametros.toString());
+                ESTADO.ultimaVenta = null;
+                ESTADO.reporteActual = datos;
+                const r = datos.resumen;
+                $('kpiVentasTotales').textContent = fmt(r.totalVendidoBs);
+                $('kpiGananciaTotal').textContent = fmt(r.totalGananciaBs);
+                $('kpiComisionesTotales').textContent = fmt(r.totalComisionesBs);
+
+                $('resumenExtra').innerHTML =
+                    '<div class="rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-3.5"><span class="text-[9px] font-bold text-[#8B95A7] uppercase block">Unidades</span><h3 class="font-display font-bold text-[#F1F5F9] mt-1 font-data text-[15px]">' + escapeHtml(r.unidades) + '</h3></div>' +
+                    '<div class="rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-3.5"><span class="text-[9px] font-bold text-[#8B95A7] uppercase block">Ticket prom.</span><h3 class="font-display font-bold text-[#F1F5F9] mt-1 font-data text-[15px]">' + escapeHtml(fmt(r.ticketPromedioBs)) + '</h3></div>' +
+                    '<div class="rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-3.5"><span class="text-[9px] font-bold text-[#8B95A7] uppercase block">Margen</span><h3 class="font-display font-bold text-[#F1F5F9] mt-1 font-data text-[15px]">' + escapeHtml(fmt(r.margenPct)) + '%</h3></div>';
+
+                if (datos.efimero) {
+                    $('resumenExtra').insertAdjacentHTML('afterend',
+                        '<div id="avisoEfimero" class="rounded-2xl bg-[#FBBF24]/10 border border-[#FBBF24]/25 p-3 text-[11px] text-[#FBBF24] leading-relaxed">' +
+                        '⚠️ El historial se guarda en la memoria del servidor y se borra cuando Render reinicia la instancia. Instala el snippet de <strong>REPORTE_VENTAS</strong> en tu Apps Script y pon <strong>REPORTES_DESDE_SHEETS=1</strong> para hacerlo permanente.</div>');
+                } else {
+                    const previo = $('avisoEfimero');
+                    if (previo) previo.remove();
+                }
+
+                renderVentas(datos.ventas);
+                renderTablas(r);
+            } catch (e) {
+                $('kpiVentasTotales').textContent = '0.00';
+                $('kpiGananciaTotal').textContent = '0.00';
+                $('kpiComisionesTotales').textContent = '0.00';
+                cont.innerHTML = '<div class="text-center text-rose-400 text-sm py-10">' + escapeHtml(e.message) + '</div>';
+            }
+        }
+
+        function renderVentas(ventas) {
+            const cont = $('listaReportes');
+            cont.innerHTML = '';
+            if (!ventas || !ventas.length) {
+                cont.innerHTML = '<div class="text-center text-[#5B6472] text-sm italic py-10">Sin ventas en este periodo.</div>';
+                return;
+            }
+            ventas.forEach((v) => {
+                const div = document.createElement('div');
+                div.className = 'rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-4';
+                div.innerHTML =
+                    '<div class="flex items-center justify-between gap-2"><p class="font-bold text-[#EDEFF3] text-[15px]">' + escapeHtml(v.vendedor) + '</p>' +
+                    '<span class="text-[10px] font-bold bg-[#242933] text-[#C4CAD4] px-2 py-0.5 rounded-full">' + escapeHtml(v.tipo) + '</span></div>' +
+                    '<p class="text-xs text-[#8B95A7] mt-1">' + escapeHtml(v.modelo) + ' · ' + escapeHtml(v.cantidad) + ' u. · ' + escapeHtml(String(v.fecha).slice(0, 10)) + '</p>' +
+                    '<div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-[#2A2F3A] text-center">' +
+                    '<div><span class="text-[9px] text-[#8B95A7] uppercase block">Total</span><span class="font-data font-bold text-[#F1F5F9]">' + escapeHtml(fmt(v.totalCobradoBs)) + '</span></div>' +
+                    '<div><span class="text-[9px] text-[#4C8DFF] uppercase block">Ganancia</span><span class="font-data font-bold text-[#4C8DFF]">' + escapeHtml(fmt(v.gananciaBs)) + '</span></div>' +
+                    '<div><span class="text-[9px] text-[#34D399] uppercase block">Comisión</span><span class="font-data font-bold text-[#34D399]">' + escapeHtml(fmt(v.comisionBs)) + '</span></div>' +
+                    '</div>';
+                cont.appendChild(div);
+            });
+        }
+
+        function renderTablas(r) {
+            const existente = $('tablasResumen');
+            if (existente) existente.remove();
+            const caja = document.createElement('div');
+            caja.id = 'tablasResumen';
+            caja.className = 'space-y-3';
+
+            const tabla = (titulo, filas, columnas) => {
+                if (!filas.length) return '';
+                let html = '<div><h3 class="text-xs font-bold text-[#8B95A7] uppercase tracking-wide mb-2 px-1">' + titulo + '</h3>' +
+                    '<div class="bg-[#1B2029] border border-[#2A2F3A] rounded-2xl overflow-hidden">';
+                filas.slice(0, 15).forEach((fila, i) => {
+                    html += '<div class="px-4 py-2.5 border-b border-[#2A2F3A] last:border-b-0 text-xs flex items-center justify-between gap-3">' +
+                        '<span class="text-[#EDEFF3] truncate">' + escapeHtml(fila[columnas.clave]) + '</span>';
+                    columnas.datos.forEach((d) => {
+                        html += '<span class="font-data text-[#8B95A7] shrink-0">' + escapeHtml(d.etiqueta) + ' ' + escapeHtml(d.valor(fila)) + '</span>';
+                    });
+                    html += '</div>';
+                    void i;
+                });
+                html += '</div></div>';
+                return html;
+            };
+
+            caja.innerHTML =
+                tabla('Por vendedor', r.porVendedor, {
+                    clave: 'vendedor',
+                    datos: [
+                        { etiqueta: 'un.', valor: (f) => f.unidades },
+                        { etiqueta: 'Bs', valor: (f) => fmt(f.ventasBs) },
+                        { etiqueta: 'com.', valor: (f) => fmt(f.comisionBs) },
+                    ],
+                }) +
+                tabla('Por modelo', r.porModelo, {
+                    clave: 'modelo',
+                    datos: [
+                        { etiqueta: 'un.', valor: (f) => f.unidades },
+                        { etiqueta: 'Bs', valor: (f) => fmt(f.ventasBs) },
+                    ],
+                });
+
+            $('resumenExtra').parentNode.insertBefore(caja, $('listaReportes').parentNode);
+        }
+
+        function exportarCsv() {
+            const datos = ESTADO.reporteActual;
+            if (!datos || !datos.ventas || !datos.ventas.length) {
+                alert('No hay ventas para exportar en este filtro.');
+                return;
+            }
+            const cabecera = ['Fecha', 'Vendedor', 'Modelo', 'Tipo', 'Cantidad', 'TC', 'PrecioUnitarioBs', 'CostoTotalBs', 'TotalBs', 'GananciaBs', 'ComisionBs'];
+            const celda = (v) => '"' + String(v === undefined || v === null ? '' : v).replace(/"/g, '""') + '"';
+            const filas = datos.ventas.map((v) => [
+                String(v.fecha).slice(0, 19).replace('T', ' '),
+                v.vendedor, v.modelo, v.tipo, v.cantidad, v.tipoCambio,
+                v.precioUnitarioBs, v.costoTotalBs, v.totalCobradoBs, v.gananciaBs, v.comisionBs,
+            ].map(celda).join(';'));
+
+            const csv = '\ufeff' + cabecera.join(';') + '\r\n' + filas.join('\r\n');
+            const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = 'ventas-' + new Date().toISOString().slice(0, 10) + '.csv';
+            document.body.appendChild(enlace);
+            enlace.click();
+            document.body.removeChild(enlace);
+            URL.revokeObjectURL(url);
+        }
+
+        // ---------- AUTENTICACION ----------
+
+        function abrirLogin() {
+            $('modalLogin').classList.remove('hidden');
+            $('inputPin').value = '';
+            $('loginError').classList.add('hidden');
+            $('inputPin').focus();
+        }
+
+        function cerrarLogin() {
+            $('modalLogin').classList.add('hidden');
+        }
+
+        async function entrar() {
+            const pin = $('inputPin').value.trim();
+            try {
+                await api('/api/auth/login', { cuerpo: { pin: pin } });
+                ESTADO.autenticado = true;
+                cerrarLogin();
+                await cargarInventario(true);
+                cambiarPestana(ESTADO.pestana);
+            } catch (e) {
+                $('loginError').textContent = e.message;
+                $('loginError').classList.remove('hidden');
+            }
+        }
+
+        async function salir() {
+            try {
+                await api('/api/auth/logout');
+            } catch (e) {
+                void e;
+            }
+            ESTADO.autenticado = false;
+            ESTADO.productos = [];
+            alert('Sesión cerrada.');
+            location.reload();
+        }
+
+        async function comprobarSesion() {
+            try {
+                const datos = await api('/api/auth/session');
+                ESTADO.autenticado = !!datos.autenticado;
+            } catch (e) {
+                ESTADO.autenticado = false;
+            }
+        }
+
+        // ---------- NAVEGACION ----------
+
+        const PESTANAS = ['vendedor', 'consignacion', 'dueno', 'reportes'];
+
+        async function cambiarPestana(pestana) {
+            if ((pestana === 'dueno' || pestana === 'reportes') && !ESTADO.autenticado) {
+                ESTADO.pestana = pestana;
+                abrirLogin();
+                return;
+            }
+
+            PESTANAS.forEach((id) => {
+                $('seccion-' + id).classList.add('hidden');
+                $('btn-' + id).classList.remove('text-[#4C8DFF]');
+                $('btn-' + id).classList.add('text-[#5B6472]');
+            });
+            $('seccion-' + pestana).classList.remove('hidden');
+            $('btn-' + pestana).classList.remove('text-[#5B6472]');
+            $('btn-' + pestana).classList.add('text-[#4C8DFF]');
+            ESTADO.pestana = pestana;
+
+            if (pestana === 'consignacion') await cargarConsignaciones();
+            if (pestana === 'dueno') renderizarInventarioDueno();
+            if (pestana === 'reportes') await cargarReportes();
+        }
+
+        // ---------- ARRANQUE ----------
+
+        function conectarEventos() {
+            const inputModelo = $('ventaModelo');
+            inputModelo.addEventListener('input', () => {
+                renderSugerencias('sugerenciasVenta', 'ventaModelo', () => { ESTADO.precioManual = false; $('avisoPrecio').classList.add('hidden'); programarPreview(); });
+                programarPreview();
+            });
+
+            $('btnLimpiarModelo').addEventListener('click', () => {
+                inputModelo.value = '';
+                ESTADO.precioManual = false;
+                $('avisoPrecio').classList.add('hidden');
+                $('fichaPanel').classList.add('hidden');
+                renderSugerencias('sugerenciasVenta', 'ventaModelo', null);
+                programarPreview();
+            });
+
+            $('ventaTipo').addEventListener('change', programarPreview);
+            $('ventaCantidad').addEventListener('input', programarPreview);
+            $('ventaTipoCambio').addEventListener('input', programarPreview);
+
+            $('ventaPrecioCobrado').addEventListener('input', () => {
+                const valor = $('ventaPrecioCobrado').value;
+                if (valor === '' || Number(valor) <= 0) {
+                    ESTADO.precioManual = false;
+                    $('avisoPrecio').classList.add('hidden');
+                    programarPreview();
+                    return;
+                }
+                marcarManual(valor);
+                programarPreview();
+            });
+
+            $('btnPrecioAuto').addEventListener('click', volverAAutomatico);
+            $('btnFicha').addEventListener('click', pedirFichaTecnica);
+            $('formVenta').addEventListener('submit', registrarVenta);
+
+            const inputCons = $('consModelo');
+            inputCons.addEventListener('input', () => renderSugerencias('sugerenciasConsignacion', 'consModelo', null));
+            $('btnLimpiarCons').addEventListener('click', () => {
+                inputCons.value = '';
+                renderSugerencias('sugerenciasConsignacion', 'consModelo', null);
+            });
+            $('formConsignacion').addEventListener('submit', registrarConsignacion);
+
+            $('btnAplicarFiltro').addEventListener('click', cargarReportes);
+            $('btnExportarCsv').addEventListener('click', exportarCsv);
+            $('btnCerrarSesion').addEventListener('click', salir);
+            $('btnCerrarSesion2').addEventListener('click', salir);
+
+            PESTANAS.forEach((id) => {
+                $('btn-' + id).addEventListener('click', () => cambiarPestana(id));
+            });
+
+            $('btnEntrarLogin').addEventListener('click', entrar);
+            $('inputPin').addEventListener('keydown', (e) => { if (e.key === 'Enter') entrar(); });
+            $('btnCancelarLogin').addEventListener('click', () => {
+                cerrarLogin();
+                if (ESTADO.pestana === 'vendedor') return;
+                cambiarPestana('vendedor');
+            });
+            $('modalLogin').addEventListener('click', (e) => {
+                if (e.target === $('modalLogin')) { cerrarLogin(); cambiarPestana('vendedor'); }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#sugerenciasVenta') && !e.target.closest('#ventaModelo') && !e.target.closest('#btnLimpiarModelo')) {
+                    $('sugerenciasVenta').classList.add('hidden');
+                }
+                if (!e.target.closest('#sugerenciasConsignacion') && !e.target.closest('#consModelo') && !e.target.closest('#btnLimpiarCons')) {
+                    $('sugerenciasConsignacion').classList.add('hidden');
+                }
+            });
+
+            $('fichaPanel').addEventListener('click', (e) => {
+                if (e.target && e.target.id === 'btnCerrarFicha') $('fichaPanel').classList.add('hidden');
+            });
+        }
+
+        async function iniciar() {
+            conectarEventos();
+            await comprobarSesion();
+
+            try {
+                ESTADO.config = await api('/api/config');
+            } catch (e) {
+                estadoConexion('error', 'Sin servidor', false);
+                alert('❌ No se pudo contactar al servidor. ' + e.message);
+                return;
+            }
+
+            if (!ESTADO.config.sheets) {
+                estadoConexion('aviso', 'Sin Sheets', false);
+                alert('⚠️ El inventario no está configurado. El dueño debe definir SHEETS_WEBAPP_URL en Render.');
+            } else {
+                try {
+                    await cargarInventario(false);
+                } catch (e) {
+                    void e;
+                }
+            }
+
+            $('btnFicha').disabled = !ESTADO.config.ia;
+            if (!ESTADO.config.ia) $('btnFicha').classList.add('opacity-50');
+
+            if (ESTADO.autenticado) await cargarInventario(true);
+        }
+
+        window.addEventListener('DOMContentLoaded', iniciar);
+    </script>
+</body>
+</html>
