@@ -1,17 +1,17 @@
 # MooN ERP · Sis_Zamir v2
 
-Sistema de ventas para「MooN Tech Mobiles」。Ahora con **backend propio en Render**：el dinero ya no se calcula en el navegador.
+Sistema de ventas para "MooN Tech Mobiles". Ahora con **backend propio en Render**: el dinero ya no se calcula en el navegador.
 
 ## Que cambio y por que
 
 ### El bug del "otro precio"
 
-La version 1 calculaba los importes en el navegador. Eso rompia de tres formas:
+La version 1 calculaba los importes en el navegador. Eso rompia de varias formas:
 
 1. Al escribir en el campo de modelo se llamaba `forzarAutofillYRecalcular()`, que ponia `dataset.manual = "false"`. **Cada tecla borraba el precio que habias tecleado a mano.**
 2. `actualizarPreciosVenta()` hacia `if (!productoSelected) return;`. Si el modelo no coincidia exacto, **no recalculaba nada** y los tres indicadores seguian mostrando los numeros del modelo anterior.
 3. `registrarVenta()` enviaba a Sheets las variables cacheadas `ultimoTotalCobrar` / `ultimaGananciaPura`, no un recalculo. Cualquier evento que no disparase el handler mandaba dinero viejo.
-4. El selector «Mayor» no tenia ninguna regla de precio asociada.
+4. El selector "Mayor" no tenia ninguna regla de precio asociada.
 5. La ganancia se calculaba sobre el precio unitario ya redondeado con `toFixed(2)` y el total no se redondeaba: el error se acumulaba en centavos.
 
 **Ahora** todo el dinero se calcula en `src/money.js`, en el servidor, usando **enteros en centavos**. No hay flotantes en el camino critico, asi que el total siempre cuadra con `precioUnitario x cantidad` y `total - costo = ganancia`. El navegador solo muestra lo que el servidor responde (`POST /api/ventas/preview`) y al guardar el servidor **vuelve a calcular desde cero** aunque alguien manipule el JS.
@@ -140,7 +140,11 @@ La v2 tambien manda campos que tu script actual ignora (`precioUnitarioBs`, `com
 
 ## Deploy en Render
 
-El repositorio ya trae el servicio configurado. En Render > Environment agrega las variables de `.env.example`.
+- Build command: `npm install`
+- Start command: `node server.js`
+- Health check path: `/api/health`
+
+En Render > Environment agrega las variables de `.env.example`.
 
 ## Lo que quedo fuera y por que
 
