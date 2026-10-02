@@ -4,14 +4,15 @@
 // alojado en GitHub. Datos ya estructurados (no hay que limpiar HTML),
 // con apertura por lente, zoom optico, imagen y enlaces de origen.
 //
-// Se intento primero esta, y si el modelo no aparece se cae al scraper
+// Se intenta primero esta, y si el modelo no aparece se cae al scraper
 // de src/specs.js. Entre las dos cubren practicamente todo.
 //
 // Resolucion del archivo: marca + anio + slug. Se adivina el slug a
 // partir del nombre que escribe el vendedor y se prueban los anos
 // recientes. raw.githubusercontent.com no tiene rate limit de API, asi
 // que los intentos fallidos son baratos. Solo si eso no basta se usa la
-// API de GitHub (que si tiene limite) para listar el directorio.
+// API de GitHub (que si tiene limite) para listar el directorio, y ahi
+// hace falta GITHUB_TOKEN para no agotar las 60 peticiones/hora.
 
 const REPO = 'GetTechAPI/TechAPI';
 const REF = process.env.DATASET_REF || 'develop';
@@ -20,13 +21,12 @@ const RAW_BASE = 'https://raw.githubusercontent.com/' + REPO + '/' + REF + '/dat
 
 const TOKEN = String(process.env.GITHUB_TOKEN || '').trim();
 const TIMEOUT_MS = 20000;
-const CACHE_MS = 30 * 24 * 60 * 60 * 1000;
 const ANIOS_REVISAR = 12;
 
 const MARCAS = {
   apple: ['apple', 'iphone', 'ipad'],
   samsung: ['samsung', 'galaxy'],
-  xiaomi: ['xiaomi', 'redmi', 'poco', 'mi '],
+  xiaomi: ['xiaomi', 'redmi', 'poco'],
   huawei: ['huawei', 'nova ', 'p smart', 'mate '],
   honor: ['honor'],
   motorola: ['motorola', 'moto'],
@@ -48,9 +48,9 @@ const MARCAS = {
   nothing: ['nothing'],
   blackberry: ['blackberry'],
   meizu: ['meizu'],
-  lenovo: ['lenovo', 'moto g'],
+  lenovo: ['lenovo'],
   tcl: ['tcl'],
-  hmd: ['hmd', 'nokia g'],
+  hmd: ['hmd'],
 };
 
 const cacheFicha = new Map();
@@ -93,24 +93,37 @@ function detectarMarca(texto) {
   const n = normalizar(texto);
   for (const marca of Object.keys(MARCAS)) {
     for (const alias of MARCAS[marca]) {
-      if (n.indexOf(alias.trim() + ' ') === 0 || n === alias.trim()) return marca;
+      const a = alias.trim();
+      if (n === a || n.indexOf(a + ' ') === 0) return marca;
     }
   }
   return '';
 }
 
+function anioEnElNombre(texto) {
+  const m = normalizar(texto).match(/\b(20[0-2][0-9])\b/);
+  return m ? m[1] : null;
+}
+
 function adivinarSlugs(modelo, marca) {
   const n = normalizar(modelo);
-  const完整 = norm(n);
-  const sinMarca = norm(n.replace(new RegExp('^' + (marca || '') + '\\s+'), ''));
-  const candidatos = [sinMarca, 完整];
+  const completo = norm(n);
 
-  const anioEnElNombre = n.match(/\b(20[0-2][0-9])\b/);
-  if (anioEnElNombre) {
-    candidatos.push(norm(n.replace(anioEnElNombre[0], '').replace(/\s+/g, ' ')));
+  let sinMarca = completo;
+  if (marca && n.indexOf(marca + ' ') === 0) {
+    sinMarca = norm(n.slice(marca.length + 1));
   }
 
-  return candidatos.filter(Boolean).filter((v, i, arr) => arr.indexOf(v) === i);
+  const candidatos = [sinMarca, completo];
+
+  const anio = anioEnElNombre(n);
+  if (anio) {
+    candidatos.push(norm(n.replace(anio, ' ')));
+  }
+
+  return candidatos
+    .filter(Boolean)
+    .filter((v, i, arr) => arr.indexOf(v) === i);
 }
 
 async function pedir(url, cabeceras) {
@@ -118,7 +131,6 @@ async function pedir(url, cabeceras) {
   const temporizador = setTimeout(() => controlador.abort(), TIMEOUT_MS);
   try {
     const r = await fetch(url, { headers: cabeceras, signal: controlador.signal });
-    if (r.status === 404) return null;
     if (!r.ok) return null;
     return await r.json();
   } catch (e) {
@@ -153,9 +165,10 @@ async function buscarEnDirectorio(marca, slugs) {
     .sort((a, b) => Number(b) - Number(a));
 
   for (const anio of dirs) {
-    if (cacheDir.has(marca + '/' + anio)) continue;
-    const archivos = await pedir(API_BASE + '/' + marca + '/' + anio, cabecerasApi());
-    cacheDir.set(marca + '/' + anio, Array.isArray(archivos) ? archivos : []);
+    const k = marca + '/' + anio;
+    if (cacheDir.has(k)) continue;
+    const archivos = await pedir(API_BASE + '/' + anio, cabecerasApi());
+    cacheDir.set(k, Array.isArray(archivos) ? archivos : []);
   }
 
   for (const anio of dirs) {
@@ -178,8 +191,6 @@ function prettifySoc(slug) {
   return String(slug || '')
     .split('-')
     .filter(Boolean)
-    .map((p) => (p === 'soc' || p === 'gen' || p === 'gt' ? '' : p))
-    .filter(Boolean)
     .map((p) => (/^\d+$/.test(p) ? p : p.charAt(0).toUpperCase() + p.slice(1)))
     .join(' ')
     .replace(/\s+/g, ' ')
@@ -199,6 +210,7 @@ function mapear(json) {
   if (!json || typeof json !== 'object' || !json.name) return null;
 
   const d = json.display || {};
+
   const pantalla = [
     d.type,
     d.size_inch ? d.size_inch + '"' : '',
@@ -211,12 +223,13 @@ function mapear(json) {
 
   const camaras = (json.cameras || [])
     .map((c) => {
-      const partes = [c.mp ? c.mp + ' MP' : ''];
+      const partes = [];
+      if (c.mp) partes.push(c.mp + ' MP');
       if (c.aperture) partes.push('f/' + c.aperture);
       if (c.ois) partes.push('OIS');
       if (c.optical_zoom) partes.push(c.optical_zoom + 'x optico');
       if (c.sensor) partes.push('sensor ' + c.sensor);
-      const texto = partes.filter(Boolean).join(', ');
+      const texto = partes.join(', ');
       const etiqueta = ETIQUETA_CAMARA[c.type] || c.type || '';
       return texto ? (etiqueta ? etiqueta + ': ' : '') + texto : '';
     })
@@ -231,9 +244,11 @@ function mapear(json) {
     .filter(Boolean)
     .join(' · ');
 
-  const almacen = Array.isArray(json.storage_options_gb) && json.storage_options_gb.length
-    ? json.storage_options_gb.join(' / ') + ' GB'
-    : '';
+  const almacen =
+    Array.isArray(json.storage_options_gb) && json.storage_options_gb.length
+      ? json.storage_options_gb.join(' / ') + ' GB'
+      : '';
+
   const memoria = [
     json.ram_gb ? json.ram_gb + ' GB RAM' : '',
     almacen ? almacen + ' almacenamiento' : '',
@@ -252,7 +267,7 @@ function mapear(json) {
     .filter(Boolean)
     .join(' · ');
 
-  const sistema = [json.os, json.os_version ? (json.os || '' === '' ? json.os_version : json.os_version)].filter(Boolean).join(' ');
+  const sistema = [json.os, json.os_version].filter(Boolean).join(' ');
   const ip = json.ip_rating ? 'IP' + String(json.ip_rating).replace(/^IP/i, '') : '';
 
   const partesResumen = [];
@@ -308,27 +323,29 @@ async function buscarFicha(modelo) {
   if (!slugs.length) return null;
 
   const anios = aniosPosibles();
-  const anioEnElNombre = normalizar(modelo).match(/\b(20[0-2][0-9])\b/);
-  if (anioEnElNombre) {
-    const i = anios.indexOf(anioEnElNombre[1]);
-    if (i > 0) anios.splice(i, 1), anios.unshift(anioEnElNombre[1]);
+  const anio = anioEnElNombre(modelo);
+  if (anio) {
+    const i = anios.indexOf(anio);
+    if (i > 0) {
+      anios.splice(i, 1);
+      anios.unshift(anio);
+    }
   }
 
-  // 1) Adivinar slug + barrer anios (raw, sin limite de API).
+  // 1) Adivinar slug y barrer anios (raw, sin limite de API).
   for (const slug of slugs) {
-    for (const anio of anios) {
-      const json = await fetchSpec(marca, anio, slug);
-      if (json) {
-        const ficha = mapear(json);
-        if (ficha) {
-          cacheFicha.set(k, { ficha: ficha });
-          return { ficha: ficha, cache: false };
-        }
+    for (const a of anios) {
+      const json = await fetchSpec(marca, a, slug);
+      if (!json) continue;
+      const ficha = mapear(json);
+      if (ficha) {
+        cacheFicha.set(k, { ficha: ficha });
+        return { ficha: ficha, cache: false };
       }
     }
   }
 
-  // 2) Listar el directorio y buscar por similitud.
+  // 2) Listar el directorio y buscar por similitud (necesita token).
   if (!TOKEN) return null;
 
   const json = await buscarEnDirectorio(marca, slugs);
