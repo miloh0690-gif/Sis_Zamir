@@ -1,59 +1,26 @@
 # MooN ERP · Sis_Zamir v2
 
-Sistema de ventas para "MooN Tech Mobiles". Ahora con **backend propio en Render**: el dinero ya no se calcula en el navegador.
-
-## Que cambio y por que
-
-### El bug del "otro precio"
-
-La version 1 calculaba los importes en el navegador. Eso rompia de varias formas:
-
-1. Al escribir en el campo de modelo se llamaba `forzarAutofillYRecalcular()`, que ponia `dataset.manual = "false"`. **Cada tecla borraba el precio que habias tecleado a mano.**
-2. `actualizarPreciosVenta()` hacia `if (!productoSelected) return;`. Si el modelo no coincidia exacto, **no recalculaba nada** y los tres indicadores seguian mostrando los numeros del modelo anterior.
-3. `registrarVenta()` enviaba a Sheets las variables cacheadas `ultimoTotalCobrar` / `ultimaGananciaPura`, no un recalculo. Cualquier evento que no disparase el handler mandaba dinero viejo.
-4. El selector "Mayor" no tenia ninguna regla de precio asociada.
-5. La ganancia se calculaba sobre el precio unitario ya redondeado con `toFixed(2)` y el total no se redondeaba: el error se acumulaba en centavos.
-
-**Ahora** todo el dinero se calcula en `src/money.js`, en el servidor, usando **enteros en centavos**. No hay flotantes en el camino critico, asi que el total siempre cuadra con `precioUnitario x cantidad` y `total - costo = ganancia`. El navegador solo muestra lo que el servidor responde (`POST /api/ventas/preview`) y al guardar el servidor **vuelve a calcular desde cero** aunque alguien manipule el JS.
-
-### El boton de ficha tecnica
-
-La v1 llamaba a `gemini-1.5-flash` desde el navegador. Eso estaba roto por partida doble:
-
-- `gemini-1.5-flash` esta **apagado** desde 2025.
-- La llave estaba **en el HTML de un repositorio publico**. Ademas, desde junio de 2026 Google rechaza llaves sin restriccion.
-
-La v2 usa `gemini-3.5-flash` por defecto, pide respuesta estructurada con `responseSchema` (por eso ya no hay que parsear texto libre), guarda la llave en `.env`, cachea 6 horas por modelo y limita a 6 consultas por minuto y por IP.
-
-### Los reportes
-
-La v1 guardaba las ventas en `baseDeDatosVentas`, un array en memoria. Recargabas y todo era 0.00. Ademas la comision nunca se enviaba a Sheets, asi que no habia historico.
-
-La v2 tiene un ledger (`src/ledger.js`) con dos motores:
-
-| `REPORTES_DESDE_SHEETS` | Donde viven las ventas |
-| --- | --- |
-| `0` (por defecto) | `data/ventas.json` en el servidor. **Se pierde cuando Render reinicia la instancia.** |
-| `1` | Tu Google Sheet, via el snippet `REPORTE_VENTAS` de mas abajo. Permanente. |
-
-Los reportes ahora se filtran por fecha y vendedor, y se exportan a CSV.
+Sistema de ventas para "MooN Tech Mobiles". El dinero se calcula en el **servidor**, no en el navegador.
 
 ## Estructura
 
 ```
 Sis_Zamir/
-├── .env.example          Plantilla de variables (copiala a .env)
-├── .gitignore            Ignora .env, node_modules y data/
+├── .env.example              Plantilla de variables
+├── .gitignore                Ignora .env, node_modules y data/
 ├── package.json
-├── server.js             Servidor Express: rutas /api/*
-├── scripts/hash-pin.js   Genera el hash del PIN
+├── server.js                 Servidor Express: rutas /api/*
+├── scripts/hash-pin.js       Genera el hash del PIN
 ├── src/
-│   ├── money.js          Motor de precios en centavos
-│   ├── inventory.js      Cliente de Google Sheets con cache
-│   ├── ledger.js         Historial de ventas y resumen
-│   ├── auth.js           PIN con scrypt + sesiones HMAC
-│   └── ai.js             Ficha tecnica con Gemini + rate limit
-└── public/index.html     La interfaz (cliente delgado)
+│   ├── money.js              Motor de precios en centavos
+│   ├── inventory.js          Cliente de Google Sheets con cache
+│   ├── ledger.js             Historial de ventas y resumen
+│   ├── auth.js               PIN con scrypt + sesiones HMAC
+│   └── ai.js                 Ficha tecnica con Gemini + rate limit
+├── public/index.html         La interfaz (cliente delgado)
+└── apps-script/
+    ├── Code.gs               Apps Script corregido (pegar en script.google.com)
+    └── appsscript.json       Manifiesto (solo si usas clasp)
 ```
 
 ## Desarollo local
@@ -61,8 +28,8 @@ Sis_Zamir/
 ```bash
 npm install
 cp .env.example .env
-npm run hash-pin -- 1234        # pega el resultado en ADMIN_PIN_HASH
-node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"  # SESSION_SECRET
+npm run hash-pin -- 1234
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 npm run dev
 ```
 
@@ -70,85 +37,102 @@ npm run dev
 
 | Variable | Para que sirve |
 | --- | --- |
-| `SHEETS_WEBAPP_URL` | URL `/exec` de tu Web App de Apps Script. **Sin esto no hay inventario.** |
+| `SHEETS_WEBAPP_URL` | URL `/exec` de tu Web App. **No se publica en la web**, solo la usa Render. |
+| `SHEETS_API_KEY` | Secreto compartido con Apps Script. Sin esto no hay inventario. |
 | `ADMIN_PIN_HASH` | Hash scrypt del PIN. El PIN en si mismo nunca se guarda. |
 | `SESSION_SECRET` | Firma las cookies de sesion. Minimo 16 caracteres. |
 | `TASA_COMISION` | Comision del vendedor sobre la ganancia. `0.30` = 30%. |
 | `DESCUENTO_MAYOR_PCT` | Descuento mayorista plano. `5` = 5%. |
-| `MAYOR_TIERS` | Tramos por volumen: `3:8,6:12` = 3+ un. 8%, 6+ un. 12%. Tiene prioridad sobre el plano. |
+| `MAYOR_TIERS` | Tramos por volumen: `3:8,6:12`. Tiene prioridad sobre el plano. |
 | `REPORTES_DESDE_SHEETS` | `1` para que el historial viva en tu Sheet. |
-| `GEMINI_API_KEY` | Llave de Google AI Studio. Sin ella la ficha tecnica sale deshabilitada. |
+| `GEMINI_API_KEY` | Llave de Google AI Studio. Se configura **solo en Render**. |
 | `GEMINI_MODEL` | Por defecto `gemini-3.5-flash`. |
-| `AI_RATE_LIMIT_POR_MIN` | Consultas de IA por minuto y por IP. Por defecto 6. |
+| `AI_RATE_LIMIT_POR_MIN` | Consultas de IA por minuto y por IP. |
 
-## Snippet para Apps Script
+---
 
-Pega esto en tu proyecto de Apps Script, **antes** del `return` final de `doPost`, para que el historial de ventas sea permanente:
+## Puesta en marcha del Apps Script
 
-```javascript
-// ---- Historial de ventas (para REPORTES_DESDE_SHEETS=1) ----
-const HOJA_VENTAS = 'Ventas';
+El archivo correcto es **`apps-script/Code.gs`**. Pega su contenido completo en tu proyecto de Apps Script, reemplazando lo anterior.
 
-function registrarVentaHistorica(d) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var hoja = ss.getSheetByName(HOJA_VENTAS);
-  if (!hoja) {
-    hoja = ss.insertSheet(HOJA_VENTAS);
-    hoja.appendRow([
-      'Fecha', 'Vendedor', 'Modelo', 'Tipo', 'Cantidad', 'TC',
-      'PrecioUnitarioBs', 'CostoTotalBs', 'TotalBs', 'GananciaBs', 'ComisionBs', 'FilaExcel'
-    ]);
-  }
-  hoja.appendRow([
-    d.fecha || new Date().toISOString(),
-    d.vendedor || '', d.modelo || '', d.tipo || '', Number(d.cantidad) || 0,
-    Number(d.tipoCambio) || 0, Number(d.precioUnitarioBs) || 0,
-    Number(d.costoTotalBs) || 0, Number(d.totalCobrado) || 0,
-    Number(d.gananciaRegistrada) || 0, Number(d.comision) || 0,
-    d.filaExcel || ''
-  ]);
-}
+**Orden de los pasos:**
 
-function leerVentasHistoricas() {
-  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(HOJA_VENTAS);
-  if (!hoja) return [];
-  var valores = hoja.getDataRange().getValues();
-  var salida = [];
-  for (var i = 1; i < valores.length; i++) {
-    var f = valores[i];
-    if (!f[0]) continue;
-    salida.push({
-      fecha: new Date(f[0]).toISOString(), vendedor: f[1], modelo: f[2],
-      tipo: f[3], cantidad: Number(f[4]) || 0, tipoCambio: Number(f[5]) || 0,
-      precioUnitarioBs: Number(f[6]) || 0, costoTotalBs: Number(f[7]) || 0,
-      totalCobradoBs: Number(f[8]) || 0, gananciaBs: Number(f[9]) || 0,
-      comisionBs: Number(f[10]) || 0, filaExcel: f[11]
-    });
-  }
-  return salida;
-}
-```
+1. **Genera la clave compartida.** En el editor de Apps Script, agrega una funcion vacia `generarClaveCompartida()`, ejecuta una vez, y copia el valor del log. Es largo y aleatorio.
 
-Y en el `doPost`, dentro del bloque que ya manejas, agrega:
+2. **Guarda la propiedad.** `Configuracion del proyecto` -> `Propiedades del script` -> `Agregar propiedad`:
+   - Nombre: `SHEETS_API_KEY`
+   - Valor: la clave del paso 1
 
-```javascript
-if (data.tipoOperacion === 'VENTA') registrarVentaHistorica(data);
-if (data.tipoOperacion === 'REPORTE_VENTAS') return leerVentasHistoricas();
-```
+3. **Borra `generarClaveCompartida()`** del script.
 
-La v2 tambien manda campos que tu script actual ignora (`precioUnitarioBs`, `comision`, `tipoCambio`). Son inocuos si tu script no los lee.
+4. **Despliega.** `Implementar` -> `Nueva implementacion`:
+   - Tipo: aplicacion web
+   - Ejecutar como: **Yo**
+   - Quien tiene acceso: **Cualquier persona**
 
-## Deploy en Render
+   Cada vez que cambies el codigo tienes que volver a desplegar. Editar el script no cambia la version que se ejecuta.
 
-- Build command: `npm install`
-- Start command: `node server.js`
-- Health check path: `/api/health`
+5. **Copia la URL `/exec`** que te da Render al terminar.
 
-En Render > Environment agrega las variables de `.env.example`.
+6. **En Render**, `Environment`, agrega las dos variables:
+   ```
+   SHEETS_WEBAPP_URL = https://script.google.com/macros/s/AKfy.../exec
+   SHEETS_API_KEY    = (la misma clave del paso 1)
+   ```
+
+7. **Prueba** entrando a `https://sis-zamir.onrender.com/api/health`. Debe decir `"sheetsUrl":true,"sheetsClave":true`.
+
+---
+
+## Bugs corregidos (y donde estaban)
+
+### En el precio
+
+La version 1 calculaba en el navegador. Se rompia por cinco caminos distintos:
+
+1. `forzarAutofillYRecalcular()` ponia `dataset.manual = "false"` en cada tecla del campo de modelo: **te borraba el precio tecleado a mano**.
+2. `actualizarPreciosVenta()` hacia `if (!productoSelected) return;`. Si el modelo no coincidia exacto, **no recalculaba** y los tres indicadores seguian mostrando los numeros del modelo anterior.
+3. `registrarVenta()` mandaba a Sheets las variables cacheadas, no un recalculo.
+4. "Mayor" no tenia ninguna regla de precio.
+5. La ganancia se calculaba sobre el precio unitario ya redondeado y el total no se redondeaba: se acumulaba error en centavos.
+
+**Ahora** todo el dinero se calcula en `src/money.js` con **enteros en centavos**. El navegador solo muestra lo que responde `POST /api/ventas/preview`, y al guardar el servidor **recalcula desde cero** aunque alguien manipule el JS.
+
+### En el Apps Script (los que acabas de pegar)
+
+1. **La ganancia restaba dolares de bolivianos.** Era `totalCobrado - (costoUsd * cantidad)`: multiplicaba dolares por unidades y no multiplicaba por el tipo de cambio. Con un costo de 100 USD a 11,75 daba una ganancia de ~-13.000 en vez de ~0.
+2. **La comision nunca se guardaba.** La hoja "Ventas" tenia 7 columnas y no incluia comision, asi que los reportes de comisiones salian en 0.
+3. **No existian consultas de reporte.** El historial era de solo escritura: no habia forma de leerlo de vuelta.
+4. **No habia validacion de stock.** El script ponia 0 si el stock daba negativo, con lo cual se vendian equipos inexistentes.
+5. **Las consignaciones contaminaban el reporte de ventas.** Iban mezcladas en la hoja "Ventas" con ganancia 0. Ahora viven en su propia hoja, con id, y el reporte las ignora.
+
+### En el contrato entre backend y Apps Script
+
+1. **Apps Script no puede leer headers HTTP.** Dentro de `doGet(e)` solo existen `parameter` y `postData`. Por eso la clave compartida viaja en `?key=` en las lecturas y en el campo `apiKey` del cuerpo JSON en las escrituras.
+2. **Se elimino el login con token de sesion del script.** El unico cliente es Render, que ya autentica con su propio PIN y cookie firmada. El token de Apps Script dependia de `CacheService`, que puede evictar la sesion y romper la lectura de inventario de forma aleatoria.
+3. **`inventory.escribir` daba por buena cualquier respuesta.** Apps Script devuelve HTTP 200 incluso cuando rechaza la operacion, con `{status:"ERROR"}` adentro. Antes eso se ignoraba y la app le decia "venta registrada" al usuario aunque la hoja nunca se hubiera tocado. Ahora `src/inventory.js` lo detecta y devuelve 409.
+
+### En la autenticacion del cliente
+
+- El PIN estaba en el HTML como `PIN_SECRETO = "1234"`. Cualquiera que abriera devtools entraba a Dueño y Reportes.
+- `enviarANube()` usaba `mode: 'no-cors'`, que devuelve una respuesta opaca. `sincronizado` **siempre daba `true`**: si Sheets fallaba, el stock local bajaba igual sin avisar.
+
+### El boton de ficha tecnica
+
+La v1 llamaba a `gemini-1.5-flash` desde el navegador, que esta **apagado** desde 2025, y con la llave metida en un HTML publico. Ademas, desde junio de 2026 Google rechaza llaves sin restriccion de proyecto.
+
+La v2 usa `gemini-3.5-flash`, pide respuesta estructurada con `responseSchema` (por eso ya no hay que parsear texto libre), guarda la llave en Render, cachea 6 horas por modelo y limita a 6 consultas por minuto y por IP.
+
+---
 
 ## Lo que quedo fuera y por que
 
-- **La lista de consignaciones no pide PIN.** Es el mismo comportamiento que la v1. Si quieres que solo el dueño vea los nombres de los clientes, agrego un gate de `auth.exigirAuth` en `GET /api/consignaciones`.
+- **La lista de consignaciones no pide PIN.** Es el mismo comportamiento que la v1. Si quieres que solo el dueño vea los nombres de los clientes, se agrega `auth.exigirAuth` a `GET /api/consignaciones`.
 - **`costoUsd` se oculta en las respuestas publicas.** Es defensa en profundidad, no una barrera real: los precios calculados ya revelan el margen.
-- **No hay rate limit por usuario en las escrituras**, solo por IP (60/min). Si un vendedor cambia de IP varias veces, ese limite se evadia.
-- **Render free reinicia la instancia tras inactividad** y se duerme. Con `REPORTES_DESDE_SHEETS=1` eso no afecta los datos, pero la primera peticion del dia va a ser lenta.
+- **El rate limit de escritura es por IP (60/min).** Si un vendedor cambia de IP, puede evadirlo.
+- **La clave compartida viaja en la query string** de las lecturas, asi que aparece en los logs de ejecucion de Google. Se acepto ese coste porque Apps Script no da otra forma de leer un secreto.
+- **Render free se duerme tras inactividad.** Con `REPORTES_DESDE_SHEETS=1` no se pierden datos, pero la primera peticion del dia va a ser lenta.
+
+## Aviso de seguridad
+
+Este repositorio es **publico**. En su historial hubo dos llaves de API de Gemini en texto plano (una en el `index.html` viejo, otra en un `.env.example` de un commit posterior). Ambas hay que considerarlas quemadas y rotarlas en [AI Studio](https://aistudio.google.com/apikey). Borrar el archivo no borra la llave de los commits: hay que rotarla.
