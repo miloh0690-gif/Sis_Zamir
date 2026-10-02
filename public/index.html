@@ -32,6 +32,7 @@
         .tap:disabled { opacity: 0.5; transform: none; }
         @keyframes moonGlow { 0%,100% { filter: drop-shadow(0 0 3px rgba(110,231,249,.4)); } 50% { filter: drop-shadow(0 0 9px rgba(110,231,249,.85)); } }
         .moon-synced { animation: moonGlow 3s ease-in-out infinite; }
+        .campo-calculado { color:#8B6472; }
         .campo-calculado { color:#8B95A7; }
         .campo-manual { color:#DCE9FF; }
     </style>
@@ -231,6 +232,7 @@
 
             <div id="avisosReportes"></div>
             <div id="resumenExtra" class="grid grid-cols-3 gap-2.5"></div>
+            <div id="tablasResumen" class="space-y-4"></div>
 
             <div>
                 <h3 class="text-xs font-bold text-[#8B95A7] uppercase tracking-wide mb-2 px-1">Ventas registradas</h3>
@@ -343,6 +345,11 @@
             if (sincronizado) $('iconoLuna').classList.add('moon-synced');
         }
 
+        function cerrarSugerencias() {
+            $('sugerenciasVenta').classList.add('hidden');
+            $('sugerenciasConsignacion').classList.add('hidden');
+        }
+
         // ---------- SUGERENCIAS DE MODELO ----------
 
         function renderSugerencias(idContenedor, idInput, alElegir) {
@@ -379,11 +386,6 @@
                 cont.appendChild(item);
             });
             cont.classList.remove('hidden');
-        }
-
-        function cerrarSugerencias() {
-            $('sugerenciasVenta').classList.add('hidden');
-            $('sugerenciasConsignacion').classList.add('hidden');
         }
 
         // ---------- PRECIO: TODO VIENE DEL SERVIDOR ----------
@@ -487,11 +489,11 @@
                 const c = datos.calculo;
                 let mensaje =
                     'Venta registrada.\n\n' +
-                    'Modelo: ' + c.cantidad + ' x ' + datos.venta.modelo + '\n' +
+                    'Cantidad: ' + c.cantidad + ' x ' + datos.venta.modelo + '\n' +
                     'Total: ' + fmt(c.totalCobradoBs) + ' Bs\n' +
                     'Ganancia: ' + fmt(c.gananciaBs) + ' Bs\n' +
                     'Comisión: ' + fmt(c.comisionBs) + ' Bs';
-                if (datos.advertencia) mensaje += '\n\n⚠️ ' + datos.advertencia;
+                if (datos.advertencia) mensaje += '\n\nAviso: ' + datos.advertencia;
                 alert(mensaje);
 
                 const indice = ESTADO.productos.findIndex((p) => normalizar(p.modelo) === normalizar(datos.venta.modelo));
@@ -509,7 +511,7 @@
                 cerrarSugerencias();
                 renderizarInventarioDueno();
             } catch (e) {
-                alert('❌ ' + e.message);
+                alert('Error: ' + e.message);
             } finally {
                 boton.disabled = false;
             }
@@ -552,8 +554,8 @@
                     '<p class="text-[#8B95A7] text-xs mt-0.5">Suc. ' + escapeHtml(c.sucursal) + '</p>' +
                     '</div><span class="font-display font-bold text-lg text-[#9B8CFF] font-data">' + escapeHtml(c.cantidad) + ' U.</span></div>' +
                     '<div class="flex gap-2 pt-1">' +
-                    '<button type="button" data-accion="estado" data-id="' + escapeHtml(c.id) + '" class="tap flex-1 h-10 rounded-xl bg-[#242933] text-xs font-bold text-[#EDEFF3]">🔄 Cambiar pago</button>' +
-                    '<button type="button" data-accion="devolver" data-id="' + escapeHtml(c.id) + '" class="tap flex-1 h-10 rounded-xl bg-rose-500/10 text-rose-400 text-xs font-bold">🔙 Reintegrar</button>' +
+                    '<button type="button" data-accion="estado" data-id="' + escapeHtml(c.id) + '" class="tap flex-1 h-10 rounded-xl bg-[#242933] text-xs font-bold text-[#EDEFF3]">Cambiar pago</button>' +
+                    '<button type="button" data-accion="devolver" data-id="' + escapeHtml(c.id) + '" class="tap flex-1 h-10 rounded-xl bg-rose-500/10 text-rose-400 text-xs font-bold">Reintegrar</button>' +
                     '</div>';
                 cont.appendChild(div);
             });
@@ -575,7 +577,7 @@
                         await cargarConsignaciones();
                         await cargarInventario();
                     } catch (e) {
-                        alert('❌ ' + e.message);
+                        alert('Error: ' + e.message);
                     } finally {
                         boton.disabled = false;
                     }
@@ -596,7 +598,7 @@
                     },
                 });
                 let mensaje = 'Consignación registrada.';
-                if (datos.advertencia) mensaje += '\n\n⚠️ ' + datos.advertencia;
+                if (datos.advertencia) mensaje += '\n\nAviso: ' + datos.advertencia;
                 alert(mensaje);
 
                 const indice = ESTADO.productos.findIndex((p) => normalizar(p.modelo) === normalizar(datos.consignacion.modelo));
@@ -608,7 +610,7 @@
                 cerrarSugerencias();
                 await cargarConsignaciones();
             } catch (e) {
-                alert('❌ ' + e.message);
+                alert('Error: ' + e.message);
             } finally {
                 boton.disabled = false;
             }
@@ -631,11 +633,11 @@
         async function pedirFichaTecnica() {
             const modelo = $('ventaModelo').value.trim();
             if (!modelo) {
-                alert('⚠️ Escribe o selecciona un modelo primero.');
+                alert('Escribe o selecciona un modelo primero.');
                 return;
             }
             if (!ESTADO.config || !ESTADO.config.ia) {
-                alert('⚠️ La consulta con IA todavía no está habilitada en el servidor.');
+                alert('La consulta con IA todavía no está habilitada en el servidor.');
                 return;
             }
 
@@ -643,7 +645,7 @@
             panel.classList.remove('hidden');
             panel.innerHTML =
                 '<div class="p-4 bg-[#1B2029] rounded-xl border border-[#4C8DFF]/30 text-xs text-[#8B95A7] flex items-center gap-2">' +
-                '<span class="animate-spin">⏳</span> Consultando ficha técnica de <strong>' + escapeHtml(modelo) + '</strong>…</div>';
+                '<span class="animate-spin">...</span> Consultando ficha técnica de <strong>' + escapeHtml(modelo) + '</strong>…</div>';
             $('btnFicha').disabled = true;
 
             try {
@@ -651,7 +653,7 @@
                 panel.innerHTML = pintarFicha(datos.ficha, datos.cache);
             } catch (e) {
                 panel.innerHTML =
-                    '<div class="p-3 bg-red-500/10 text-red-400 rounded-xl text-xs border border-red-500/20">❌ ' + escapeHtml(e.message) + '</div>';
+                    '<div class="p-3 bg-red-500/10 text-red-400 rounded-xl text-xs border border-red-500/20">Error: ' + escapeHtml(e.message) + '</div>';
             } finally {
                 $('btnFicha').disabled = false;
             }
@@ -757,8 +759,8 @@
 
                 $('avisosReportes').innerHTML = datos.efimero
                     ? '<div class="rounded-2xl bg-[#FBBF24]/10 border border-[#FBBF24]/25 p-3 text-[11px] text-[#FBBF24] leading-relaxed">' +
-                      '⚠️ El historial vive en la memoria del servidor y se borra cuando Render reinicia la instancia. ' +
-                      'Instala el snippet <strong>REPORTE_VENTAS</strong> de tu Apps Script y pon <strong>REPORTES_DESDE_SHEETS=1</strong> en Render para hacerlo permanente.</div>'
+                      'El historial vive en la memoria del servidor y se borra cuando Render reinicia la instancia. ' +
+                      'Instala el snippet REPORTE_VENTAS en tu Apps Script y pon REPORTES_DESDE_SHEETS=1 en Render para hacerlo permanente.</div>'
                     : '';
 
                 renderVentas(datos.ventas);
@@ -811,7 +813,7 @@
                     html += '<div class="px-4 py-2.5 border-b border-[#2A2F3A] last:border-b-0 text-xs flex items-center justify-between gap-3">' +
                         '<span class="text-[#EDEFF3] truncate">' + escapeHtml(fila[clave]) + '</span>';
                     datos.forEach((d) => {
-                        html += '<span class="font-data text-[#8B95A7] shrink-0">' + d.etiqueta + ' ' + escapeHtml(d.valor(fila)) + '</span>';
+                        html += '<span class="font-data text-[#8B6472] shrink-0">' + d.etiqueta + ' ' + escapeHtml(d.valor(fila)) + '</span>';
                     });
                     html += '</div>';
                 });
@@ -991,7 +993,7 @@
                 if (ESTADO.pestana !== 'vendedor') cambiarPestana('vendedor');
             });
             $('modalLogin').addEventListener('click', (e) => {
-                if (e.target === $('modalLogin)) {
+                if (e.target === $('modalLogin')) {
                     cerrarLogin();
                     if (ESTADO.pestana !== 'vendedor') cambiarPestana('vendedor');
                 }
@@ -1019,13 +1021,13 @@
                 ESTADO.config = await api('/api/config');
             } catch (e) {
                 estadoConexion('error', 'Sin servidor', false);
-                alert('❌ No se pudo contactar al servidor. ' + e.message);
+                alert('No se pudo contactar al servidor. ' + e.message);
                 return;
             }
 
             if (!ESTADO.config.sheets) {
                 estadoConexion('aviso', 'Sin Sheets', false);
-                alert('⚠️ El inventario no está configurado. El dueño debe definir SHEETS_WEBAPP_URL en Render.');
+                alert('El inventario no está configurado. El dueño debe definir SHEETS_WEBAPP_URL en Render.');
             } else {
                 try {
                     await cargarInventario();
@@ -1036,9 +1038,8 @@
 
             if (!ESTADO.config.ia) {
                 $('btnFicha').disabled = true;
-                $('btnFicha').classList.add('opacity-50');
                 $('btnFicha').classList.remove('text-[#4C8DFF]');
-                $('btnFicha').classList.add('text-[#5B6472]');
+                $('btnFicha').classList.add('text-[#5B6472]', 'opacity-50');
             }
 
             renderizarInventarioDueno();
