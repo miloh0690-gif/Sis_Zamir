@@ -48,15 +48,19 @@ function clave(texto) {
 // Si dos SKUs distintos caen en la misma clave solo entra el primero. Se
 // avisa al arrancar en vez de devolver la ficha del otro en silencio.
 const POR_CLAVE = {};
+const YA_INDEXADO = {};
 const COLISIONES = {};
 for (const nombre of Object.keys(TABLAS)) {
   const k = clave(nombre);
   if (!k) continue;
   if (POR_CLAVE[k]) {
-    COLISIONES[nombre] = POR_CLAVE[k];
+    // COLISIONES guarda el SKU que se lleva la ficha, no la ruta: al
+    // reportar hay que poder leer los dos nombres, no dos rutas.
+    COLISIONES[nombre] = YA_INDEXADO[k] || '';
     continue;
   }
   POR_CLAVE[k] = TABLAS[nombre];
+  YA_INDEXADO[k] = nombre;
 }
 
 for (const nombre of Object.keys(COLISIONES)) {
@@ -97,11 +101,29 @@ async function buscar(modelo) {
   if (!ruta) return null;
 
   const json = await fetchJson(RAW_BASE + '/' + ruta);
-  const ficha = dataset.mapear(json);
+  const ficha = sinMarcaDuplicada(dataset.mapear(json));
   if (!ficha) return null;
 
   cache.set(k, ficha);
   return { ficha: ficha, cache: false };
+}
+
+/**
+ * El dataset trae brand ("xiaomi") y name ("Xiaomi Redmi A7 4G"), y
+ * dataset.mapear los concatena: "Xiaomi Xiaomi Redmi A7 4G". Se repite
+ * cuando el name ya empieza con la marca, que es lo habitual.
+ */
+function sinMarcaDuplicada(ficha) {
+  if (!ficha || !ficha.nombre || !ficha.marca) return ficha;
+  const partes = String(ficha.nombre).trim().split(/\s+/);
+  while (partes.length > 1 && partes[0].toLowerCase() === String(ficha.marca).toLowerCase()) {
+    partes.shift();
+  }
+  const limpio = partes.join(' ');
+  if (limpio === ficha.nombre) return ficha;
+  const copia = Object.assign({}, ficha);
+  copia.nombre = limpio;
+  return copia;
 }
 
 function tiene(modelo) {
