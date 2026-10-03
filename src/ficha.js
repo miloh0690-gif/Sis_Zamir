@@ -5,8 +5,19 @@
 //   1. src/indice.js  -> src/fichas.json: indice horneado y verificado.
 //                        Sin GITHUB_TOKEN y sin rate limit. Cubre 89 de
 //                        los 225 SKUs reales de la tienda.
-//   2. src/dataset.js -> indice en vivo del dataset (necesita GITHUB_TOKEN)
-//   3. src/specs.js   -> scraper de GSMArena (respaldo)
+//   2. src/gsm.js     -> BUSQUEDA en el espejo de GSMArena, con los nombres
+//                        oficiales ("Samsung Galaxy A06"). Cubre los que el
+//                        indice no tiene, sin GITHUB_TOKEN.
+//   3. src/dataset.js -> indice en vivo del dataset (necesita GITHUB_TOKEN)
+//   4. src/specs.js   -> coincidencia exacta de nombre (respaldo)
+//   5. src/iaficha.js -> fichas redactadas por IA. ULTIMO recurso, y van
+//                        marcadas como no verificadas. La IA solo llega
+//                        aqui cuando ninguna base de datos tiene el equipo.
+//
+// Todo lo que sale de las fuentes 1 a 4 pasa por el gate de src/modelo.js.
+// La fuente 5 NO: por definicion no hay con que verificarla, y por eso
+// viaja con verificado:false, fuenteDatos:'ia' y el resultado de comparar
+// dos respuestas independientes (estable / diferencias).
 //
 // Antes de devolver nada se VERIFICA que la ficha sea del telefono que se
 // pidio, comparando tokens de identidad (src/modelo.js). La version
@@ -22,10 +33,19 @@
 // y con argumentosError explicando por que.
 
 const indice = require('./indice');
+const gsm = require('./gsm');
 const dataset = require('./dataset');
 const specs = require('./specs');
+const iaficha = require('./iaficha');
 const ia = require('./ia');
 const modelo = require('./modelo');
+
+// La ficha por IA se puede apagar. Con FICHAS_POR_IA=0 el sistema vuelve a
+// decir "no hay ficha verificada" en vez de mostrar una ficha de IA. Es la
+// opcion para cuando Milo prefiera no arriesgar una especificacion al
+// cliente aunque venga marcada como no verificada.
+const IA_COMO_FICHA =
+  String(process.env.FICHAS_POR_IA === undefined ? '1' : process.env.FICHAS_POR_IA) !== '0';
 
 function habilitado() {
   return true;
@@ -93,8 +113,8 @@ function aplicarMemoriaDelSku(ficha, texto) {
 
   ficha.ramAlmacenamiento = textoMemoria;
   // El resumen arrastra la memoria de la base y el panel lo muestra, asi
-  // que hay que corregirlo tambien: si no, el vendedor leeria la RAM
-  // nueva junto al almacenamiento viejo en la misma linea.
+  // que hay que corregirlo tambien. Ojo: en el resumen el almacenamiento
+  // NO dice "almacenamiento", dice "256 / 512 GB" a secas, y va al final.
   if (ficha.resumen) {
     ficha.resumen = ficha.resumen.replace(
       /\d+\s*GB\s*RAM/gi,
@@ -115,9 +135,17 @@ function aplicarMemoriaDelSku(ficha, texto) {
   ficha.memoriaDelSku = true;
 }
 
-async function finalizar(ficha, cache, ip) {
+/**
+ * `opciones.sinArgumentos` se usa para la ficha de IA: si los datos no
+ * coinciden entre dos consultas, no se inventan argumentos de venta encima,
+ * porque multiplicaria el riesgo.
+ */
+async function finalizar(ficha, cache, ip, opciones) {
+  const opts = opciones || {};
   ficha.puntosDeVenta = [];
-  ficha.argumentosError = null;
+  ficha.argumentosError = opts.nota || null;
+
+  if (opts.sinArgumentos) return { ficha: ficha, cache: cache };
 
   if (ia.habilitado()) {
     try {
@@ -165,7 +193,24 @@ async function fichaTecnica(modelo, ip) {
     }
   }
 
-  // 2) indice en vivo del dataset (necesita GITHUB_TOKEN)
+  // 2) busqueda en el espejo de GSMArena con nombres oficiales
+  if (gsm.habilitado()) {
+    try {
+      const rg = await gsm.buscar(texto);
+      if (rg && rg.ficha) {
+        const problema = verificar(rg.ficha, texto);
+        if (!problema) {
+          aplicarMemoriaDelSku(rg.ficha, texto);
+          return finalizar(rg.ficha, rg.cache, ip);
+        }
+        razones.push('gsm: ' + problema);
+      }
+    } catch (eg) {
+      razones.push('gsm: ' + eg.message);
+    }
+  }
+
+  // 3) indice en vivo del dataset (necesita GITHUB_TOKEN)
   try {
     const r1 = await dataset.buscarFicha(texto);
     if (r1) {
@@ -180,7 +225,7 @@ async function fichaTecnica(modelo, ip) {
     razones.push('dataset: ' + e1.message);
   }
 
-  // 3) scraper de GSMArena
+  // 4) coincidencia exacta de nombre en GSMArena
   try {
     const r2 = await specs.buscarFicha(texto);
     const problema = verificar(r2.ficha, texto);
@@ -191,6 +236,44 @@ async function fichaTecnica(modelo, ip) {
     razones.push('scraper: ' + problema);
   } catch (e2) {
     razones.push('scraper: ' + e2.message);
+  }
+
+  // 5) ultimo recurso: la ficha la redacta la IA. No se verifica contra
+  //    una base porque no hay ninguna que la verifique, asi que se marca.
+  if (IA_COMO_FICHA) {
+    let r3 = null;
+    try {
+      r3 = await iaficha.buscar(texto);
+    } catch (e3) {
+      razones.push('ia: ' + e3.message);
+    }
+
+    if (r3 && r3.ficha) {
+      const f = r3.ficha;
+      // La identidad sigue sin verificarse: si la IA contesta con otro
+      // telefono, es peor que no devolver nada.
+      const problema = verificar(f, texto);
+      if (!problema) {
+        aplicarMemoriaDelSku(f, texto);
+        f.verificado = false;
+        f.esFichaDeIa = true;
+        f.estable = r3.estable;
+        f.diferencias = r3.diferencias;
+
+        const nota = r3.estable
+          ? 'Ficha redactada por IA, no verificada contra ninguna base de ' +
+            'datos. Las dos consultas coincidieron, pero confirmala antes de ' +
+            'leerla al cliente.'
+          : 'Ficha de IA SIN VERIFICAR: los datos no coinciden entre dos ' +
+            'consultas (' + (r3.diferencias.join(', ') || 'sin detalle') +
+            '). El modelo esta inventando. No la leas al cliente.';
+
+        return finalizar(f, false, ip, { sinArgumentos: !r3.estable, nota: nota });
+      }
+      razones.push('ia: ' + problema);
+    } else if (r3 && r3.mensaje) {
+      razones.push('ia: ' + r3.mensaje);
+    }
   }
 
   const detalle = razones.length ? ' (' + razones.join(' | ') + ')' : '';
@@ -205,6 +288,9 @@ async function fichaTecnica(modelo, ip) {
 
 module.exports = {
   fichaTecnica: fichaTecnica,
+  iaComoFicha: function () {
+    return IA_COMO_FICHA && iaficha.habilitado();
+  },
   habilitado: habilitado,
   hayArgumentos: hayArgumentos,
   modeloArgs: ia.modelo,
