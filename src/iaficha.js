@@ -11,7 +11,7 @@
 // excepcion invisible:
 //
 //   - La ficha viene marcada `fuenteDatos: 'ia'` y `verificado: false`.
-//   - `especifico: true` cuando el modelo NO conoce el equipo.
+//   - `loConoce: false` cuando el modelo dice que NO conoce el equipo.
 //   - Se pregunta DOS VEZES, por separado. Si los numeros no coinciden
 //     entre las dos respuestas, `estable: false`: el modelo esta inventando
 //     y el numero sale con toda seguridad.
@@ -191,7 +191,7 @@ async function buscar(modeloTexto, nombreConocido) {
   if (!k || !habilitado()) return null;
 
   const guardado = cache.get(k);
-  if (guardado) return guardado;
+  if (guardado && Date.now() - guardado.fecha < CACHE_MS) return guardado.salida;
 
   const objetivo = nombreConocido || k;
 
@@ -206,6 +206,7 @@ async function buscar(modeloTexto, nombreConocido) {
   if (!Known(p1) && !Known(p2)) {
     const salida = {
       ficha: null,
+      cache: false,
       fuenteDatos: 'ia',
       verificado: false,
       loConoce: false,
@@ -216,7 +217,7 @@ async function buscar(modeloTexto, nombreConocido) {
         'conoce. Salio hace poco y no hay ficha verificada. No inventar: ' +
         'preguntale al fabricante o a un mayorista.',
     };
-    cache.set(k, salida);
+    cache.set(k, { fecha: Date.now(), salida: salida });
     return salida;
   }
 
@@ -266,7 +267,7 @@ async function buscar(modeloTexto, nombreConocido) {
     estable: ficha.estable,
     diferencias: diferencias,
   };
-  cache.set(k, salida);
+  cache.set(k, { fecha: Date.now(), salida: salida });
   return salida;
 }
 
