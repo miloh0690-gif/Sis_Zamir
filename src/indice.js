@@ -27,23 +27,43 @@ const TIMEOUT_MS = 25000;
 const dataset = require('./dataset');
 const TABLAS = require('./fichas.json');
 
-function normalizar(texto) {
+/**
+ * Clave de busqueda de la tabla. El "+" SE CONSERVA, a proposito.
+ *
+ * "SAMSUNG S26 256/12" y "SAMSUNG S26+ 256/12" dan la misma clave si el "+"
+ * se convierte en espacio. Con dos SKUs en la misma clave, el primero se
+ * queda con la ficha del segundo y el vendedor del Galaxy S26+ leeria las
+ * especificaciones del S26. Son telefonos distintos.
+ */
+function clave(texto) {
   return String(texto === undefined || texto === null ? '' : texto)
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/[^a-z0-9+]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
-// La tabla se indexa por clave normalizada ("black shark 128 6", minusculas
-// y sin acentos) porque las claves del archivo son las crudas del Excel
-// ("BLACK SHARK 128/6"). Sin esto la tabla nunca pegaria.
+// Si dos SKUs distintos caen en la misma clave solo entra el primero. Se
+// avisa al arrancar en vez de devolver la ficha del otro en silencio.
 const POR_CLAVE = {};
+const COLISIONES = {};
 for (const nombre of Object.keys(TABLAS)) {
-  const k = normalizar(nombre);
-  if (k && !POR_CLAVE[k]) POR_CLAVE[k] = TABLAS[nombre];
+  const k = clave(nombre);
+  if (!k) continue;
+  if (POR_CLAVE[k]) {
+    COLISIONES[nombre] = POR_CLAVE[k];
+    continue;
+  }
+  POR_CLAVE[k] = TABLAS[nombre];
+}
+
+for (const nombre of Object.keys(COLISIONES)) {
+  console.error(
+    '[indice] "' + nombre + '" y "' + COLISIONES[nombre] +
+      '" dan la misma clave. Solo se indexa el primero.'
+  );
 }
 
 const cache = new Map();
@@ -67,7 +87,7 @@ async function fetchJson(url) {
  * La fichaTodavia NO esta verificada: eso lo hace quien la pide.
  */
 async function buscar(modelo) {
-  const k = normalizar(modelo);
+  const k = clave(modelo);
   if (!k) return null;
 
   const guardado = cache.get(k);
@@ -85,7 +105,7 @@ async function buscar(modelo) {
 }
 
 function tiene(modelo) {
-  return Boolean(POR_CLAVE[normalizar(modelo)]);
+  return Boolean(POR_CLAVE[clave(modelo)]);
 }
 
 function cuantos() {
@@ -96,5 +116,6 @@ module.exports = {
   buscar: buscar,
   tiene: tiene,
   cuantos: cuantos,
-  normalizar: normalizar,
+  colisiones: COLISIONES,
+  clave: clave,
 };
