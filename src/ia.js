@@ -1,9 +1,9 @@
 'use strict';
 
 // Solo los ARGUMENTOS DE VENTA. Las especificaciones nunca salen de
-// aqui: llegan de src/specs.js, y este modulo las recibe como contexto
-// para redactar. Asi el modelo no puede inventar una capacidad de
-// bateria que no esta en los datos.
+// aqui: llegan del indice o de src/specs.js, y este modulo las recibe
+// como contexto para redactar. Asi el modelo no puede inventar una
+// capacidad de bateria que no esta en los datos.
 //
 // Groq es el proveedor con el plan gratuito mas generoso y el unico que
 // sigue publicando su tabla de limites completa:
@@ -58,13 +58,15 @@ setInterval(() => {
 // Peticion
 // -----------------------------------------------------------------
 
+// minItems/maxItems NO van aqui. La decodificacion restringida de Groq
+// no los soporta en el subconjunto de JSON Schema que acepta, y con ellos
+// presentes la generacion falla. El conteo se fuerza en el codigo, que es
+// mas barato que un 400 de Groq.
 const ESQUEMA = {
   type: 'object',
   properties: {
     puntosDeVenta: {
       type: 'array',
-      minItems: 3,
-      maxItems: 3,
       items: { type: 'string' },
     },
   },
@@ -107,7 +109,110 @@ function construirPrompt(ficha) {
     'uno de camara o pantalla, y uno de bateria, memoria o conectividad.',
     'Piensa en que le importa a alguien que esta pagando: no digas "gran',
     'bateria", di la capacidad real.',
+    '',
+    'Responde SOLO con este JSON y nada mas, sin texto antes ni despues:',
+    '{"puntosDeVenta": ["...","...","..."]}',
   ].join('\n');
+}
+
+/**
+ * Pide los argumentos a Groq. Intenta primero con el esquema estricto y,
+ * si la generacion falla, reintenta sin response_format pidiendo el JSON
+ * en el prompt. El motivo: gpt-oss-120b es un modelo de RAZONAMIENTO y con
+ * max_tokens chico se agota pensando antes de emitir el JSON. Medido el
+ * 2026-10-03: con 400 tokens la mitad de las fichas salian sin argumentos
+ * y el log decia "Failed to validate JSON".
+ */
+async function pedir(ficha, usarEsquema) {
+  const cuerpo = {
+    model: modelo(),
+    // Groq recomienda meter todas las instrucciones en el mensaje de
+    // usuario, no en un system prompt.
+    messages: [{ role: 'user', content: construirPrompt(ficha) }],
+    // low = razonamiento corto. Un argumento de venta no necesita pensar
+    // mucho, y cada token de razonamiento sale del presupuesto del JSON.
+    reasoning_effort: 'low',
+    include_reasoning: false,
+    temperature: 0.6,
+    // El default de Groq es 1024 y la doc avisa que para razonamiento puede
+    // quedar corto. Con 400 fallaba de forma intermitente.
+    max_completion_tokens: 1400,
+  };
+
+  if (usarEsquema) {
+    cuerpo.response_format = {
+      type: 'json_schema',
+      json_schema: { name: 'argumentos_venta', strict: true, schema: ESQUEMA },
+    };
+  }
+
+  const controlador = new AbortController();
+  const temporizador = setTimeout(() => controlador.abort(), TIMEOUT_MS);
+  try {
+    const r = await fetch(URL_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + apiKey() },
+      signal: controlador.signal,
+      body: JSON.stringify(cuerpo),
+    });
+
+    const texto = await r.text();
+    let datos = null;
+    try {
+      datos = JSON.parse(texto);
+    } catch (e) {
+      datos = null;
+    }
+
+    if (!r.ok) {
+      const mensaje =
+        (datos && datos.error && (datos.error.message || datos.error.type)) ||
+        'Groq respondio HTTP ' + r.status;
+      const e = new Error('Groq: ' + mensaje);
+      e.codigo = 502;
+      throw e;
+    }
+
+    const opcion = datos && datos.choices && datos.choices[0];
+    const parte = opcion && opcion.message && opcion.message.content;
+    if (!parte) {
+      const razon = opcion && opcion.finish_reason ? ' (' + opcion.finish_reason + ')' : '';
+      const e = new Error('Groq no devolvio contenido' + razon + '.');
+      e.codigo = 502;
+      throw e;
+    }
+
+    return listaDe(parte);
+  } finally {
+    clearTimeout(temporizador);
+  }
+}
+
+/**
+ * Saca los 3 strings del texto. Tolera que el modelo lo envuelva en ```json
+ * o que de 4 o 2: se recorta a 3 y se descarta lo que no sea texto.
+ */
+function listaDe(texto) {
+  let limpio = String(texto).trim();
+  const cerca = limpio.indexOf('{');
+  const lejos = limpio.lastIndexOf('}');
+  if (cerca >= 0 && lejos > cerca) limpio = limpio.slice(cerca, lejos + 1);
+
+  let datos = null;
+  try {
+    datos = JSON.parse(limpio);
+  } catch (e) {
+    datos = null;
+  }
+  if (!datos || !Array.isArray(datos.puntosDeVenta)) return null;
+
+  const lista = datos.puntosDeVenta
+    .map(function (p) {
+      return String(p === undefined || p === null ? '' : p).trim();
+    })
+    .filter(Boolean)
+    .slice(0, 3);
+  return lista.length ? lista : null;
 }
 
 async function argumentosDeVenta(ficha, ip) {
@@ -124,83 +229,20 @@ async function argumentosDeVenta(ficha, ip) {
     throw e;
   }
 
-  const controlador = new AbortController();
-  const temporizador = setTimeout(() => controlador.abort(), TIMEOUT_MS);
-
-  try {
-    const respuesta = await fetch(URL_API, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + apiKey(),
-      },
-      signal: controlador.signal,
-      body: JSON.stringify({
-        model: modelo(),
-        messages: [{ role: 'user', content: construirPrompt(ficha) }],
-        response_format: {
-          type: 'json_schema',
-          json_schema: {
-            name: 'argumentos_venta',
-            strict: true,
-            schema: ESQUEMA,
-          },
-        },
-        max_tokens: 400,
-      }),
-    });
-
-    const texto = await respuesta.text();
-    let datos;
+  const problemas = [];
+  for (const usarEsquema of [true, false]) {
     try {
-      datos = JSON.parse(texto);
+      const lista = await pedir(ficha, usarEsquema);
+      if (lista) return lista;
+      problemas.push('respuesta sin argumentos utilizables');
     } catch (e) {
-      datos = {};
+      problemas.push(e.message);
     }
-
-    if (!respuesta.ok) {
-      const mensaje =
-        (datos && datos.error && (datos.error.message || datos.error.type)) ||
-        'Groq respondio HTTP ' + respuesta.status;
-      const e = new Error('Groq: ' + mensaje);
-      e.codigo = 502;
-      throw e;
-    }
-
-    const contenido = datos && datos.choices && datos.choices[0];
-    const parte = contenido && contenido.message && contenido.message.content;
-    if (!parte) {
-      const e = new Error('Groq no devolvio contenido.');
-      e.codigo = 502;
-      throw e;
-    }
-
-    let lista;
-    try {
-      lista = JSON.parse(parte).puntosDeVenta;
-    } catch (e) {
-      lista = null;
-    }
-
-    if (!Array.isArray(lista) || !lista.length) {
-      const e = new Error('Groq no devolvio argumentos utilizables.');
-      e.codigo = 502;
-      throw e;
-    }
-
-    return lista.map((p) => String(p).trim()).filter(Boolean).slice(0, 3);
-  } catch (e) {
-    if (e.codigo) throw e;
-    const fallo = new Error(
-      e.name === 'AbortError'
-        ? 'Groq tardo demasiado. Intenta de nuevo.'
-        : 'No se pudo contactar a Groq.'
-    );
-    fallo.codigo = 502;
-    throw fallo;
-  } finally {
-    clearTimeout(temporizador);
   }
+
+  const e = new Error('Groq: ' + problemas.join(' | '));
+  e.codigo = 502;
+  throw e;
 }
 
 module.exports = {

@@ -4,7 +4,7 @@
 //
 //   1. src/indice.js  -> src/fichas.json: indice horneado y verificado.
 //                        Sin GITHUB_TOKEN y sin rate limit. Cubre 89 de
-//                        los 226 SKUs reales de la tienda.
+//                        los 225 SKUs reales de la tienda.
 //   2. src/dataset.js -> indice en vivo del dataset (necesita GITHUB_TOKEN)
 //   3. src/specs.js   -> scraper de GSMArena (respaldo)
 //
@@ -16,7 +16,8 @@
 // verificada" antes que mentirle a un cliente.
 //
 // Los ARGUMENTOS DE VENTA los redacta src/ia.js (Groq) usando esta ficha
-// como unico contexto. Si Groq falla, se entrega la ficha sin argumentos.
+// como unico contexto. Si Groq falla, se entrega la ficha sin argumentos
+// y con argumentosError explicando por que.
 
 const indice = require('./indice');
 const dataset = require('./dataset');
@@ -49,13 +50,20 @@ function verificar(ficha, pedido) {
 
 async function finalizar(ficha, cache, ip) {
   ficha.puntosDeVenta = [];
+  ficha.argumentosError = null;
 
   if (ia.habilitado()) {
     try {
       ficha.puntosDeVenta = await ia.argumentosDeVenta(ficha, ip);
     } catch (e) {
+      // Antes se devolvia la lista vacia sin decir por que, y el vendedor
+      // no tenia forma de distinguir "la IA no tiene nada que decir" de
+      // "la IA esta caida". Ahora el motivo viaja con la respuesta.
+      ficha.argumentosError = e.message;
       console.error('[ficha] Groq fallo, se entrega solo la ficha: ' + e.message);
     }
+  } else {
+    ficha.argumentosError = 'La IA no esta habilitada (falta GROQ_API_KEY en el servidor).';
   }
 
   return { ficha: ficha, cache: cache };
