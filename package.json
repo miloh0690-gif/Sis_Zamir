@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "hash-pin": "node scripts/hash-pin.js"
+    "hash-pin": "node scripts/hash-pin.js",
+    "indexar": "node scripts/indexar-fichas.js"
   },
   "engines": {
     "node": ">=20"

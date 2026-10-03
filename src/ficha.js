@@ -2,31 +2,27 @@
 
 // Orquesta la ficha tecnica. Fuentes, en orden de preferencia:
 //
-//   1. src/dataset.js -> dataset abierto en GitHub (datos estructurados)
-//   2. src/specs.js   -> scraper de GSMArena (respaldo, cubre los ultimos)
+//   1. src/indice.js  -> src/fichas.json: indice horneado y verificado.
+//                        Sin GITHUB_TOKEN y sin rate limit. Cubre 89 de
+//                        los 226 SKUs reales de la tienda.
+//   2. src/dataset.js -> indice en vivo del dataset (necesita GITHUB_TOKEN)
+//   3. src/specs.js   -> scraper de GSMArena (respaldo)
 //
 // Antes de devolver nada se VERIFICA que la ficha sea del telefono que se
-// pidio, en las dos direcciones:
-//
-//   - el pedido tiene generacion o modificador y la ficha no    -> otro tel.
-//   - la ficha tiene modificador y el pedido no pide ese        -> otro tel.
-//
-// Sin esto la base de datos responde con el modelo mas parecido y el
-// vendedor le dice esas especificaciones al cliente. Lo que se vio:
-// "REDMI 17 256/4" devolvia el Redmi 9, "IPHONE 17 PRO MAX" devolvia el
-// iPhone 17 Pro y "REALME 14 5G" devolvia el Realme 14 Pro+. Es preferible
-// decir "no hay ficha verificada" antes que mentir.
+// pidio, comparando tokens de identidad (src/modelo.js). La version
+// anterior comparaba numeros >= 10, lo que dejaba pasar "Samsung ZFOLD 5"
+// cuando la base devolvia un "Z Flip 5", y "Redmi Note 15 Pro" cuando
+// devolvia el "Note 11 Pro+". Es preferible decir "no hay ficha
+// verificada" antes que mentirle a un cliente.
 //
 // Los ARGUMENTOS DE VENTA los redacta src/ia.js (Groq) usando esta ficha
 // como unico contexto. Si Groq falla, se entrega la ficha sin argumentos.
 
+const indice = require('./indice');
 const dataset = require('./dataset');
 const specs = require('./specs');
 const ia = require('./ia');
-
-// Modificadores que distinguen un telefono de otro. 5G/4G/Lite/Fe NO estan
-// aqui: son variantes de conectividad que comparten nucleo de ficha.
-const ESTRICTOS = ['pro', 'max', 'ultra', 'mini', 'plus'];
+const modelo = require('./modelo');
 
 function habilitado() {
   return true;
@@ -36,63 +32,19 @@ function hayArgumentos() {
   return ia.habilitado();
 }
 
-function palabras(texto) {
-  return String(texto === undefined || texto === null ? '' : texto)
-    .toLowerCase()
-    .split(/[^a-z0-9]+/)
-    .filter(Boolean);
-}
-
-function palabraEn(texto, palabra) {
-  return palabras(texto).indexOf(palabra) !== -1;
-}
-
-function generacion(texto) {
-  const numeros = String(texto === undefined || texto === null ? '' : texto).match(/\d+/g) || [];
-  return numeros
-    .map(function (n) {
-      return Number(n);
-    })
-    .filter(function (n) {
-      return n >= 10;
-    });
-}
-
 /**
  * Devuelve null si la ficha es del telefono pedido, o el motivo del
  * rechazo si no lo es.
+ *
+ * La comparacion por tokens de identidad vive en src/modelo.js. La version
+ * anterior comparaba numeros >= 10, lo que dejaba pasar "Samsung ZFOLD 5"
+ * cuando la base devolvia un "Z Flip 5" y "Redmi Note 15 Pro" cuando
+ * devolvia el "Note 11 Pro+".
  */
 function verificar(ficha, pedido) {
   if (!ficha) return 'la fuente no devolvio nada';
   if (!ficha.nombre) return 'la ficha no trae nombre';
-
-  const nombre = ficha.nombre;
-
-  const pedidoGen = generacion(pedido);
-  const nombreGen = generacion(nombre);
-
-  if (pedidoGen.length) {
-    let coincide = false;
-    for (let i = 0; i < pedidoGen.length; i++) {
-      if (nombreGen.indexOf(pedidoGen[i]) !== -1) coincide = true;
-    }
-    if (!coincide) return 'es de otro modelo (' + nombre + ')';
-  }
-
-  for (let j = 0; j < ESTRICTOS.length; j++) {
-    const mod = ESTRICTOS[j];
-    const pedidoLoTiene = palabraEn(pedido, mod);
-    const fichaLoTiene = palabraEn(nombre, mod);
-
-    if (pedidoLoTiene && !fichaLoTiene) {
-      return 'le falta "' + mod + '" (' + nombre + ')';
-    }
-    if (!pedidoLoTiene && fichaLoTiene) {
-      return 'es la version "' + mod + '" y se pidio la basica (' + nombre + ')';
-    }
-  }
-
-  return null;
+  return modelo.verificar(pedido, ficha.nombre);
 }
 
 async function finalizar(ficha, cache, ip) {
@@ -119,7 +71,23 @@ async function fichaTecnica(modelo, ip) {
 
   const razones = [];
 
-  // 1) dataset estructurado
+  // 1) indice horneado: la via que no depende de ninguna llave
+  if (indice.tiene(texto)) {
+    try {
+      const r0 = await indice.buscar(texto);
+      if (r0) {
+        const problema = verificar(r0.ficha, texto);
+        if (!problema) return finalizar(r0.ficha, r0.cache, ip);
+        razones.push('indice: ' + problema);
+      } else {
+        razones.push('indice: el archivo ya no esta en el dataset');
+      }
+    } catch (e0) {
+      razones.push('indice: ' + e0.message);
+    }
+  }
+
+  // 2) indice en vivo del dataset (necesita GITHUB_TOKEN)
   try {
     const r1 = await dataset.buscarFicha(texto);
     if (r1) {
@@ -131,7 +99,7 @@ async function fichaTecnica(modelo, ip) {
     razones.push('dataset: ' + e1.message);
   }
 
-  // 2) scraper de GSMArena
+  // 3) scraper de GSMArena
   try {
     const r2 = await specs.buscarFicha(texto);
     const problema = verificar(r2.ficha, texto);
@@ -157,4 +125,7 @@ module.exports = {
   hayArgumentos: hayArgumentos,
   modeloArgs: ia.modelo,
   verificar: verificar,
+  identidad: modelo.identidad,
+  enIndice: indice.tiene,
+  indiceCuantos: indice.cuantos,
 };
