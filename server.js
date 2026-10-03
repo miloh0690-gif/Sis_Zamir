@@ -141,6 +141,50 @@ app.get('/api/diagnostico', async (req, res) => {
   }
 });
 
+// Presencia de cada variable sensible, NUNCA su valor. Solo booleano y
+// longitud: alcanza para distinguir "no esta", "esta vacia" y "esta
+// truncada", y no sirve para reconstruir la llave.
+//
+// Existe porque el nombre importa y no se puede ver desde afuera: si la
+// llave de Groq se guarda en Render como GROQ_KEY en vez de GROQ_API_KEY,
+// el servidor la ignora en silencio y la IA queda dead sin avisar.
+const SENSIBLES = [
+  'GROQ_API_KEY',
+  'GROQ_KEY',
+  'GROQ_API',
+  'GROQ_TOKEN',
+  'GROQ',
+  'GROQ_MODEL',
+  'GITHUB_TOKEN',
+  'SESSION_SECRET',
+  'ADMIN_PIN_HASH',
+  'SHEETS_WEBAPP_URL',
+  'SHEETS_API_KEY',
+];
+
+app.get('/api/claves', (req, res) => {
+  const variables = {};
+  for (const nombre of SENSIBLES) {
+    const valor = String(process.env[nombre] || '').trim();
+    variables[nombre] = { presente: Boolean(valor), longitud: valor.length };
+  }
+  const groq = Object.keys(variables).filter(
+    (n) => n.indexOf('GROQ') === 0 && n !== 'GROQ_MODEL' && variables[n].presente
+  );
+  res.json({
+    ok: true,
+    variables: variables,
+    groqEncontradaEn: groq,
+    laIaLee: 'GROQ_API_KEY',
+    coincide: groq.indexOf('GROQ_API_KEY') !== -1,
+    accion: groq.indexOf('GROQ_API_KEY') !== -1
+      ? null
+      : groq.length
+        ? 'La llave esta en Render como "' + groq[0] + '" pero src/ia.js solo lee GROQ_API_KEY. Renombrala en Render > Environment.'
+        : 'No hay ninguna variable de Groq definida en Render. Agrega GROQ_API_KEY en Render > Environment.',
+  });
+});
+
 app.get('/api/config', (req, res) => {
   res.json({
     sheets: inventory.completo(),
@@ -327,9 +371,7 @@ app.post('/api/consignaciones', limitar(60, 60000), async (req, res) => {
     const producto = await inventory.buscar(modeloTexto);
     if (!producto) return res.status(400).json({ error: 'Ese modelo no existe en el inventario.' });
     if (producto.stock < cantidad) {
-      return res.status(409).json({
-        error: 'Stock insuficiente. Solo quedan ' + producto.stock + ' unidades.',
-      });
+      return res.status(409).json({ error: 'Stock insuficiente. Solo quedan ' + producto.stock + ' unidades.' });
     }
 
     const id = ledger.nuevoId('C');
