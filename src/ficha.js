@@ -92,12 +92,25 @@ function aplicarMemoriaDelSku(ficha, texto) {
   const textoMemoria = mem.ram + ' GB RAM \u00b7 ' + mem.almacenamiento + ' GB almacenamiento';
 
   ficha.ramAlmacenamiento = textoMemoria;
-  // El resumen arrastra la memoria de la base: hay que corregirla tambien
-  // o el panel mostraria las dos y la IA leeria la vieja.
+  // El resumen arrastra la memoria de la base y el panel lo muestra, asi
+  // que hay que corregirlo tambien: si no, el vendedor leeria la RAM
+  // nueva junto al almacenamiento viejo en la misma linea.
   if (ficha.resumen) {
-    ficha.resumen = ficha.resumen
-      .replace(/\d+\s*GB\s*RAM/gi, mem.ram + ' GB RAM')
-      .replace(/[\d\s/]*\d+\s*GB\s*almacenamiento/gi, mem.almacenamiento + ' GB almacenamiento');
+    ficha.resumen = ficha.resumen.replace(
+      /\d+\s*GB\s*RAM/gi,
+      mem.ram + ' GB RAM'
+    );
+    // Forma con la palabra: "64 GB almacenamiento".
+    ficha.resumen = ficha.resumen.replace(
+      /[\d\s/]*\d+\s*GB\s*almacenamiento/gi,
+      mem.almacenamiento + ' GB almacenamiento'
+    );
+    // Forma desnuda al final: "..., 128 / 256 GB." Es la que arma
+    // dataset.mapear, porque ahi el almacenamiento no lleva ninguna palabra.
+    ficha.resumen = ficha.resumen.replace(
+      /(?:\s*,\s*|\s+)[\d\s/]*\d+\s*GB\s*\.?\s*$/,
+      ', ' + mem.almacenamiento + ' GB.'
+    );
   }
   ficha.memoriaDelSku = true;
 }
