@@ -732,7 +732,14 @@
                     '<p class="text-[11px] font-bold text-amber-400 uppercase">Ficha de IA · sin verificar</p>' +
                     '<p class="text-[11px] text-amber-300/90 mt-1 leading-snug">No hay esta ficha en ninguna base de datos. ' +
                     'Las dos consultas de la IA coincidieron, pero confirmá los datos antes de leerlos al cliente.</p></div>';
-            } else if (ficha.verificado === false) {
+            } else if (ficha.verificado === false && ficha.fuenteDatos !== 'dataset') {
+                // OJO: no se muestra para las fichas del dataset. Ahi
+                // verificado:false significa que el propio dataset no
+                // marco la entrada como revisada, no que la ficha sea del
+                // telefono equivocado: la identidad ya la confirmo el gate
+                // de src/modelo.js. Si se mostrara en todas, el vendedor
+                // dejaria de leer los avisos y perderiamos el que si
+                // importa, el de la ficha inventada.
                 html += '<div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl">' +
                     '<p class="text-[11px] font-bold text-amber-400 uppercase">Ficha sin verificar</p>' +
                     '<p class="text-[11px] text-amber-300/90 mt-1 leading-snug">Los datos no pudieron cruzarse contra una fuente. Confirmalos antes de leerlos al cliente.</p></div>';
