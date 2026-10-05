@@ -286,6 +286,8 @@
             precioManual: false,
             temporizador: null,
             reporteActual: null,
+            claveVenta: null,
+            claveConsignacion: null,
         };
 
         const PESTANAS = ['vendedor', 'consignacion', 'dueno', 'reportes'];
@@ -449,6 +451,38 @@
             };
         }
 
+        // -----------------------------------------------------------------
+        // CLAVE DE IDEMPOTENCIA
+        // -----------------------------------------------------------------
+        // Una clave por intento de cobro. Si la peticion falla o expira, el
+        // vendedor toca "cobrar" otra vez: se REUTILIZA la misma clave y el
+        // servidor reconoce que es el mismo cobro y no cobra dos veces.
+        // Cuando la venta si se registro, se genera una clave nueva para el
+        // siguiente cobro.
+        //
+        // Sin esto, un timeout registraba dos ventas y descontaba el stock
+        // dos veces. Deshabilitar el boton no alcanza: el problema es la red,
+        // no el doble toque.
+        function nuevaClave() {
+            const bytes = new Uint8Array(16);
+            if (window.crypto && window.crypto.getRandomValues) {
+                window.crypto.getRandomValues(bytes);
+            } else {
+                for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+            }
+            return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function claveVenta() {
+            if (!ESTADO.claveVenta) ESTADO.claveVenta = nuevaClave();
+            return ESTADO.claveVenta;
+        }
+
+        function claveConsignacion() {
+            if (!ESTADO.claveConsignacion) ESTADO.claveConsignacion = nuevaClave();
+            return ESTADO.claveConsignacion;
+        }
+
         async function pedirPreview() {
             const cuerpo = cuerpoVenta();
             if (!cuerpo.modelo) {
@@ -485,10 +519,10 @@
 
             boton.disabled = true;
             try {
-                const datos = await api('/api/ventas', { cuerpo: cuerpo });
+                const datos = await api('/api/ventas', { cuerpo: Object.assign({}, cuerpo, { claveIdempotencia: claveVenta() }) });
                 const c = datos.calculo;
                 let mensaje =
-                    'Venta registrada.\n\n' +
+                    (datos.repetida ? 'Esta venta ya estaba registrada.\n\n' : 'Venta registrada.\n\n') +
                     'Cantidad: ' + c.cantidad + ' x ' + datos.venta.modelo + '\n' +
                     'Total: ' + fmt(c.totalCobradoBs) + ' Bs\n' +
                     'Ganancia: ' + fmt(c.gananciaBs) + ' Bs\n' +
@@ -498,6 +532,10 @@
 
                 const indice = ESTADO.productos.findIndex((p) => normalizar(p.modelo) === normalizar(datos.venta.modelo));
                 if (indice >= 0) ESTADO.productos[indice].stock = datos.stockRestante;
+
+                // El cobro quedo registrado: la siguiente venta es otra
+                // operacion y necesita una clave nueva.
+                ESTADO.claveVenta = null;
 
                 $('ventaVendedor').value = '';
                 $('ventaModelo').value = '';
@@ -595,14 +633,17 @@
                         cliente: $('consCliente').value.trim(),
                         modelo: $('consModelo').value.trim(),
                         cantidad: $('consCantidad').value,
+                        claveIdempotencia: claveConsignacion(),
                     },
                 });
-                let mensaje = 'Consignación registrada.';
+                let mensaje = datos.repetida ? 'Esta consignación ya estaba registrada.' : 'Consignación registrada.';
                 if (datos.advertencia) mensaje += '\n\nAviso: ' + datos.advertencia;
                 alert(mensaje);
 
                 const indice = ESTADO.productos.findIndex((p) => normalizar(p.modelo) === normalizar(datos.consignacion.modelo));
                 if (indice >= 0) ESTADO.productos[indice].stock = datos.stockRestante;
+
+                ESTADO.claveConsignacion = null;
 
                 $('consCliente').value = '';
                 $('consModelo').value = '';
@@ -670,6 +711,43 @@
                 (desdeCache ? 'cache · cerrar' : 'cerrar') + '</button>' +
                 '</div>';
 
+            // -------------------------------------------------------------
+            // AVISOS. Todo esto ya lo calculaba el servidor (src/ficha.js) y
+            // el panel lo ignoraba: el vendedor veia una ficha pelada sin
+            // saber si era de la base de datos o inventada por una IA.
+            // -------------------------------------------------------------
+
+            // La mas urgente: la IA dio dos respuestas distintas, o sea que
+            // se esta inventando los datos. No se puede leer al cliente.
+            if (ficha.esFichaDeIa && ficha.estable === false) {
+                html += '<div class="p-3 bg-red-500/15 border border-red-500/40 rounded-xl">' +
+                    '<p class="text-[11px] font-bold text-red-400 uppercase">No leas esta ficha al cliente</p>' +
+                    '<p class="text-[11px] text-red-300/90 mt-1 leading-snug">La IA dio dos respuestas distintas para este equipo' +
+                    (Array.isArray(ficha.diferencias) && ficha.diferencias.length
+                        ? ' (difieren en: ' + escapeHtml(ficha.diferencias.join(', ')) + ')'
+                        : '') +
+                    '. Esos datos no están verificados. Decí solo el modelo y el precio.</p></div>';
+            } else if (ficha.esFichaDeIa) {
+                html += '<div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl">' +
+                    '<p class="text-[11px] font-bold text-amber-400 uppercase">Ficha de IA · sin verificar</p>' +
+                    '<p class="text-[11px] text-amber-300/90 mt-1 leading-snug">No hay esta ficha en ninguna base de datos. ' +
+                    'Las dos consultas de la IA coincidieron, pero confirmá los datos antes de leerlos al cliente.</p></div>';
+            } else if (ficha.verificado === false) {
+                html += '<div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl">' +
+                    '<p class="text-[11px] font-bold text-amber-400 uppercase">Ficha sin verificar</p>' +
+                    '<p class="text-[11px] text-amber-300/90 mt-1 leading-snug">Los datos no pudieron cruzarse contra una fuente. Confirmalos antes de leerlos al cliente.</p></div>';
+            }
+
+            // La memoria la pone la etiqueta del SKU, no la base de datos.
+            // Sin este aviso el vendedor ve "16 GB" y la caja dice 8.
+            if (ficha.memoriaDelSku && ficha.ramAlmacenamiento) {
+                html += '<div class="p-3 bg-[#4C8DFF]/10 border border-[#4C8DFF]/30 rounded-xl">' +
+                    '<p class="text-[11px] font-bold text-[#4C8DFF] uppercase">Memoria según la etiqueta</p>' +
+                    '<p class="text-[11px] text-[#C4CAD4] mt-1 leading-snug">' +
+                    escapeHtml(ficha.ramAlmacenamiento) +
+                    '. La base de datos guarda una sola variante del modelo y la tienda vende varias: la RAM y el almacenamiento de arriba son los de esta caja.</p></div>';
+            }
+
             if (ficha.resumen) {
                 html += '<p class="text-xs text-[#C4CAD4] leading-relaxed">' + escapeHtml(ficha.resumen) + '</p>';
             }
@@ -688,6 +766,15 @@
                     html += '<li class="text-[12px] text-[#EDEFF3] leading-snug"><span class="font-data font-bold text-[#34D399]">' + (i + 1) + '.</span> ' + escapeHtml(punto) + '</li>';
                 });
                 html += '</ol></div>';
+            } else if (ficha.argumentosError) {
+                // Sin argumentos hay dos motivos muy distintos: la IA se
+                // cayo, o se decidio no inventarlos. El vendedor tiene que
+                // poder distinguir " Groq esta caido" de "esta ficha no es
+                // confiable", porque uno se arregla reiniciando y el otro
+                // no se lee.
+                html += '<div class="border-t border-[#2A2F3A] pt-3">' +
+                    '<p class="text-[11px] text-[#8B95A7] leading-snug"><span class="font-bold uppercase text-[9px]">Sin argumentos de venta.</span> ' +
+                    escapeHtml(ficha.argumentosError) + '</p></div>';
             }
 
             html += '</div>';

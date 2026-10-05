@@ -45,6 +45,28 @@
 //    de esa fila no haya cambiado, la sanitizacion anti-formulas y el
 //    limite de cantidad por operacion.
 //
+// 8. BUG QUE HACIA INUTILIZABLE EL REPORTE DE VENTAS. leerVentas() tiene
+//    que quedarse solo con las filas de venta, porque antes las
+//    consignaciones se guardaban en la misma hoja. Para eso descartaba
+//    toda fila cuya columna "Tipo" no fuera exactamente "VENTA". Pero la
+//    columna Tipo guarda UNIDAD o MAYOR (ver normalizarTipo en money.js),
+//    nunca "VENTA": el filtro descartaba el 100% de las filas. El reporte
+//    devolvia una lista vacia siempre. Ahora:
+//      a) las columnas se buscan POR ENCABEZADO, no por posicion, asi que
+//         agregar o reordenar columnas ya no rompe la lectura, y
+//      b) el filtro acepta VENTA, UNIDAD y MAYOR.
+//
+// 9. IDEMPOTENCIA. Se agrego la columna "ClaveIdempotencia" a la hoja
+//    "Ventas". El servidor de Render manda una clave distinta por cada
+//    intento de cobro y la REUTILIZA si reintenta. Antes de tocar el stock
+//    el script busca esa clave: si ya esta, responde que ya se registro y
+//    no duplica ni la venta ni el descuento de stock. Sin esto, un doble
+//    toque o un reintento tras un timeout cobraba dos veces.
+//
+// 10. La hoja se completa sola. Si le falta un encabezado (por ejemplo
+//    ClaveIdempotencia en una hoja que ya existia), el script lo agrega al
+//    desplegar. No hay que tocar la hoja a mano.
+//
 // -----------------------------------------------------------------
 // CONFIGURACION INICIAL (una sola vez, en este orden):
 //
@@ -81,8 +103,14 @@ var CANTIDAD_MAXIMA_POR_OPERACION = 500;
 var ENCABEZADO_VENTAS = [
   "Fecha", "Vendedor", "Modelo", "Tipo", "Cantidad", "TC",
   "PrecioUnitarioBs", "CostoTotalBs", "TotalBs", "GananciaBs",
-  "ComisionBs", "Sucursal"
+  "ComisionBs", "Sucursal", "ClaveIdempotencia"
 ];
+
+// Valores que la columna "Tipo" puede tener en una fila de VENTA.
+// "VENTA" queda por compatibilidad con las filas que escribio la version
+// vieja del script; las actuales ponen UNIDAD o MAYOR (normalizarTipo en
+// src/money.js del servidor).
+var TIPOS_DE_VENTA = { "VENTA": true, "UNIDAD": true, "MAYOR": true };
 
 var ENCABEZADO_CONSIGNACIONES = [
   "Fecha", "Cliente", "Modelo", "Cantidad", "Sucursal", "Estado",
@@ -133,7 +161,7 @@ function doGet(e) {
       return responderJSON({
         ok: true,
         hora: new Date().toISOString(),
-        version: 2
+        version: 3
       });
     }
 
@@ -228,6 +256,28 @@ function doPost(e) {
     }
 
     if (data.tipoOperacion === "VENTA") {
+      // La columna ClaveIdempotencia tiene que existir ANTES de buscar
+      // duplicados, y no al escribir la fila: si la hoja ya existia, el
+      // encabezado se agrega recien en registrarVenta, y el chequeo de
+      // duplicados no serviria de nada en la primera venta.
+      obtenerHoja(ss, NOMBRE_HOJA_VENTAS, ENCABEZADO_VENTAS);
+
+      // Idempotencia: si esta venta ya se escribio con la misma clave, se
+      // responde que ya estaba y no se toca el stock ni se agrega otra
+      // fila. Va antes que la validacion a proposito: si el reintento
+      // llega cuando el stock ya bajo por esa misma venta, la validacion
+      // lo rechazaria por "stock insuficiente" y el vendedor veria un
+      // error donde en realidad ya cobro bien.
+      var repetida = filaYaRegistrada(ss, NOMBRE_HOJA_VENTAS, "ClaveIdempotencia", data.claveIdempotencia);
+      if (repetida) {
+        return responderJSON({
+          status: "SUCCESS",
+          message: "YA_REGISTRADA",
+          duplicada: true,
+          filaExcelVenta: repetida.fila
+        });
+      }
+
       var tipoCambio = parseFloat(data.tipoCambio) || 0;
       var costoUsd = validacion.filaData.costoUsd;
       var cantidad = parseInt(data.cantidad, 10) || 0;
@@ -245,6 +295,24 @@ function doPost(e) {
     }
 
     else if (data.tipoOperacion === "CONSIGNACION") {
+      // El Id lo genera el servidor UNA vez por operacion. Si vuelve a
+      // llegar el mismo Id, el doble toque ya desconto stock: no se
+      // toca el stock otra vez.
+      if (data.subTipo === "DESPACHO" || data.subTipo === "DEVOLUCION") {
+        obtenerHoja(ss, NOMBRE_HOJA_CONSIGNACIONES, ENCABEZADO_CONSIGNACIONES);
+        var yaConsignada = filaYaRegistrada(
+          ss, NOMBRE_HOJA_CONSIGNACIONES, "Id", data.id
+        );
+        if (yaConsignada) {
+          return responderJSON({
+            status: "SUCCESS",
+            message: "YA_REGISTRADA",
+            duplicada: true,
+            filaExcelConsignacion: yaConsignada.fila
+          });
+        }
+      }
+
       if (data.subTipo === "DESPACHO") {
         actualizarStock(hojaInventario, data.filaExcel, -data.cantidad);
         registrarLogConsignacion(ss, data);
@@ -279,8 +347,61 @@ function obtenerHoja(ss, nombre, encabezados) {
     hoja.appendRow(encabezados);
     hoja.getRange(1, 1, 1, encabezados.length).setFontWeight("bold");
     hoja.setFrozenRows(1);
+  } else {
+    asegurarEncabezados(hoja, encabezados);
   }
   return hoja;
+}
+
+/**
+ * Agrega los encabezados que falten, sin tocar los que ya estan.
+ *
+ * Existe porque una hoja que ya existe nunca se "actualiza": si el
+ * encabezado nuevo (ClaveIdempotencia) no aparece en la fila 1, la
+ * columna queda sin nombre y la lectura por nombre no la encuentra.
+ * Asi el que despliega el script no tiene que agregar columnas a mano.
+ */
+function asegurarEncabezados(hoja, encabezados) {
+  var ultima = hoja.getLastColumn();
+  var cab = hoja.getRange(1, 1, 1, Math.max(ultima, 1)).getValues()[0];
+
+  for (var i = 0; i < encabezados.length; i++) {
+    var nombre = String(encabezados[i]);
+    var yaEsta = false;
+
+    for (var j = 0; j < ultima; j++) {
+      if (String(cab[j] || "").trim().toLowerCase() === nombre.toLowerCase()) {
+        yaEsta = true;
+        break;
+      }
+    }
+    if (yaEsta) continue;
+
+    ultima = ultima + 1;
+    hoja.getRange(1, ultima).setValue(nombre);
+    Logger.log("Columna agregada a '" + hoja.getName() + "': " + nombre);
+  }
+}
+
+/**
+ * Posicion de una columna POR SU NOMBRE.
+ *
+ * Leer por indice fijo se rompio en cuanto se agrego una columna. Con el
+ * nombre, reordenar o agregar columnas no afecta la lectura.
+ */
+function columna(cab, nombre, porDefecto) {
+  for (var i = 0; i < cab.length; i++) {
+    if (String(cab[i] || "").trim().toLowerCase() === String(nombre).toLowerCase()) {
+      return i;
+    }
+  }
+  // La hoja es vieja y no tiene el encabezado: se usa la posicion de
+  // siempre, que es la que tenia cuando se escribieron esas filas.
+  return porDefecto;
+}
+
+function celda(fila, indice) {
+  return indice >= 0 && indice < fila.length ? fila[indice] : "";
 }
 
 function registrarVenta(ss, data, calculo) {
@@ -297,8 +418,51 @@ function registrarVenta(ss, data, calculo) {
     parseFloat(data.totalCobrado) || 0,
     calculo.gananciaBs,
     parseFloat(data.comision) || 0,
-    sanitizarTexto(data.sucursal)
+    sanitizarTexto(data.sucursal),
+    sanitizarTexto(data.claveIdempotencia)
   ]);
+}
+
+/**
+ * Busca si ya hay una fila con esta clave de idempotencia.
+ *
+ * Se llama con el lock tomado, adentro del mismo doPost, antes de tocar
+ * el stock. Es la segunda capa: la primera es la cache en memoria del
+ * servidor de Render, que se pierde si el servidor reinicia. Esta cubre
+ * ese caso, porque la clave quedo escrita en la hoja.
+ *
+ * Sirve para las dos hojas: "Ventas" por ClaveIdempotencia y
+ * "Consignaciones" por Id. Un doble toque en consignar tambien
+ * descuenta stock dos veces.
+ */
+function filaYaRegistrada(ss, nombreHoja, nombreColumna, clave) {
+  var limpio = String(clave === undefined || clave === null ? "" : clave).trim();
+  if (!limpio) return null;
+
+  var hoja = ss.getSheetByName(nombreHoja);
+  if (!hoja || hoja.getLastRow() < 2) return null;
+
+  var cab = hoja.getRange(1, 1, 1, hoja.getLastColumn()).getValues()[0];
+  // -1 y no una posicion por defecto: si la columna no existe, NO se lee
+  // una columna cualquiera. Es preferible no deduplicar (y avisar) que
+  // deduplicar comparando contra la columna equivocada.
+  var indice = columna(cab, nombreColumna, -1);
+  if (indice < 0) {
+    Logger.log("AVISO: la hoja '" + nombreHoja + "' no tiene la columna " +
+               nombreColumna + ". Re-despliega el script para que se agregue sola.");
+    return null;
+  }
+
+  var valores = hoja
+    .getRange(2, indice + 1, hoja.getLastRow() - 1, 1)
+    .getValues();
+
+  for (var i = 0; i < valores.length; i++) {
+    if (String(valores[i][0] || "").trim() === limpio) {
+      return { fila: i + 2 };
+    }
+  }
+  return null;
 }
 
 // El historial de consignaciones es un registro de cambios: se escribe
@@ -317,34 +481,72 @@ function registrarLogConsignacion(ss, data) {
   ]);
 }
 
-// Devuelve solo ventas. Ignora cualquier otro tipo de fila para que el
-// reporte de ventas no se contamine.
+// Devuelve solo ventas, para que el reporte de ventas no se contamine.
+//
+// OJO, esta funcion estuvo rota y por eso el reporte salia VACIO: pedia
+// que la columna Tipo fuera exactamente "VENTA", pero ahi va UNIDAD o
+// MAYOR (normalizarTipo en src/money.js del servidor de Render). Como no
+// hubo ninguna fila que cumpliera eso, descartaba todas. Ahora:
+//   - las columnas se ubican por encabezado, no por posicion, y
+//   - se aceptan VENTA (filas viejas), UNIDAD y MAYOR (filas nuevas).
 function leerVentas() {
   var hoja = SpreadsheetApp.getActiveSpreadsheet()
                .getSheetByName(NOMBRE_HOJA_VENTAS);
   if (!hoja) return [];
 
   var valores = hoja.getDataRange().getValues();
+  if (valores.length < 2) return [];
+
+  var cab = valores[0];
+  var cFecha    = columna(cab, "Fecha", 0);
+  var cVendedor = columna(cab, "Vendedor", 1);
+  var cModelo   = columna(cab, "Modelo", 2);
+  var cTipo     = columna(cab, "Tipo", 3);
+  var cCantidad = columna(cab, "Cantidad", 4);
+  var cTC       = columna(cab, "TC", 5);
+  var cPrecio   = columna(cab, "PrecioUnitarioBs", 6);
+  var cCosto    = columna(cab, "CostoTotalBs", 7);
+  var cTotal    = columna(cab, "TotalBs", 8);
+  var cGanancia = columna(cab, "GananciaBs", 9);
+  var cComision = columna(cab, "ComisionBs", 10);
+  var cSucursal = columna(cab, "Sucursal", 11);
+
   var salida = [];
 
   for (var i = 1; i < valores.length; i++) {
     var f = valores[i];
-    if (!f[0]) continue;
-    if (String(f[3] || "") !== "VENTA") continue;
+
+    var fechaCruda = celda(f, cFecha);
+    if (!fechaCruda) continue;
+
+    // Si la hoja tiene columna Tipo, se usa para separar. Si no la tiene,
+    // no se filtra nada: la hoja "Ventas" es solo de ventas.
+    if (cTipo >= 0) {
+      var tipo = String(celda(f, cTipo) || "").trim().toUpperCase();
+      if (!TIPOS_DE_VENTA[tipo]) continue;
+    }
+
+    var fecha = fechaCruda;
+    try {
+      fecha = new Date(fechaCruda).toISOString();
+    } catch (e) {
+      continue;
+    }
+    if (isNaN(new Date(fechaCruda).getTime())) continue;
 
     salida.push({
-      fecha: new Date(f[0]).toISOString(),
-      vendedor: String(f[1] || ""),
-      modelo: String(f[2] || ""),
-      tipo: String(f[3] || ""),
-      cantidad: Number(f[4]) || 0,
-      tipoCambio: Number(f[5]) || 0,
-      precioUnitarioBs: Number(f[6]) || 0,
-      costoTotalBs: Number(f[7]) || 0,
-      totalCobradoBs: Number(f[8]) || 0,
-      gananciaBs: Number(f[9]) || 0,
-      comisionBs: Number(f[10]) || 0,
-      sucursal: String(f[11] || "")
+      fecha: fecha,
+      vendedor: String(celda(f, cVendedor) || ""),
+      modelo: String(celda(f, cModelo) || ""),
+      tipo: String(celda(f, cTipo) || "UNIDAD"),
+      cantidad: Number(celda(f, cCantidad)) || 0,
+      tipoCambio: Number(celda(f, cTC)) || 0,
+      precioUnitarioBs: Number(celda(f, cPrecio)) || 0,
+      costoTotalBs: Number(celda(f, cCosto)) || 0,
+      totalCobradoBs: Number(celda(f, cTotal)) || 0,
+      gananciaBs: Number(celda(f, cGanancia)) || 0,
+      comisionBs: Number(celda(f, cComision)) || 0,
+      sucursal: String(celda(f, cSucursal) || "")
     });
   }
 

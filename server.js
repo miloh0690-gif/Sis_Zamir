@@ -106,6 +106,71 @@ function exigirSheets(res) {
   return true;
 }
 
+// -----------------------------------------------------------------
+// IDEMPOTENCIA
+// -----------------------------------------------------------------
+// El navegador manda una clave distinta por cada intento de cobro, y la
+// REUTILIZA si reintenta. Si la misma clave vuelve a llegar, se devuelve
+// la respuesta que ya se dio, sin volver a escribir en la hoja.
+//
+// Por que hace falta: el boton se deshabilita en el navegador, pero eso
+// no protege el dinero. Render free se duerme tras inactividad (la
+// primera peticion del dia tarda ~20 s), asi que un timeout del vendedor
+// tocando "cobrar" otra vez registraba DOS ventas y descontaba el stock
+// DOS veces. El disable del boton evita el doble toque; esto evita el
+// resto.
+//
+// Esta es la capa rapida, en memoria. La capa lenta es la columna
+// ClaveIdempotencia de la hoja, que cubre el caso en que el servidor de
+// Render reinicia entre el intento y el reintento: la clave quedo escrita
+// en la hoja y ahi se la busca.
+
+const CLAVE_VIGENCIA_MS = 30 * 60 * 1000;
+const CLAVE_MAXIMO = 500;
+
+// Prefijo por tipo de operacion: una consignacion y una venta no pueden
+// compartir clave, asi que viven en mapas separados.
+const CLAVE_VENTA = 'venta:';
+const CLAVE_CONSIGNACION = 'consignacion:';
+
+const ventasPorClave = new Map();
+
+function claveValida(valor) {
+  const s = String(valor === undefined || valor === null ? '' : valor).trim();
+  // Solo caracteres seguros: la clave se escribe en una hoja y se
+  // compara al releerla, no tiene por que admitir nada raro.
+  return /^[A-Za-z0-9_-]{8,64}$/.test(s) ? s : '';
+}
+
+function operacionRecordada(clave) {
+  if (!clave) return null;
+  const guardado = ventasPorClave.get(clave);
+  if (!guardado) return null;
+  if (guardado.expira < Date.now()) {
+    ventasPorClave.delete(clave);
+    return null;
+  }
+  return guardado.respuesta;
+}
+
+function recordarOperacion(clave, respuesta) {
+  if (!clave) return;
+  if (ventasPorClave.size >= CLAVE_MAXIMO) {
+    // El mapa es chico y las claves duran 30 minutos. Si se llena (no
+    // deberia: serian 500 operaciones en media hora) se pisa la mas vieja.
+    const masVieja = ventasPorClave.keys().next();
+    if (!masVieja.done) ventasPorClave.delete(masVieja.value);
+  }
+  ventasPorClave.set(clave, { expira: Date.now() + CLAVE_VIGENCIA_MS, respuesta: respuesta });
+}
+
+setInterval(() => {
+  const ahora = Date.now();
+  for (const [clave, guardado] of ventasPorClave) {
+    if (guardado.expira < ahora) ventasPorClave.delete(clave);
+  }
+}, 5 * 60 * 1000).unref();
+
 function construirCalculo(producto, cuerpo) {
   const c = cuerpo || {};
   return money.calcularVenta({
@@ -262,6 +327,18 @@ app.post('/api/ventas', limitar(60, 60000), async (req, res) => {
     const modeloTexto = texto(cuerpo.modelo, 120);
     const cantidad = entero(cuerpo.cantidad);
     const tipoCambio = decimal(cuerpo.tipoCambio);
+    const clave = claveValida(cuerpo.claveIdempotencia);
+
+    // Reintento del mismo cobro: se devuelve lo que ya se respondio y no
+    // se toca la hoja. Va antes de validar, para que un reintento no
+    // falle por "stock insuficiente" cuando lo que bajo de stock fue
+    // esta misma venta.
+    if (clave) {
+      const previa = operacionRecordada(CLAVE_VENTA + clave);
+      if (previa) {
+        return res.status(200).json(Object.assign({}, previa, { repetida: true }));
+      }
+    }
 
     if (!vendedor) return res.status(400).json({ error: 'Ingresa el nombre del vendedor.' });
     if (!modeloTexto) return res.status(400).json({ error: 'Ingresa o selecciona un modelo.' });
@@ -304,7 +381,7 @@ app.post('/api/ventas', limitar(60, 60000), async (req, res) => {
 
     // Si Apps Script rechaza (fila movida, stock racedado) esto lanza y
     // no se toca el historial, asi que no queda una venta fantasma.
-    await inventory.escribir({
+    const escrito = await inventory.escribir({
       tipoOperacion: 'VENTA',
       filaExcel: producto.filaExcel,
       fecha: fechaIso,
@@ -320,7 +397,25 @@ app.post('/api/ventas', limitar(60, 60000), async (req, res) => {
       totalCobrado: calculo.totalCobradoBs,
       gananciaRegistrada: calculo.gananciaBs,
       comision: calculo.comisionBs,
+      claveIdempotencia: clave,
     });
+
+    // El script encontro la clave en la hoja: la venta ya estaba
+    // registrada (el servidor de Render reinicio entre el intento y el
+    // reintento, y se perdio la cache en memoria). No se vuelve a
+    // guardar en el historial ni a descontar stock.
+    if (escrito && escrito.duplicada) {
+      const listaDup = await inventory.listar({ forzar: true });
+      const productoDup = inventory.buscarEn(listaDup, producto.modelo);
+      return res.status(200).json({
+        venta: ledger.normalizarVenta(registro),
+        calculo: calculo,
+        stockRestante: productoDup ? productoDup.stock : producto.stock,
+        advertencia:
+          'Esta venta ya estaba registrada. No se cobro ni se desconto stock dos veces.',
+        repetida: true,
+      });
+    }
 
     let advertencia = null;
     try {
@@ -333,12 +428,18 @@ app.post('/api/ventas', limitar(60, 60000), async (req, res) => {
     const lista = await inventory.listar({ forzar: true });
     const actualizado = inventory.buscarEn(lista, producto.modelo);
 
-    res.status(201).json({
+    const respuesta = {
       venta: ledger.normalizarVenta(registro),
       calculo: calculo,
       stockRestante: actualizado ? actualizado.stock : Math.max(0, producto.stock - cantidad),
       advertencia: advertencia,
-    });
+    };
+
+    // Se recuerda la respuesta para que un reintento con la misma clave no
+    // vuelva a cobrar. Es lo que hace segura la segunda capa (la hoja).
+    recordarOperacion(CLAVE_VENTA + clave, respuesta);
+
+    res.status(201).json(respuesta);
   } catch (e) {
     responderError(res, e);
   }
@@ -363,6 +464,15 @@ app.post('/api/consignaciones', limitar(60, 60000), async (req, res) => {
     const cliente = texto(cuerpo.cliente, 80);
     const modeloTexto = texto(cuerpo.modelo, 120);
     const cantidad = entero(cuerpo.cantidad);
+    const clave = claveValida(cuerpo.claveIdempotencia);
+
+    // Misma proteccion que en ventas: un doble toque no descuenta stock
+    // dos veces. Va antes de validar porque el reintento llegaria con el
+    // stock ya bajado por esta misma consignacion.
+    if (clave) {
+      const previa = operacionRecordada(CLAVE_CONSIGNACION + clave);
+      if (previa) return res.status(200).json(Object.assign({}, previa, { repetida: true }));
+    }
 
     if (!cliente) return res.status(400).json({ error: 'Ingresa el responsable.' });
     if (!modeloTexto) return res.status(400).json({ error: 'Ingresa o selecciona un modelo.' });
@@ -374,10 +484,13 @@ app.post('/api/consignaciones', limitar(60, 60000), async (req, res) => {
       return res.status(409).json({ error: 'Stock insuficiente. Solo quedan ' + producto.stock + ' unidades.' });
     }
 
-    const id = ledger.nuevoId('C');
+    // El Id de la consignacion es la clave que manda el navegador, para
+    // que un reintento conserve el mismo Id y la hoja lo reconozca como
+    // la misma operacion. Sin clave (llamadas viejas) se genera una.
+    const id = clave || ledger.nuevoId('C');
     const fechaIso = new Date().toISOString();
 
-    await inventory.escribir({
+    const escrito = await inventory.escribir({
       tipoOperacion: 'CONSIGNACION',
       subTipo: 'DESPACHO',
       id: id,
@@ -389,6 +502,18 @@ app.post('/api/consignaciones', limitar(60, 60000), async (req, res) => {
       sucursal: producto.sucursal,
       estado: 'Pendiente',
     });
+
+    // El script ya tenia este Id: no se desconto stock de nuevo.
+    if (escrito && escrito.duplicada) {
+      const listaDup = await inventory.listar({ forzar: true });
+      const productoDup = inventory.buscarEn(listaDup, producto.modelo);
+      return res.status(200).json({
+        consignacion: { id: id, fecha: fechaIso, cliente: cliente, modelo: producto.modelo, sucursal: producto.sucursal, cantidad: cantidad, estado: 'Pendiente', filaExcel: producto.filaExcel },
+        stockRestante: productoDup ? productoDup.stock : producto.stock,
+        advertencia: 'Esta consignacion ya estaba registrada. No se desconto stock dos veces.',
+        repetida: true,
+      });
+    }
 
     let advertencia = null;
     let consignacion;
@@ -421,11 +546,15 @@ app.post('/api/consignaciones', limitar(60, 60000), async (req, res) => {
     const lista = await inventory.listar({ forzar: true });
     const actualizado = inventory.buscarEn(lista, producto.modelo);
 
-    res.status(201).json({
+    const respuesta = {
       consignacion: consignacion,
       stockRestante: actualizado ? actualizado.stock : Math.max(0, producto.stock - cantidad),
       advertencia: advertencia,
-    });
+    };
+
+    recordarOperacion(CLAVE_CONSIGNACION + clave, respuesta);
+
+    res.status(201).json(respuesta);
   } catch (e) {
     responderError(res, e);
   }

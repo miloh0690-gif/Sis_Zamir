@@ -44,10 +44,19 @@ npm run dev
 | `TASA_COMISION` | Comision del vendedor sobre la ganancia. `0.30` = 30%. |
 | `DESCUENTO_MAYOR_PCT` | Descuento mayorista plano. `5` = 5%. |
 | `MAYOR_TIERS` | Tramos por volumen: `3:8,6:12`. Tiene prioridad sobre el plano. |
-| `REPORTES_DESDE_SHEETS` | `1` para que el historial viva en tu Sheet. |
-| `GEMINI_API_KEY` | Llave de Google AI Studio. Se configura **solo en Render**. |
-| `GEMINI_MODEL` | Por defecto `gemini-3.5-flash`. |
+| `REPORTES_DESDE_SHEETS` | `1` para que el historial viva en tu Sheet y no en el disco de Render. |
+| `GROQ_API_KEY` | Llave de Groq. **Solo en Render.** Sin esto no hay argumentos de venta, pero la ficha tecnica sigue funcionando. |
+| `GROQ_MODEL` | Por defecto `openai/gpt-oss-120b`. Ojo: la capacidad gratuita es del modelo, no de la cuenta. |
 | `AI_RATE_LIMIT_POR_MIN` | Consultas de IA por minuto y por IP. |
+| `FICHAS_POR_IA` | `0` apaga las fichas redactadas por IA y vuelve a decir "no hay ficha verificada". |
+| `GITHUB_TOKEN` | Opcional. Solo lo necesita `npm run indexar`. |
+
+> [!IMPORTANT]
+> `REPORTES_DESDE_SHEETS=1` **exige el `Code.gs` version 3** en el Apps
+> Script. Con la version 2 el reporte de ventas sale VACIO: el lector
+> pedia que la columna "Tipo" fuera exactamente `VENTA`, pero ahi va
+> `UNIDAD` o `MAYOR`, y descartaba todas las filas. Verifica con
+> `/api/diagnostico` que diga `version 3` antes de prenderlo.
 
 ---
 
@@ -82,6 +91,38 @@ El archivo correcto es **`apps-script/Code.gs`**. Pega su contenido completo en 
 
 7. **Prueba** entrando a `https://sis-zamir.onrender.com/api/health`. Debe decir `"sheetsUrl":true,"sheetsClave":true`.
 
+8. **Confirma que corre la version que creés.** `https://sis-zamir.onrender.com/api/diagnostico` responde `Code.gs desplegado, version N`. Si dice `version 2`, tenés la version vieja pegada: el reporte de ventas y la idempotencia no funcionan.
+
+9. **La hoja "Ventas" se completa sola.** No hace falta agregar columnas a mano: al primer deploy, el script agrega `ClaveIdempotencia` al final si no existe. Vas a ver el cambio en el registro de ejecuciones.
+
+---
+
+## Idempotencia: por que no se cobra dos veces
+
+Deshabilitar el boton "Cobrar" no protege el dinero. Render free se duerme
+tras inactividad y la primera peticion del dia tarda mas de 20 segundos. Si
+la peticion expira despues de que el servidor ya escribio en la hoja, y el
+vendedor toca el boton otra vez, se registraban **dos ventas y se
+descontaba el stock dos veces**.
+
+Ahora el navegador manda una `claveIdempotencia` por intento de cobro, y la
+**reutiliza** si reintenta. Hay dos capas:
+
+1. **En memoria, en Render.** La clave se recuerda 30 minutos. Un reintento
+   devuelve la respuesta original sin tocar la hoja.
+2. **En la hoja.** La clave queda escrita en la columna
+   `ClaveIdempotencia`. Antes de descontar stock, el script la busca: si ya
+   esta, responde "ya registrada" y no duplica. Esta capa cubre que el
+   servidor de Render reinicie entre el intento y el reintento.
+
+Lo mismo aplica a las consignaciones, que tambien mueven stock. Ahi la
+clave viaja en la columna `Id`.
+
+> [!NOTE]
+> La clave se genera **una vez por intento**. Cuando la venta si se
+> registro, el navegador genera una nueva para el siguiente cobro. Si
+> borras la clave a mano, la proteccion se pierde para esa venta.
+
 ---
 
 ## Bugs corregidos (y donde estaban)
@@ -105,6 +146,9 @@ La version 1 calculaba en el navegador. Se rompia por cinco caminos distintos:
 3. **No existian consultas de reporte.** El historial era de solo escritura: no habia forma de leerlo de vuelta.
 4. **No habia validacion de stock.** El script ponia 0 si el stock daba negativo, con lo cual se vendian equipos inexistentes.
 5. **Las consignaciones contaminaban el reporte de ventas.** Iban mezcladas en la hoja "Ventas" con ganancia 0. Ahora viven en su propia hoja, con id, y el reporte las ignora.
+6. **`leerVentas()` no devolvia NINGUNA venta.** Para separar las ventas de las consignaciones descartaba toda fila cuya columna "Tipo" no fuera exactamente `VENTA`. Pero ahi va `UNIDAD` o `MAYOR` (lo produce `normalizarTipo` en `src/money.js`), nunca `VENTA`. O sea que descartaba el 100% de las filas y el reporte salia vacio. Ese filtro era un resto de cuando las consignaciones vivian en la misma hoja. Ahora acepta `VENTA`, `UNIDAD` y `MAYOR`, y **las columnas se buscan por encabezado en vez de por posicion**, asi que agregar o reordenar columnas ya no rompe la lectura.
+7. **No habia idempotencia.** Un doble toque o un reintento tras un timeout cobraba dos veces y descontava stock dos veces. Ver la seccion de arriba.
+8. **La hoja no se actualizaba sola.** Si le faltaba una columna, `registrarVenta` la escribia en una columna sin nombre y la lectura por nombre no la encontraba. Ahora `asegurarEncabezados()` agrega la que falta al desplegar.
 
 ### En el contrato entre backend y Apps Script
 

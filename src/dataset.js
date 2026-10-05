@@ -609,4 +609,10 @@ module.exports = {
   detectarCategoria: detectarCategoria,
   adivinarSlugs: adivinarSlugs,
   juegosDeTokens: juegosDeTokens,
+  // Los usa scripts/indexar-fichas.js para armar src/fichas.json. Se
+  // exportan para que el indexador y el runtime compartan exactamente la
+  // misma forma de puntuar un archivo, y no se desincronicen.
+  tokensDe: tokensDe,
+  mejorArchivo: mejorArchivo,
+  indiceDeMarca: indexarMarca,
 };
