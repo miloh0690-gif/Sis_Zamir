@@ -311,6 +311,22 @@
                 .trim();
         }
 
+        // Código de tienda. El servidor lo exige solo si tiene STORE_KEY definida
+        // en el entorno; si no está, se mandan las requests igual. Se guarda en
+        // sessionStorage, o sea que dura el turno: recargar la página lo pide de
+        // nuevo, cerrarla lo borra.
+        function codigoTienda() {
+            try { return sessionStorage.getItem('tienda_codigo') || ''; }
+            catch (e) { return ''; }
+        }
+
+        function guardarCodigoTienda(valor) {
+            try {
+                if (valor) sessionStorage.setItem('tienda_codigo', valor);
+                else sessionStorage.removeItem('tienda_codigo');
+            } catch (e) { /* modo privado: se pierde al recargar, no es grave */ }
+        }
+
         async function api(ruta, opciones) {
             const config = Object.assign({}, opciones || {});
             config.headers = Object.assign({}, config.headers);
@@ -319,6 +335,8 @@
                 config.headers['Content-Type'] = 'application/json';
                 config.body = JSON.stringify(config.cuerpo);
             }
+            const codigo = codigoTienda();
+            if (codigo) config.headers['X-Tienda'] = codigo;
             config.credentials = 'same-origin';
             const respuesta = await fetch(ruta, config);
             let datos = null;
@@ -330,9 +348,40 @@
             if (!respuesta.ok) {
                 const error = new Error((datos && datos.error) || 'Error ' + respuesta.status);
                 error.codigo = respuesta.status;
+                // El servidor dice "codigo de tienda incorrecto": se borra el
+                // guardado para que el siguiente intento la vuelva a pedir, en
+                // vez de fallar con el mismo valor una y otra vez.
+                if (respuesta.status === 401 && datos && /c[oó]digo de tienda/i.test(datos.error || '')) {
+                    guardarCodigoTienda('');
+                    error.pideCodigoTienda = true;
+                }
                 throw error;
             }
             return datos;
+        }
+
+        function pedirCodigoTienda() {
+            const valor = window.prompt(
+                'Código de la tienda.\n\nSe escribe una vez por turno y queda hasta que cierres la pestaña.',
+                ''
+            );
+            if (valor === null) return null;
+            const limpio = valor.trim();
+            if (limpio) guardarCodigoTienda(limpio);
+            return limpio;
+        }
+
+        /** Envuelve una acción de escritura: pide el código solo si falta. */
+        async function conCodigoTienda(accion) {
+            if (!codigoTienda()) {
+                if (pedirCodigoTienda() === null) return null;
+            }
+            try {
+                return await accion();
+            } catch (e) {
+                if (e.pideCodigoTienda && pedirCodigoTienda() !== null) return accion();
+                throw e;
+            }
         }
 
         function estadoConexion(clase, texto, sincronizado) {
@@ -519,7 +568,8 @@
 
             boton.disabled = true;
             try {
-                const datos = await api('/api/ventas', { cuerpo: Object.assign({}, cuerpo, { claveIdempotencia: claveVenta() }) });
+                const datos = await conCodigoTienda(() => api('/api/ventas', { cuerpo: Object.assign({}, cuerpo, { claveIdempotencia: claveVenta() }) }));
+                if (!datos) return;
                 const c = datos.calculo;
                 let mensaje =
                     (datos.repetida ? 'Esta venta ya estaba registrada.\n\n' : 'Venta registrada.\n\n') +
@@ -561,7 +611,8 @@
             const cont = $('listaConsignaciones');
             cont.innerHTML = '<div class="text-center text-[#5B6472] text-sm italic py-10">Cargando…</div>';
             try {
-                const datos = await api('/api/consignaciones');
+                const datos = await conCodigoTienda(() => api('/api/consignaciones'));
+                if (!datos) return;
                 ESTADO.consignaciones = datos.consignaciones || [];
                 renderConsignaciones();
             } catch (e) {
@@ -607,10 +658,10 @@
                     try {
                         if (accion === 'estado') {
                             const nuevo = actual && actual.estado === 'Pagado' ? 'Pendiente' : 'Pagado';
-                            await api('/api/consignaciones/estado', { cuerpo: { id: id, estado: nuevo } });
+                            await conCodigoTienda(() => api('/api/consignaciones/estado', { cuerpo: { id: id, estado: nuevo } }));
                         } else {
                             if (!confirm('¿Confirmas la devolución física de estos equipos al inventario?')) return;
-                            await api('/api/consignaciones/devolver', { cuerpo: { id: id } });
+                            await conCodigoTienda(() => api('/api/consignaciones/devolver', { cuerpo: { id: id } }));
                         }
                         await cargarConsignaciones();
                         await cargarInventario();
@@ -628,14 +679,15 @@
             const boton = $('btnRegistrarConsignacion');
             boton.disabled = true;
             try {
-                const datos = await api('/api/consignaciones', {
+                const datos = await conCodigoTienda(() => api('/api/consignaciones', {
                     cuerpo: {
                         cliente: $('consCliente').value.trim(),
                         modelo: $('consModelo').value.trim(),
                         cantidad: $('consCantidad').value,
                         claveIdempotencia: claveConsignacion(),
                     },
-                });
+                }));
+                if (!datos) return;
                 let mensaje = datos.repetida ? 'Esta consignación ya estaba registrada.' : 'Consignación registrada.';
                 if (datos.advertencia) mensaje += '\n\nAviso: ' + datos.advertencia;
                 alert(mensaje);

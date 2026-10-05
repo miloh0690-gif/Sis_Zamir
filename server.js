@@ -3,6 +3,7 @@
 require('dotenv').config();
 
 const path = require('node:path');
+const crypto = require('node:crypto');
 const express = require('express');
 
 const inventory = require('./src/inventory');
@@ -31,6 +32,38 @@ app.use((req, res, next) => {
 });
 
 const golpes = new Map();
+
+// ---------------------------------------------------------------------------
+// Código de tienda.
+//
+// Por diseño el POS es abierto: el vendedor teclea su nombre y cobra. Eso
+// está bien dentro del local, pero la app vive en una URL pública y cualquiera
+// puede POSTear /api/ventas o /api/consignaciones y descontar stock de verdad.
+// El rate limit (60/min) limita el volumen, no el acceso.
+//
+// La corrección es un código compartido de la tienda, que el vendedor escribe
+// una vez por turno. Se activa poniendo STORE_KEY en el entorno: si no está
+// definida, TODO sigue como antes. Un solo número en el dashboard de Render
+// decide si el POS es público o no.
+//
+// No es fail-closed: si STORE_KEY no está definida el sistema queda abierto, y eso
+// es una decisión consciente — defaults que rompen el POS en el deploy son
+// peores que un riesgo conocido y documentado.
+// ---------------------------------------------------------------------------
+const STORE_KEY = String(process.env.STORE_KEY || '').trim();
+
+function exigirLlaveTienda(req, res, siguiente) {
+  if (!STORE_KEY) return siguiente();
+  const enviada = String(req.get('X-Tienda') || '');
+  const a = crypto.createHash('sha256').update(enviada).digest();
+  const b = crypto.createHash('sha256').update(STORE_KEY).digest();
+  // Comparación de tiempo constante: con === la comparación se corta en el primer
+  // caracter distinto y el tiempo de respuesta filtra la llave.
+  if (enviada.length === 0 || !crypto.timingSafeEqual(a, b)) {
+    return res.status(401).json({ error: 'Código de tienda incorrecto. Recargá la página e ingresalo de nuevo.' });
+  }
+  siguiente();
+}
 
 function limitar(tope, ventanaMs) {
   return function (req, res, next) {
@@ -227,7 +260,12 @@ const SENSIBLES = [
   'SHEETS_API_KEY',
 ];
 
-app.get('/api/claves', (req, res) => {
+// Diagnóstico de variables. Antes era público: cualquiera que abriera la URL
+// recibía el mapa de qué variables tiene el servidor y de qué largo. No filtra
+// valores, pero es reconocimiento gratis y no lo necesita nadie más que el
+// dueño. Se puso abierto para diagnosticar la llave de Groq el 2026-10-03 y
+// nunca se cerró.
+app.get('/api/claves', auth.exigirAuth, (req, res) => {
   const variables = {};
   for (const nombre of SENSIBLES) {
     const valor = String(process.env[nombre] || '').trim();
@@ -250,20 +288,27 @@ app.get('/api/claves', (req, res) => {
   });
 });
 
+// El panel necesita solo los booleanos (`sheets`, `ia`) para decidir si avisa.
+// Los numeros comerciales —tasa de comision, descuento mayor, tramos y el
+// modelo de IA— son estructura de negocio: antes de esto eran publicos y
+// cualquiera los leia. Se devuelven solo con sesion del dueño.
 app.get('/api/config', (req, res) => {
-  res.json({
+  const publico = {
     sheets: inventory.completo(),
     sheetsUrl: inventory.estaConfigurado(),
     sheetsClave: inventory.tieneClave(),
     ia: ficha.habilitado(),
     argumentosVenta: ficha.hayArgumentos(),
+    reportes: ledger.modo(),
+    reportesEfimeros: ledger.esEfimero(),
+  };
+  if (!auth.estaAutenticado(req)) return res.json(publico);
+  res.json(Object.assign(publico, {
     modeloArgs: ficha.hayArgumentos() ? ficha.modeloArgs : null,
     tasaComision: TASA_COMISION,
     descuentoMayorPct: DESCUENTO_MAYOR_PCT,
     tramosMayor: TRAMOS_MAYOR,
-    reportes: ledger.modo(),
-    reportesEfimeros: ledger.esEfimero(),
-  });
+  }));
 });
 
 app.post('/api/auth/login', limitar(10, 60000), (req, res) => {
@@ -319,7 +364,7 @@ app.post('/api/ventas/preview', limitar(120, 60000), async (req, res) => {
   }
 });
 
-app.post('/api/ventas', limitar(60, 60000), async (req, res) => {
+app.post('/api/ventas', limitar(60, 60000), exigirLlaveTienda, async (req, res) => {
   try {
     if (!exigirSheets(res)) return;
     const cuerpo = req.body || {};
@@ -445,7 +490,7 @@ app.post('/api/ventas', limitar(60, 60000), async (req, res) => {
   }
 });
 
-app.get('/api/consignaciones', limitar(60, 60000), async (req, res) => {
+app.get('/api/consignaciones', limitar(60, 60000), exigirLlaveTienda, async (req, res) => {
   try {
     const lista = await ledger.listarConsignaciones({
       desde: fecha(req.query.desde),
@@ -457,7 +502,7 @@ app.get('/api/consignaciones', limitar(60, 60000), async (req, res) => {
   }
 });
 
-app.post('/api/consignaciones', limitar(60, 60000), async (req, res) => {
+app.post('/api/consignaciones', limitar(60, 60000), exigirLlaveTienda, async (req, res) => {
   try {
     if (!exigirSheets(res)) return;
     const cuerpo = req.body || {};
@@ -560,7 +605,7 @@ app.post('/api/consignaciones', limitar(60, 60000), async (req, res) => {
   }
 });
 
-app.post('/api/consignaciones/estado', limitar(60, 60000), async (req, res) => {
+app.post('/api/consignaciones/estado', limitar(60, 60000), exigirLlaveTienda, async (req, res) => {
   try {
     const id = texto(req.body && req.body.id, 60);
     const todas = await ledger.listarConsignaciones({});
@@ -590,7 +635,7 @@ app.post('/api/consignaciones/estado', limitar(60, 60000), async (req, res) => {
   }
 });
 
-app.post('/api/consignaciones/devolver', limitar(60, 60000), async (req, res) => {
+app.post('/api/consignaciones/devolver', limitar(60, 60000), exigirLlaveTienda, async (req, res) => {
   try {
     const id = texto(req.body && req.body.id, 60);
     const todas = await ledger.listarConsignaciones({});
