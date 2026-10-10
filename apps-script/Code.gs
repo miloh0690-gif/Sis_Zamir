@@ -1,5 +1,5 @@
 // =================================================================
-// MOON ERP - BACKEND SEGURO (GOOGLE APPS SCRIPT)
+// JHSEL TECH MOBILES - BACKEND SEGURO (GOOGLE APPS SCRIPT)
 // Sirve inventario y registra ventas / consignaciones.
 // =================================================================
 //

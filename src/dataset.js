@@ -277,7 +277,7 @@ async function pedirJson(url) {
 }
 
 function cabecerasApi() {
-  const h = { Accept: 'application/vnd.github+json', 'User-Agent': 'moon-erp' };
+  const h = { Accept: 'application/vnd.github+json', 'User-Agent': 'jhsel-tech-mobiles' };
   if (TOKEN) h.Authorization = 'Bearer ' + TOKEN;
   return h;
 }

@@ -85,7 +85,7 @@ function gastarApi() {
 }
 
 function cabeceras() {
-  const h = { Accept: 'application/vnd.github+json', 'User-Agent': 'sis-zamir-indexar' };
+  const h = { Accept: 'application/vnd.github+json', 'User-Agent': 'jhsel-indexar' };
   if (TOKEN) h.Authorization = 'Bearer ' + TOKEN;
   return h;
 }

@@ -3,7 +3,7 @@
 // Ficha TECNICA redactada por IA. Es el ULTIMO recurso, cuando ninguna base
 // de datos tiene el equipo.
 //
-// CONTRASTE CON LA REGLA DE SIS ZAMIR
+// CONTRASTE CON LA REGLA DE SIS JHSEL
 //
 // La regla del proyecto es "la IA redacta, la base decide": las
 // especificaciones salen de la base de datos y la IA solo arma argumentos de

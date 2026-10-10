@@ -1,11 +1,11 @@
-# MooN ERP · Sis_Zamir v2
+# Jhsel Tech Mobiles - Sis Jhessel v2
 
-Sistema de ventas para "MooN Tech Mobiles". El dinero se calcula en el **servidor**, no en el navegador.
+Sistema de ventas para "Jhsel Tech Mobiles". El dinero se calcula en el **servidor**, no en el navegador.
 
 ## Estructura
 
 ```
-Sis_Zamir/
+Sis_Jhessel/
 ├── .env.example              Plantilla de variables
 ├── .gitignore                Ignora .env, node_modules y data/
 ├── package.json

@@ -1,8 +1,8 @@
 {
-  "name": "sis-zamir",
+  "name": "jhessel",
   "version": "2.0.0",
   "private": true,
-  "description": "MooN ERP - Tech Mobiles. Backend seguro con calculo autoritativo de precios.",
+  "description": "Jhsel Tech Mobiles. Backend seguro con calculo autoritativo de precios.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

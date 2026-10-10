@@ -721,7 +721,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PUERTO, '0.0.0.0', () => {
-  console.log('MooN ERP escuchando en el puerto ' + PUERTO);
+  console.log('Jhsel Tech Mobiles escuchando en el puerto ' + PUERTO);
   console.log('Sheets URL: ' + inventory.estaConfigurado());
   console.log('Sheets clave: ' + inventory.tieneClave());
   console.log('Reportes: ' + ledger.modo() + (ledger.esEfimero() ? ' (efimero)' : ''));
