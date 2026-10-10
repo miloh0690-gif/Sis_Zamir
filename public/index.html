@@ -15,6 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="/report-export.js"></script>
 
     <style>
         :root { color-scheme: dark; }
@@ -109,10 +110,16 @@
                             class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] font-data focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
                     </div>
                     <div>
-                        <label for="ventaPrecioCobrado" class="block text-[11px] font-bold text-[#4C8DFF] uppercase tracking-wide mb-1.5">Precio unitario (Bs)</label>
+                        <label for="ventaCostoUsd" class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Costo (USD)</label>
+                        <input type="number" id="ventaCostoUsd" step="0.01" min="0" placeholder="Escribe el costo"
+                            class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] font-data focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="ventaPrecioCobrado" class="block text-[11px] font-bold text-[#4C8DFF] uppercase tracking-wide mb-1.5">Precio unitario (Bs)</label>
                         <input type="number" id="ventaPrecioCobrado" step="0.01" min="0" placeholder="Automatico"
                             class="w-full h-12 px-4 rounded-xl bg-[#182236] border border-[#4C8DFF]/40 text-[15px] font-data font-bold campo-calculado focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
-                    </div>
                 </div>
 
                 <div id="avisoPrecio" class="hidden text-[11px] font-data text-[#FBBF24] flex items-center justify-between gap-2 bg-[#FBBF24]/10 border border-[#FBBF24]/20 rounded-xl px-3 py-2">
@@ -225,7 +232,8 @@
                 </div>
                 <div class="grid grid-cols-2 gap-2.5">
                     <button type="button" id="btnAplicarFiltro" class="tap h-11 rounded-xl bg-[#4C8DFF] text-white text-sm font-bold">Aplicar</button>
-                    <button type="button" id="btnExportarCsv" class="tap h-11 rounded-xl bg-[#242933] text-[#EDEFF3] text-sm font-bold">Exportar CSV</button>
+                    <button type="button" id="btnExportarPdf" class="tap h-11 rounded-xl bg-[#242933] text-[#EDEFF3] text-sm font-bold">Exportar PDF</button>
+                    <button type="button" id="btnImprimirTermica" class="tap h-11 col-span-2 rounded-xl bg-[#242933] text-[#EDEFF3] text-sm font-bold">Imprimir térmica 50×50 mm</button>
                 </div>
                 <button type="button" id="btnCerrarSesion2" class="tap w-full h-10 rounded-xl bg-[#242933] text-xs font-bold text-[#EDEFF3]">Cerrar sesión</button>
             </div>
@@ -284,6 +292,7 @@
             autenticado: false,
             pestana: 'vendedor',
             precioManual: false,
+            costoManual: false,
             temporizador: null,
             reporteActual: null,
             claveVenta: null,
@@ -453,6 +462,7 @@
             $('txtComisionVendedor').textContent = '0.00';
             $('detallePrecio').textContent = mensaje || 'Selecciona un modelo del inventario.';
             if (!ESTADO.precioManual) $('ventaPrecioCobrado').value = '';
+            if (!ESTADO.costoManual) $('ventaCostoUsd').value = '';
         }
 
         function pintarCalculo(datos) {
@@ -462,7 +472,7 @@
             $('txtComisionVendedor').textContent = fmt(c.comisionBs);
 
             const partes = [
-                'Stock: ' + datos.stock + ' u.',
+                datos.enInventario === false ? 'Sin inventario' : 'Stock: ' + datos.stock + ' u.',
                 'Costo unitario: ' + fmt(c.costoUnitarioBs) + ' Bs',
                 'Margen: ' + fmt(c.margenPct) + '%',
             ];
@@ -473,6 +483,9 @@
 
             if (!ESTADO.precioManual) {
                 $('ventaPrecioCobrado').value = c.precioUnitarioBs.toFixed(2);
+            }
+            if (!ESTADO.costoManual) {
+                $('ventaCostoUsd').value = Number(c.costoUsd || 0).toFixed(2);
             }
         }
 
@@ -502,6 +515,7 @@
                 tipo: $('ventaTipo').value,
                 cantidad: $('ventaCantidad').value,
                 tipoCambio: $('ventaTipoCambio').value,
+                costoUsd: $('ventaCostoUsd').value,
                 precioManualBs: ESTADO.precioManual ? $('ventaPrecioCobrado').value : null,
             };
         }
@@ -551,7 +565,7 @@
                     limpiarPanelPrecio(
                         datos.motivo === 'vacio'
                             ? 'Selecciona un modelo del inventario.'
-                            : 'Ese modelo no está en el inventario. Selecciónalo de la lista.'
+                            : 'Ese modelo no está en el inventario. Escribe el costo y el precio manualmente.'
                     );
                     $('detallePrecio').classList.add('text-rose-400');
                     return;
@@ -597,7 +611,9 @@
                 $('ventaModelo').value = '';
                 $('ventaCantidad').value = 1;
                 ESTADO.precioManual = false;
+                ESTADO.costoManual = false;
                 $('avisoPrecio').classList.add('hidden');
+                $('ventaCostoUsd').value = '';
                 $('ventaPrecioCobrado').classList.add('campo-calculado');
                 $('ventaPrecioCobrado').classList.remove('campo-manual');
                 $('fichaPanel').classList.add('hidden');
@@ -985,29 +1001,38 @@
             ]);
         }
 
-        function exportarCsv() {
+        function abrirImpresion(html, titulo) {
+            const ventana = window.open('', '_blank');
+            if (!ventana) {
+                alert('El navegador bloqueó la ventana de impresión. Permite las ventanas emergentes e inténtalo de nuevo.');
+                return;
+            }
+            ventana.document.open();
+            ventana.document.write(html);
+            ventana.document.close();
+            ventana.document.title = titulo;
+            ventana.addEventListener('load', () => {
+                ventana.focus();
+                ventana.print();
+            });
+        }
+
+        function exportarPdf() {
             const datos = ESTADO.reporteActual;
             if (!datos || !datos.ventas || !datos.ventas.length) {
                 alert('No hay ventas para exportar en este filtro.');
                 return;
             }
-            const cabecera = ['Fecha', 'Vendedor', 'Modelo', 'Tipo', 'Cantidad', 'TC', 'PrecioUnitarioBs', 'CostoTotalBs', 'TotalBs', 'GananciaBs', 'ComisionBs'];
-            const celda = (v) => '"' + String(v === undefined || v === null ? '' : v).replace(/"/g, '""') + '"';
-            const filas = datos.ventas.map((v) => [
-                String(v.fecha).slice(0, 19).replace('T', ' '),
-                v.vendedor, v.modelo, v.tipo, v.cantidad, v.tipoCambio,
-                v.precioUnitarioBs, v.costoTotalBs, v.totalCobradoBs, v.gananciaBs, v.comisionBs,
-            ].map(celda).join(';'));
+            abrirImpresion(window.ReporteExportacion.construirReporteImprimible(datos), 'Reporte de ventas');
+        }
 
-            const csv = '\ufeff' + cabecera.join(';') + '\r\n' + filas.join('\r\n');
-            const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-            const enlace = document.createElement('a');
-            enlace.href = url;
-            enlace.download = 'ventas-' + new Date().toISOString().slice(0, 10) + '.csv';
-            document.body.appendChild(enlace);
-            enlace.click();
-            document.body.removeChild(enlace);
-            URL.revokeObjectURL(url);
+        function imprimirTermica() {
+            const datos = ESTADO.reporteActual;
+            if (!datos || !datos.ventas || !datos.ventas.length) {
+                alert('No hay ventas para imprimir en este filtro.');
+                return;
+            }
+            abrirImpresion(window.ReporteExportacion.construirReporteTermico(datos), 'Reporte térmico');
         }
 
         // ---------- AUTENTICACION ----------
@@ -1087,6 +1112,7 @@
             inputModelo.addEventListener('input', () => {
                 renderSugerencias('sugerenciasVenta', 'ventaModelo', () => {
                     ESTADO.precioManual = false;
+                    ESTADO.costoManual = false;
                     $('avisoPrecio').classList.add('hidden');
                     programarPreview();
                 });
@@ -1096,6 +1122,8 @@
             $('btnLimpiarModelo').addEventListener('click', () => {
                 inputModelo.value = '';
                 ESTADO.precioManual = false;
+                ESTADO.costoManual = false;
+                $('ventaCostoUsd').value = '';
                 $('avisoPrecio').classList.add('hidden');
                 $('fichaPanel').classList.add('hidden');
                 renderSugerencias('sugerenciasVenta', 'ventaModelo', null);
@@ -1105,6 +1133,11 @@
             $('ventaTipo').addEventListener('change', programarPreview);
             $('ventaCantidad').addEventListener('input', programarPreview);
             $('ventaTipoCambio').addEventListener('input', programarPreview);
+
+            $('ventaCostoUsd').addEventListener('input', () => {
+                ESTADO.costoManual = $('ventaCostoUsd').value !== '';
+                programarPreview();
+            });
 
             $('ventaPrecioCobrado').addEventListener('input', () => {
                 const valor = $('ventaPrecioCobrado').value;
@@ -1130,7 +1163,8 @@
             $('formConsignacion').addEventListener('submit', registrarConsignacion);
 
             $('btnAplicarFiltro').addEventListener('click', cargarReportes);
-            $('btnExportarCsv').addEventListener('click', exportarCsv);
+            $('btnExportarPdf').addEventListener('click', exportarPdf);
+            $('btnImprimirTermica').addEventListener('click', imprimirTermica);
             $('btnCerrarSesion').addEventListener('click', salir);
             $('btnCerrarSesion2').addEventListener('click', salir);
 
