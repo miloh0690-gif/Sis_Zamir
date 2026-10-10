@@ -371,16 +371,22 @@
             return limpio;
         }
 
-        /** Envuelve una acción de escritura: pide el código solo si falta. */
+        /**
+         * Envuelve una acción de escritura. El servidor solo exige el código de
+         * tienda cuando tiene STORE_KEY definida en el entorno, así que primero
+         * se intenta sin preguntar y el código se pide únicamente cuando el
+         * servidor responde 401 pidiendo uno. Si el usuario cancela, se devuelve
+         * null y la acción no se repite.
+         */
         async function conCodigoTienda(accion) {
-            if (!codigoTienda()) {
-                if (pedirCodigoTienda() === null) return null;
-            }
-            try {
-                return await accion();
-            } catch (e) {
-                if (e.pideCodigoTienda && pedirCodigoTienda() !== null) return accion();
-                throw e;
+            for (let intento = 0; intento < 2; intento++) {
+                try {
+                    return await accion();
+                } catch (e) {
+                    if (!e.pideCodigoTienda || intento === 1) throw e;
+                    const escrito = pedirCodigoTienda();
+                    if (escrito === null) return null;
+                }
             }
         }
 
