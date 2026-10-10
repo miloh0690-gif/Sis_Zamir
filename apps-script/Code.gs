@@ -404,23 +404,69 @@ function celda(fila, indice) {
   return indice >= 0 && indice < fila.length ? fila[indice] : "";
 }
 
+/**
+ * Una fila esta CORRIDA si la escribio la version vieja de registrarVenta,
+ * que usaba appendRow con una lista fija de 13 valores.
+ *
+ * Esa version escribia posicional contra el layout real de la hoja (que tiene
+ * 15 columnas y Fecha no es la primera), asi que todo quedo corrido: la Fecha
+ * quedo bajo "Vendedor", el costo bajo "Fecha", y TotalBs/GananciaBs/
+ * ComisionBs quedaron vacios porque las columnas que el script creia_fill no
+ * son las de la hoja. El reporte salia con todo en 0.
+ *
+ * La senal es una sola y es fiable: la version vieja escribia la fecha en la
+ * posicion 0, y en la hoja real la posicion 0 es la columna "Vendedor". O
+ * sea, una fila corrida SIEMPRE tiene una fecha donde deberia ir el nombre.
+ * Una fila escrita bien trae una Date en su columna Fecha y un nombre de
+ * persona en la de Vendedor, y se descarta.
+ */
+function filaCorrida(fila, cFecha, cVendedor) {
+  if (celda(fila, cFecha) instanceof Date) return false;
+
+  var enVendedor = celda(fila, cVendedor);
+  if (enVendedor instanceof Date) return true;
+  return typeof enVendedor === "string" &&
+    /GMT|UTC|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(enVendedor);
+}
+
+/**
+ * Escribe la venta POR NOMBRE DE COLUMBA, no por posicion.
+ *
+ * Importa porque la hoja de Ventas del cliente tiene su propio orden: trae
+ * dos columnas que el script no conoce (TotalCobrado y GananciaEquipo) y la
+ * Fecha no es la primera. Antes se escribia con appendRow y una lista fija
+ * de 13 valores, asi que cada venta caia corrida: la Fecha se guardaba bajo
+ * "Vendedor", el costo bajo "Fecha", la ganancia bajo "PrecioUnitarioBs" y
+ * los importes que faltaban quedaban vacios. De ahi que el reporte del
+ * Dueño saliera con todo en 0 y los nombres mezclados.
+ */
 function registrarVenta(ss, data, calculo) {
   var hoja = obtenerHoja(ss, NOMBRE_HOJA_VENTAS, ENCABEZADO_VENTAS);
-  hoja.appendRow([
-    new Date(),
-    sanitizarTexto(data.vendedor),
-    sanitizarTexto(data.modelo),
-    sanitizarTexto(data.tipo),
-    parseInt(data.cantidad, 10) || 0,
-    parseFloat(data.tipoCambio) || 0,
-    parseFloat(data.precioUnitarioBs) || 0,
-    calculo.costoTotalBs,
-    parseFloat(data.totalCobrado) || 0,
-    calculo.gananciaBs,
-    parseFloat(data.comision) || 0,
-    sanitizarTexto(data.sucursal),
-    sanitizarTexto(data.claveIdempotencia)
-  ]);
+  var cab = hoja.getRange(1, 1, 1, Math.max(hoja.getLastColumn(), 1)).getValues()[0];
+
+  var porNombre = {};
+  porNombre.Fecha = new Date();
+  porNombre.Vendedor = sanitizarTexto(data.vendedor);
+  porNombre.Modelo = sanitizarTexto(data.modelo);
+  porNombre.Tipo = sanitizarTexto(data.tipo);
+  porNombre.Cantidad = parseInt(data.cantidad, 10) || 0;
+  porNombre.TC = parseFloat(data.tipoCambio) || 0;
+  porNombre.PrecioUnitarioBs = parseFloat(data.precioUnitarioBs) || 0;
+  porNombre.CostoTotalBs = calculo.costoTotalBs;
+  porNombre.TotalBs = parseFloat(data.totalCobrado) || 0;
+  porNombre.GananciaBs = calculo.gananciaBs;
+  porNombre.ComisionBs = parseFloat(data.comision) || 0;
+  porNombre.Sucursal = sanitizarTexto(data.sucursal);
+  porNombre.ClaveIdempotencia = sanitizarTexto(data.claveIdempotencia);
+
+  var ancho = Math.max(hoja.getLastColumn(), ENCABEZADO_VENTAS.length);
+  var fila = [];
+  for (var i = 0; i < ancho; i++) {
+    var clave = String(cab[i] || "").trim();
+    fila.push(clave && porNombre.hasOwnProperty(clave) ? porNombre[clave] : "");
+  }
+
+  hoja.appendRow(fila);
 }
 
 /**
@@ -513,18 +559,38 @@ function leerVentas() {
 
   var salida = [];
 
+  // Posiciones con las que escribia la version VIEJA de registrarVenta.
+  // Se usan solo para las filas que quedaron corridas, para poder leerlas
+  // bien sin tocar la hoja a mano.
+  var VIEJO = {
+    fecha: 0, vendedor: 1, modelo: 2, tipo: 3, cantidad: 4, tc: 5,
+    precio: 6, costo: 7, total: 8, ganancia: 9, comision: 10, sucursal: 11
+  };
+
   for (var i = 1; i < valores.length; i++) {
     var f = valores[i];
 
-    var fechaCruda = celda(f, cFecha);
+    var corrida = filaCorrida(f, cFecha, cVendedor);
+    var col = corrida
+      ? {
+          fecha: VIEJO.fecha, vendedor: VIEJO.vendedor, modelo: VIEJO.modelo,
+          tipo: VIEJO.tipo, cantidad: VIEJO.cantidad, tc: VIEJO.tc,
+          precio: VIEJO.precio, costo: VIEJO.costo, total: VIEJO.total,
+          ganancia: VIEJO.ganancia, comision: VIEJO.comision, sucursal: VIEJO.sucursal
+        }
+      : {
+          fecha: cFecha, vendedor: cVendedor, modelo: cModelo, tipo: cTipo,
+          cantidad: cCantidad, tc: cTC, precio: cPrecio, costo: cCosto,
+          total: cTotal, ganancia: cGanancia, comision: cComision, sucursal: cSucursal
+        };
+
+    var fechaCruda = celda(f, col.fecha);
     if (!fechaCruda) continue;
 
     // Si la hoja tiene columna Tipo, se usa para separar. Si no la tiene,
     // no se filtra nada: la hoja "Ventas" es solo de ventas.
-    if (cTipo >= 0) {
-      var tipo = String(celda(f, cTipo) || "").trim().toUpperCase();
-      if (!TIPOS_DE_VENTA[tipo]) continue;
-    }
+    var tipo = String(celda(f, col.tipo) || "").trim().toUpperCase();
+    if (tipo && !TIPOS_DE_VENTA[tipo]) continue;
 
     var fecha = fechaCruda;
     try {
@@ -536,17 +602,17 @@ function leerVentas() {
 
     salida.push({
       fecha: fecha,
-      vendedor: String(celda(f, cVendedor) || ""),
-      modelo: String(celda(f, cModelo) || ""),
-      tipo: String(celda(f, cTipo) || "UNIDAD"),
-      cantidad: Number(celda(f, cCantidad)) || 0,
-      tipoCambio: Number(celda(f, cTC)) || 0,
-      precioUnitarioBs: Number(celda(f, cPrecio)) || 0,
-      costoTotalBs: Number(celda(f, cCosto)) || 0,
-      totalCobradoBs: Number(celda(f, cTotal)) || 0,
-      gananciaBs: Number(celda(f, cGanancia)) || 0,
-      comisionBs: Number(celda(f, cComision)) || 0,
-      sucursal: String(celda(f, cSucursal) || "")
+      vendedor: String(celda(f, col.vendedor) || ""),
+      modelo: String(celda(f, col.modelo) || ""),
+      tipo: tipo || "UNIDAD",
+      cantidad: Number(celda(f, col.cantidad)) || 0,
+      tipoCambio: Number(celda(f, col.tc)) || 0,
+      precioUnitarioBs: Number(celda(f, col.precio)) || 0,
+      costoTotalBs: Number(celda(f, col.costo)) || 0,
+      totalCobradoBs: Number(celda(f, col.total)) || 0,
+      gananciaBs: Number(celda(f, col.ganancia)) || 0,
+      comisionBs: Number(celda(f, col.comision)) || 0,
+      sucursal: String(celda(f, col.sucursal) || "")
     });
   }
 
