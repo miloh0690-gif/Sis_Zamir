@@ -279,7 +279,10 @@ function doPost(e) {
       }
 
       var tipoCambio = parseFloat(data.tipoCambio) || 0;
-      var costoUsd = validacion.filaData.costoUsd;
+      var costoUsd = Number(data.costoUsd);
+      if (!isFinite(costoUsd) || costoUsd < 0) {
+        costoUsd = validacion.filaData ? validacion.filaData.costoUsd : 0;
+      }
       var cantidad = parseInt(data.cantidad, 10) || 0;
       var totalBs = parseFloat(data.totalCobrado) || 0;
 
@@ -673,6 +676,13 @@ function validarOperacion(hojaInventario, data) {
 
   // CAMBIO_ESTADO no mueve stock, asi que no necesita fila valida.
   if (data.subTipo === "CAMBIO_ESTADO") {
+    return { ok: true, filaData: null };
+  }
+
+  // Una venta manual no tiene fila que validar ni stock que descontar. El
+  // servidor ya calculo el costo y el precio; Apps Script solo registra el
+  // movimiento en la hoja de ventas.
+  if (data.tipoOperacion === "VENTA" && data.subTipo === "SIN_INVENTARIO") {
     return { ok: true, filaData: null };
   }
 

@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
+    "test": "node --test",
     "hash-pin": "node scripts/hash-pin.js",
     "indexar": "node scripts/indexar-fichas.js"
   },

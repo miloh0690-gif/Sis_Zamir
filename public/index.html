@@ -1109,10 +1109,15 @@
 
         function conectarEventos() {
             const inputModelo = $('ventaModelo');
+            // Solo se pisan costo y precio cuando el modelo cambia de verdad
+            // (se elige uno de la lista). Escribir en el campo no debe borrar
+            // lo que el vendedor ya escribio a mano.
             inputModelo.addEventListener('input', () => {
                 renderSugerencias('sugerenciasVenta', 'ventaModelo', () => {
                     ESTADO.precioManual = false;
                     ESTADO.costoManual = false;
+                    $('ventaCostoUsd').value = '';
+                    $('ventaPrecioCobrado').value = '';
                     $('avisoPrecio').classList.add('hidden');
                     programarPreview();
                 });

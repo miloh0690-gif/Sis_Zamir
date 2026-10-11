@@ -206,8 +206,17 @@ setInterval(() => {
 
 function construirCalculo(producto, cuerpo) {
   const c = cuerpo || {};
+  // El costo lo escribe el vendedor y es 100% editable: el inventario solo
+  // aporta el costo cuando el vendedor no escribio ninguno, y el resultado
+  // automatico queda como sugerencia al lado, nunca pisando lo escrito.
+  const costoEscrito = c.costoUsd === undefined || c.costoUsd === null || c.costoUsd === ''
+    ? NaN
+    : Number(c.costoUsd);
+  const costoDelInventario = producto && Number.isFinite(Number(producto.costoUsd))
+    ? Number(producto.costoUsd)
+    : NaN;
   return money.calcularVenta({
-    costoUsd: producto.costoUsd,
+    costoUsd: Number.isFinite(costoEscrito) && costoEscrito >= 0 ? costoEscrito : costoDelInventario,
     tipo: c.tipo,
     cantidad: entero(c.cantidad),
     tipoCambio: decimal(c.tipoCambio),
@@ -351,13 +360,16 @@ app.post('/api/ventas/preview', limitar(120, 60000), async (req, res) => {
     const modelo = texto(req.body && req.body.modelo, 120);
     if (!modelo) return res.json({ encontrado: false, motivo: 'vacio' });
     const producto = await inventory.buscar(modelo);
-    if (!producto) return res.json({ encontrado: false, motivo: 'no_existe' });
+    // Si el modelo no esta en el inventario igual se puede calcular: el
+    // vendedor escribe el costo y el precio a mano. No se descuenta stock.
+    const enInventario = !!producto;
     res.json({
       encontrado: true,
-      modelo: producto.modelo,
-      stock: producto.stock,
-      sucursal: producto.sucursal,
-      calculo: construirCalculo(producto, req.body),
+      enInventario: enInventario,
+      modelo: enInventario ? producto.modelo : modelo,
+      stock: enInventario ? producto.stock : 0,
+      sucursal: enInventario ? producto.sucursal : '',
+      calculo: construirCalculo(enInventario ? producto : null, req.body),
     });
   } catch (e) {
     responderError(res, e);
@@ -391,10 +403,9 @@ app.post('/api/ventas', limitar(60, 60000), exigirLlaveTienda, async (req, res) 
     if (!(tipoCambio > 0)) return res.status(400).json({ error: 'El tipo de cambio debe ser mayor a 0.' });
 
     const producto = await inventory.buscar(modeloTexto);
-    if (!producto) {
-      return res.status(400).json({ error: 'Ese modelo no existe en el inventario.' });
-    }
-    if (producto.stock < cantidad) {
+    // Vender un equipo que no esta cargado en el inventario es valido: el
+    // vendedor escribe costo y precio a mano. Solo no se descuenta stock.
+    if (producto && producto.stock < cantidad) {
       return res.status(409).json({
         error: 'Stock insuficiente. Solo quedan ' + producto.stock + ' unidades de ' + producto.modelo + '.',
       });
@@ -409,11 +420,12 @@ app.post('/api/ventas', limitar(60, 60000), exigirLlaveTienda, async (req, res) 
     const registro = {
       fecha: fechaIso,
       vendedor: vendedor,
-      modelo: producto.modelo,
-      sucursal: producto.sucursal,
+      modelo: producto ? producto.modelo : modeloTexto,
+      sucursal: producto ? producto.sucursal : '',
       tipo: calculo.tipo,
       cantidad: cantidad,
       tipoCambio: calculo.tipoCambio,
+      costoUsd: calculo.costoUsd,
       precioUnitarioBs: calculo.precioUnitarioBs,
       costoUnitarioBs: calculo.costoUnitarioBs,
       costoTotalBs: calculo.costoTotalBs,
@@ -421,21 +433,25 @@ app.post('/api/ventas', limitar(60, 60000), exigirLlaveTienda, async (req, res) 
       gananciaBs: calculo.gananciaBs,
       comisionBs: calculo.comisionBs,
       descuentoAplicadoPct: calculo.descuentoAplicadoPct,
-      filaExcel: producto.filaExcel,
+      filaExcel: producto ? producto.filaExcel : null,
     };
 
     // Si Apps Script rechaza (fila movida, stock racedado) esto lanza y
     // no se toca el historial, asi que no queda una venta fantasma.
     const escrito = await inventory.escribir({
       tipoOperacion: 'VENTA',
-      filaExcel: producto.filaExcel,
+      // Sin inventario no hay fila para descontar stock. Apps Script valida
+      // que la fila exista, asi que se marca explicitamente para que la omita.
+      subTipo: producto ? undefined : 'SIN_INVENTARIO',
+      filaExcel: producto ? producto.filaExcel : null,
       fecha: fechaIso,
       vendedor: vendedor,
-      modelo: producto.modelo,
-      sucursal: producto.sucursal,
+      modelo: producto ? producto.modelo : modeloTexto,
+      sucursal: producto ? producto.sucursal : '',
       tipo: calculo.tipo,
       cantidad: cantidad,
       tipoCambio: calculo.tipoCambio,
+      costoUsd: calculo.costoUsd,
       precioUnitarioBs: calculo.precioUnitarioBs,
       costoUnitarioBs: calculo.costoUnitarioBs,
       costoTotalBs: calculo.costoTotalBs,
@@ -451,11 +467,11 @@ app.post('/api/ventas', limitar(60, 60000), exigirLlaveTienda, async (req, res) 
     // guardar en el historial ni a descontar stock.
     if (escrito && escrito.duplicada) {
       const listaDup = await inventory.listar({ forzar: true });
-      const productoDup = inventory.buscarEn(listaDup, producto.modelo);
+      const productoDup = producto ? inventory.buscarEn(listaDup, producto.modelo) : null;
       return res.status(200).json({
         venta: ledger.normalizarVenta(registro),
         calculo: calculo,
-        stockRestante: productoDup ? productoDup.stock : producto.stock,
+        stockRestante: productoDup ? productoDup.stock : (producto ? producto.stock : 0),
         advertencia:
           'Esta venta ya estaba registrada. No se cobro ni se desconto stock dos veces.',
         repetida: true,
@@ -471,12 +487,14 @@ app.post('/api/ventas', limitar(60, 60000), exigirLlaveTienda, async (req, res) 
     }
 
     const lista = await inventory.listar({ forzar: true });
-    const actualizado = inventory.buscarEn(lista, producto.modelo);
+    const actualizado = producto ? inventory.buscarEn(lista, producto.modelo) : null;
 
     const respuesta = {
       venta: ledger.normalizarVenta(registro),
       calculo: calculo,
-      stockRestante: actualizado ? actualizado.stock : Math.max(0, producto.stock - cantidad),
+      stockRestante: actualizado
+        ? actualizado.stock
+        : (producto ? Math.max(0, producto.stock - cantidad) : 0),
       advertencia: advertencia,
     };
 
