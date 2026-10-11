@@ -28,6 +28,9 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('Referrer-Policy', 'no-referrer');
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  // Vercel proxea /api hacia este servidor y respeta el Cache-Control del
+  // origen. Sin esto serviria respuestas viejas: stock, precios y sesiones.
+  res.setHeader('Cache-Control', 'no-store');
   next();
 });
 
