@@ -1062,14 +1062,32 @@
         }
 
         async function salir() {
+            const botones = [$('btnCerrarSesion'), $('btnCerrarSesion2')];
+            const textos = botones.map((b) => b.textContent);
+            botones.forEach((b) => {
+                b.disabled = true;
+                b.textContent = 'Cerrando...';
+            });
             try {
                 await api('/api/auth/logout');
             } catch (e) {
-                void e;
+                // Si la red falla igual se limpia del lado del cliente: el
+                // Dueño no puede quedar a la vista de los empleados.
             }
             ESTADO.autenticado = false;
             ESTADO.productos = [];
-            location.reload();
+            ESTADO.claveVenta = null;
+            ESTADO.reporteActual = null;
+            $('listaInventarioDueno').innerHTML = '';
+            // No se usa location.reload(): en la PWA instalada a veces no
+            // recarga y el Dueño queda abierto. Se oculta y se vuelve a
+            // la pantalla de venta en el momento.
+            await cambiarPestana('venta');
+            botones.forEach((b, i) => {
+                b.disabled = false;
+                b.textContent = textos[i];
+            });
+            alert('Sesión cerrada.');
         }
 
         async function comprobarSesion() {
