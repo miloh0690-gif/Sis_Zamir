@@ -299,7 +299,7 @@ test('el SALUD declara la version, para saber si este codigo ya esta desplegado'
   const respuesta = ctx.doGet({ parameter: { action: 'SALUD' } });
   const cuerpo = JSON.parse(respuesta.getContent());
 
-  assert.equal(cuerpo.version, 7);
+  assert.equal(cuerpo.version, 8);
   assert.equal(cuerpo.drive.ok, true);
   assert.match(cuerpo.drive.detalle, /^con acceso a Drive\./);
 });
@@ -384,14 +384,14 @@ test('urlDeAutorizacionDrive no revienta si la plataforma no responde', () => {
   assert.equal(resultado.url, '');
 });
 
-test('el SALUD declara la version 7 y trae la URL de autorizacion de Drive', () => {
+test('el SALUD declara la version 8 y trae la URL de autorizacion de Drive', () => {
   const llamadas = [];
   const { ctx } = crearContextoConScriptApp('NOT_AUTHORIZED', llamadas);
 
   const respuesta = ctx.doGet({ parameter: { action: 'SALUD' } });
   const cuerpo = JSON.parse(respuesta.getContent());
 
-  assert.equal(cuerpo.version, 7);
+  assert.equal(cuerpo.version, 8);
   assert.equal(cuerpo.drive.ok, true);
   assert.equal(cuerpo.driveAuth.ok, false);
   assert.match(cuerpo.driveAuth.url, /accounts\.google\.com/);

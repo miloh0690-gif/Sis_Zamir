@@ -231,7 +231,10 @@ function doGet(e) {
       return responderJSON({
         ok: true,
         hora: new Date().toISOString(),
-        version: 7,
+        // Subir el numero en cada cambio es lo que permite saber, desde
+        // /api/diagnostico, si el codigo que corre es el que pegamos o el
+        // anterior. Sin esto, un despliegue viejo pasa por nuevo.
+        version: 8,
         // Si el scope de Drive no esta autorizado, guardarFotoEnDrive falla
         // en silencio y las ventas se registran sin foto. Esto lo hace
         // visible sin tener que adivinarlo por la columna vacia.
