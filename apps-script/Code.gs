@@ -103,7 +103,8 @@ var CANTIDAD_MAXIMA_POR_OPERACION = 500;
 var ENCABEZADO_VENTAS = [
   "Fecha", "Vendedor", "Modelo", "Tipo", "Cantidad", "TC",
   "PrecioUnitarioBs", "CostoTotalBs", "TotalBs", "GananciaBs",
-  "ComisionBs", "Sucursal", "ClaveIdempotencia"
+  "ComisionBs", "Sucursal", "ClaveIdempotencia",
+  "Cliente", "Nota", "Accesorios", "AccesoriosBs", "AccesoriosCostoBs", "Foto"
 ];
 
 // Valores que la columna "Tipo" puede tener en una fila de VENTA.
@@ -161,7 +162,7 @@ function doGet(e) {
       return responderJSON({
         ok: true,
         hora: new Date().toISOString(),
-        version: 3
+        version: 4
       });
     }
 
@@ -461,6 +462,12 @@ function registrarVenta(ss, data, calculo) {
   porNombre.ComisionBs = parseFloat(data.comision) || 0;
   porNombre.Sucursal = sanitizarTexto(data.sucursal);
   porNombre.ClaveIdempotencia = sanitizarTexto(data.claveIdempotencia);
+  porNombre.Cliente = textoCelda(data.cliente);
+  porNombre.Nota = textoCelda(data.nota);
+  porNombre.Accesorios = textoCelda(data.accesoriosTexto);
+  porNombre.AccesoriosBs = parseFloat(calculo.precioAccesoriosBs) || 0;
+  porNombre.AccesoriosCostoBs = parseFloat(calculo.costoAccesoriosBs) || 0;
+  porNombre.Foto = textoCelda(data.fotoUrl);
 
   var ancho = Math.max(hoja.getLastColumn(), ENCABEZADO_VENTAS.length);
   var fila = [];
@@ -559,6 +566,12 @@ function leerVentas() {
   var cGanancia = columna(cab, "GananciaBs", 9);
   var cComision = columna(cab, "ComisionBs", 10);
   var cSucursal = columna(cab, "Sucursal", 11);
+  var cCliente = columna(cab, "Cliente", -1);
+  var cNota = columna(cab, "Nota", -1);
+  var cAccesorios = columna(cab, "Accesorios", -1);
+  var cAccesoriosBs = columna(cab, "AccesoriosBs", -1);
+  var cAccesoriosCostoBs = columna(cab, "AccesoriosCostoBs", -1);
+  var cFoto = columna(cab, "Foto", -1);
 
   var salida = [];
 
@@ -615,7 +628,13 @@ function leerVentas() {
       totalCobradoBs: Number(celda(f, col.total)) || 0,
       gananciaBs: Number(celda(f, col.ganancia)) || 0,
       comisionBs: Number(celda(f, col.comision)) || 0,
-      sucursal: String(celda(f, col.sucursal) || "")
+      sucursal: String(celda(f, col.sucursal) || ""),
+      cliente: cCliente < 0 ? "" : String(celda(f, cCliente) || ""),
+      nota: cNota < 0 ? "" : String(celda(f, cNota) || ""),
+      accesorios: cAccesorios < 0 ? "" : String(celda(f, cAccesorios) || ""),
+      accesoriosBs: cAccesoriosBs < 0 ? 0 : Number(celda(f, cAccesoriosBs)) || 0,
+      accesoriosCostoBs: cAccesoriosCostoBs < 0 ? 0 : Number(celda(f, cAccesoriosCostoBs)) || 0,
+      foto: cFoto < 0 ? "" : String(celda(f, cFoto) || "")
     });
   }
 
@@ -760,4 +779,25 @@ function sanitizarTexto(valor) {
     return "'" + texto;
   }
   return texto;
+}
+
+function textoCelda(valor) {
+  var texto = String(valor == null ? "" : valor).trim();
+  if (/^[=+\-@]/.test(texto)) {
+    texto = "'" + texto;
+  }
+  return texto.slice(0, 500);
+}
+
+function textoAccesorios(lista) {
+  if (!Array.isArray(lista)) return "";
+  var nombres = [];
+  for (var i = 0; i < lista.length; i++) {
+    var nombre = String(lista[i] && lista[i].nombre == null ? "" : lista[i].nombre)
+      .trim();
+    if (!nombre) continue;
+    nombre = textoCelda(nombre).slice(0, 300);
+    if (nombre) nombres.push(nombre);
+  }
+  return nombres.join(", ");
 }
