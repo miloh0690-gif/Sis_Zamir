@@ -198,12 +198,44 @@ test('una venta duplicada no sube una segunda foto a Drive', () => {
   assert.equal(archivos.length, 0);
 });
 
+test('driveDisponible dice con que cuenta de Google corre el script', () => {
+  // Esto es lo que sospechamos: el permiso se concedio con una cuenta, pero el
+  // script se ejecuta con otra (el dueo del deployment). El diagnostico tiene
+  // que decir CUAL, no solo que falta el permiso.
+  const { ctx } = crearContexto();
+  ctx.Session = {
+    getEffectiveUser: () => ({ getEmail: () => 'dueno@jhsel.com' }),
+    getActiveUser: () => ({ getEmail: () => '' }),
+  };
+
+  const resultado = ctx.driveDisponible();
+
+  assert.equal(
+    resultado.cuenta,
+    'dueno@jhsel.com',
+    'tiene que decir la cuenta que EFECTIVAMENTE ejecuta el script'
+  );
+});
+
+test('driveDisponible no revienta si Session no esta disponible', () => {
+  const { ctx } = crearContexto();
+  ctx.Session = undefined;
+
+  const resultado = ctx.driveDisponible();
+
+  assert.equal(resultado.cuenta, '', 'si no se puede saber la cuenta, vacio y nada mas');
+  assert.equal(resultado.ok, true, 'que no se pueda leer la cuenta no vuelve roja la foto');
+});
+
 test('driveDisponible dice que SI hay acceso a Drive cuando la carpeta de la hoja responde', () => {
   const { ctx } = crearContexto();
   // deepEqual no sirve: el objeto sale del sandbox de vm, con otro prototipo.
   const resultado = ctx.driveDisponible();
   assert.equal(resultado.ok, true);
-  assert.equal(resultado.detalle, 'con acceso a Drive');
+  // El detalle dice la cuenta que corre el script: es la clave del bug de
+  // permisos, asi que tiene que estar en el mensaje.
+  assert.match(resultado.detalle, /^con acceso a Drive\./, 'arranca diciendo que hay acceso');
+  assert.match(resultado.detalle, /Corriendo como:/, 'y dice con que cuenta corre');
 });
 
 test('driveDisponible usa la MISMA llamada que necesita la foto, no getFoldersByName', () => {
@@ -267,9 +299,9 @@ test('el SALUD declara la version, para saber si este codigo ya esta desplegado'
   const respuesta = ctx.doGet({ parameter: { action: 'SALUD' } });
   const cuerpo = JSON.parse(respuesta.getContent());
 
-  assert.equal(cuerpo.version, 6);
+  assert.equal(cuerpo.version, 7);
   assert.equal(cuerpo.drive.ok, true);
-  assert.equal(cuerpo.drive.detalle, "con acceso a Drive");
+  assert.match(cuerpo.drive.detalle, /^con acceso a Drive\./);
 });
 
 // --- Autorizacion manual de Drive ---------------------------------------
@@ -352,14 +384,14 @@ test('urlDeAutorizacionDrive no revienta si la plataforma no responde', () => {
   assert.equal(resultado.url, '');
 });
 
-test('el SALUD declara la version 6 y trae la URL de autorizacion de Drive', () => {
+test('el SALUD declara la version 7 y trae la URL de autorizacion de Drive', () => {
   const llamadas = [];
   const { ctx } = crearContextoConScriptApp('NOT_AUTHORIZED', llamadas);
 
   const respuesta = ctx.doGet({ parameter: { action: 'SALUD' } });
   const cuerpo = JSON.parse(respuesta.getContent());
 
-  assert.equal(cuerpo.version, 6);
+  assert.equal(cuerpo.version, 7);
   assert.equal(cuerpo.drive.ok, true);
   assert.equal(cuerpo.driveAuth.ok, false);
   assert.match(cuerpo.driveAuth.url, /accounts\.google\.com/);

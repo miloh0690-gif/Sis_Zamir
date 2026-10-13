@@ -231,7 +231,7 @@ function doGet(e) {
       return responderJSON({
         ok: true,
         hora: new Date().toISOString(),
-        version: 6,
+        version: 7,
         // Si el scope de Drive no esta autorizado, guardarFotoEnDrive falla
         // en silencio y las ventas se registran sin foto. Esto lo hace
         // visible sin tener que adivinarlo por la columna vacia.
@@ -870,6 +870,19 @@ function sanitizarTexto(valor) {
   return texto;
 }
 
+// Dice con que cuenta de Google se esta ejecutando ESTE script. Es la causa
+// mas comun de "no tengo permiso de Drive": uno concede el permiso con su
+// cuenta, pero el deployment corre con la del dueno, y ahi nunca se concedio.
+// Session.getActiveUser() NO sirve: con acceso anonimo devuelve vacio. El que
+// corre de verdad es getEffectiveUser().
+function cuentaQueEjecuta() {
+  try {
+    return String(Session.getEffectiveUser().getEmail() || "");
+  } catch (error) {
+    return "";
+  }
+}
+
 // Dice si el script puede usar Drive. Si no puede, guardarFotoEnDrive falla en
 // silencio: la venta se guarda, pero el jefe nunca ve la foto de la nota.
 //
@@ -879,10 +892,15 @@ function sanitizarTexto(valor) {
 // vez de un texto que supone la causa: un catch que se come el error hace que
 // uno persiga permisos que ya estan bien.
 function driveDisponible() {
+  var cuenta = cuentaQueEjecuta();
   try {
     var hoja = SpreadsheetApp.getActiveSpreadsheet();
     DriveApp.getFileById(hoja.getId()).getParentFolder();
-    return { ok: true, detalle: "con acceso a Drive" };
+    return {
+      ok: true,
+      cuenta: cuenta,
+      detalle: "con acceso a Drive. Corriendo como: " + (cuenta || "cuenta desconocida")
+    };
   } catch (error) {
     var mensaje = (error && error.message) ? String(error.message) : String(error);
     if (!mensaje || mensaje === "undefined" || mensaje === "[object Object]") {
@@ -890,7 +908,10 @@ function driveDisponible() {
     }
     return {
       ok: false,
-      detalle: "sin acceso a Drive. Lo que respondio Google: " + mensaje.slice(0, 300)
+      cuenta: cuenta,
+      detalle:
+        "sin acceso a Drive. Corriendo como: " + (cuenta || "cuenta desconocida") +
+        ". Lo que respondio Google: " + mensaje.slice(0, 300)
     };
   }
 }

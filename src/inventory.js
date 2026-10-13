@@ -298,6 +298,9 @@ async function diagnostico() {
         paso: 5,
         nombre: 'El script tiene acceso a Drive',
         ok: d.drive.ok === true,
+        // El detalle trae la cuenta que ejecuta el script: es la clave del
+        // bug, porque el permiso se concede con una cuenta y el deployment
+        // puede correr con otra.
         detalle: d.drive.detalle || (d.drive.ok ? 'con acceso a Drive' : 'sin acceso'),
       });
     }
@@ -370,12 +373,13 @@ async function diagnostico() {
   if (!okTodo && pasoDrive && !pasoDrive.ok) {
     accion =
       'El script no puede usar Drive, asi que las ventas se estan guardando SIN ' +
-      'la foto de la nota. Lo que respondio Google esta en el paso 5 de arriba: ' +
+      'la foto de la nota. Lo que respondio Google: ' +
       String(pasoDrive.detalle || '') +
-      ' Si el paso 5 dice que no encuentra el archivo de la hoja, el script ' +
-      'perdio el acceso a Drive: revisa que oauthScopes tenga ' +
-      '"https://www.googleapis.com/auth/drive" en el manifiesto appsscript.json ' +
-      'y despues Implementar > Nueva version.' +
+      ' Lo mas comun es que el permiso se haya concedido con una cuenta distinta ' +
+      'a la que corre el script (el paso 5 dice cual es): Apps Script > ' +
+      'Administrar implementaciones > editar el deployment > "Ejecutar como" = Yo. ' +
+      'Y revisa tambien que oauthScopes tenga ' +
+      '"https://www.googleapis.com/auth/drive" en el manifiesto appsscript.json.' +
       (pasoAuth && pasoAuth.detalle ? ' ' + pasoAuth.detalle : '');
   } else if (!okTodo && pasoAuth && !pasoAuth.ok) {
     accion =
