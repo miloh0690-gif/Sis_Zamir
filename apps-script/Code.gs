@@ -113,6 +113,75 @@ var ENCABEZADO_VENTAS = [
 // src/money.js del servidor).
 var TIPOS_DE_VENTA = { "VENTA": true, "UNIDAD": true, "MAYOR": true };
 
+function decodificarFoto(base64) {
+  if (typeof base64 !== "string" || base64.length > 1.5 * 1024 * 1024) {
+    return null;
+  }
+
+  var coincidencia = base64.match(/^data:image\/(jpeg|png);base64,/i);
+  if (!coincidencia) return null;
+
+  var mimeType = "image/" + coincidencia[1].toLowerCase();
+  var extension = coincidencia[1].toLowerCase() === "jpeg" ? "jpg" : "png";
+  var contenido = base64.substring(coincidencia[0].length);
+
+  try {
+    return {
+      bytes: Utilities.base64Decode(contenido),
+      nombre: "nota-venta-" + Utilities.getUuid() + "." + extension,
+      mimeType: mimeType
+    };
+  } catch (error) {
+    return null;
+  }
+}
+
+function carpetaFotos(ss) {
+  try {
+    var propiedades = PropertiesService.getScriptProperties();
+    var idGuardado = propiedades.getProperty("ID_CARPETA_FOTOS");
+    if (idGuardado) return idGuardado;
+
+    var padre;
+    try {
+      padre = DriveApp.getFileById(ss.getId()).getParentFolder();
+    } catch (errorPadre) {
+      padre = DriveApp.getRootFolder();
+    }
+
+    var carpeta = padre.createFolder("Fotos de ventas");
+    var id = carpeta.getId();
+    if (id) propiedades.setProperty("ID_CARPETA_FOTOS", id);
+    return id || "";
+  } catch (error) {
+    Logger.log("Error al preparar carpeta de fotos: " + error);
+    return "";
+  }
+}
+
+function guardarFotoEnDrive(datos, ss) {
+  if (!datos || !datos.fotoBase64) return "";
+
+  try {
+    var foto = decodificarFoto(datos.fotoBase64);
+    if (!foto) {
+      Logger.log("Foto rechazada: formato o tamaño inválido");
+      return "";
+    }
+
+    var idCarpeta = carpetaFotos(ss);
+    if (!idCarpeta) return "";
+    var carpeta = DriveApp.getFolderById(idCarpeta);
+    var blob = Utilities.newBlob(foto.bytes, foto.mimeType, foto.nombre);
+    var archivo = carpeta.createFile(blob);
+    archivo.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    return "https://drive.google.com/uc?export=view&id=" + archivo.getId();
+  } catch (error) {
+    Logger.log("Error al guardar foto en Drive: " + error);
+    return "";
+  }
+}
+
 var ENCABEZADO_CONSIGNACIONES = [
   "Fecha", "Cliente", "Modelo", "Cantidad", "Sucursal", "Estado",
   "Id", "FilaExcel"
@@ -279,6 +348,8 @@ function doPost(e) {
         });
       }
 
+      data.fotoUrl = guardarFotoEnDrive(data, ss);
+
       var tipoCambio = parseFloat(data.tipoCambio) || 0;
       var costoUsd = Number(data.costoUsd);
       if (!isFinite(costoUsd) || costoUsd < 0) {
@@ -294,7 +365,9 @@ function doPost(e) {
       actualizarStock(hojaInventario, data.filaExcel, -cantidad);
       registrarVenta(ss, data, {
         costoTotalBs: costoTotalBs,
-        gananciaBs: gananciaBs
+        gananciaBs: gananciaBs,
+        precioAccesoriosBs: parseFloat(data.precioAccesoriosBs) || 0,
+        costoAccesoriosBs: parseFloat(data.costoAccesoriosBs) || 0
       });
     }
 
