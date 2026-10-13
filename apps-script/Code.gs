@@ -816,17 +816,9 @@ function validarOperacion(hojaInventario, data) {
   }
 
   var stock = parseInt(filaReal[2], 10) || 0;
-  var esDevolucion = data.subTipo === "DEVOLUCION";
-  var saldo = esDevolucion ? stock + Math.abs(cantidad) : stock - Math.abs(cantidad);
-
-  // Antes el script solo truncaba en 0 y dejaba vender inexistentes.
-  if (saldo < 0) {
-    return {
-      ok: false,
-      mensaje: "Stock insuficiente en la hoja: quedan " + stock + " unidades."
-    };
-  }
-
+  // El catalogo es referencial, no un inventario: no se rechaza por saldo.
+  // El descuento lo hace actualizarStock, que ya trunca en 0 y nunca deja
+  // negativo, asi que vender con 0 unidades solo baja el numero.
   return {
     ok: true,
     filaData: {

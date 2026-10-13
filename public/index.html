@@ -469,7 +469,7 @@
                 return;
             }
             const coincidencias = ESTADO.productos
-                .filter((p) => p.stock > 0 && normalizar(p.modelo).indexOf(texto) !== -1)
+                .filter((p) => normalizar(p.modelo).indexOf(texto) !== -1)
                 .slice(0, 8);
 
             if (coincidencias.length === 0) {
@@ -484,7 +484,7 @@
                 item.className = 'px-4 py-2.5 border-b border-[#2A2F3A] last:border-b-0 active:bg-[#242933] cursor-pointer';
                 item.innerHTML =
                     '<p class="text-[14px] text-[#EDEFF3] font-medium">' + escapeHtml(p.modelo) + '</p>' +
-                    '<p class="text-[11px] text-[#8B95A7] font-data">Stock: ' + escapeHtml(p.stock) + ' u. · Suc: ' + escapeHtml(p.sucursal) + '</p>';
+                    '<p class="text-[11px] text-[#8B95A7] font-data">Stock registrado: ' + escapeHtml(p.stock) + ' u. · Suc: ' + escapeHtml(p.sucursal) + '</p>';
                 item.addEventListener('click', () => {
                     $(idInput).value = p.modelo;
                     cont.classList.add('hidden');
@@ -514,7 +514,7 @@
             $('txtComisionVendedor').textContent = fmt(c.comisionBs);
 
             const partes = [
-                datos.enInventario === false ? 'Sin inventario' : 'Stock: ' + datos.stock + ' u.',
+                datos.enInventario === false ? 'Sin inventario' : 'Stock registrado: ' + datos.stock + ' u.',
                 'Costo unitario: ' + fmt(c.costoUnitarioBs) + ' Bs',
                 'Margen: ' + fmt(c.margenPct) + '%',
             ];

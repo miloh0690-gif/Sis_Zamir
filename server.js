@@ -426,13 +426,10 @@ app.post('/api/ventas', limitar(60, 60000), exigirLlaveTienda, async (req, res) 
     if (!(tipoCambio > 0)) return res.status(400).json({ error: 'El tipo de cambio debe ser mayor a 0.' });
 
     const producto = await inventory.buscar(modeloTexto);
-    // Vender un equipo que no esta cargado en el inventario es valido: el
-    // vendedor escribe costo y precio a mano. Solo no se descuenta stock.
-    if (producto && producto.stock < cantidad) {
-      return res.status(409).json({
-        error: 'Stock insuficiente. Solo quedan ' + producto.stock + ' unidades de ' + producto.modelo + '.',
-      });
-    }
+    // El catalogo es una lista de precios y fichas referencial, no un
+    // inventario: quedarse sin unidades NO bloquea la venta. El seller
+    // escribe costo y precio a mano y la columna Stock de la hoja se
+    // sigue descontando como dato de lo que salio, truncada en 0.
 
     const calculo = construirCalculo(producto, cuerpo);
     if (!(calculo.precioUnitarioBs > 0)) {
@@ -597,9 +594,9 @@ app.post('/api/consignaciones', limitar(60, 60000), exigirLlaveTienda, async (re
 
     const producto = await inventory.buscar(modeloTexto);
     if (!producto) return res.status(400).json({ error: 'Ese modelo no existe en el inventario.' });
-    if (producto.stock < cantidad) {
-      return res.status(409).json({ error: 'Stock insuficiente. Solo quedan ' + producto.stock + ' unidades.' });
-    }
+    // Sin control de stock: el catalogo es referencial, asi que consignar
+    // un modelo con 0 unidades es valido. El modelo tiene que existir, la
+    // cantidad no tiene que estar disponible.
 
     // El Id de la consignacion es la clave que manda el navegador, para
     // que un reintento conserve el mismo Id y la hoja lo reconozca como
