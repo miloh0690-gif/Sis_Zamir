@@ -52,6 +52,7 @@ function calcularVenta(opciones = {}) {
     tasaComision = 0.3,
     descuentoMayorPct = 0,
     tramosMayor = [],
+    accesorios: accesoriosRecibidos = [],
   } = opciones;
 
   const cant = Math.max(1, Math.floor(Number(cantidad) || 0));
@@ -80,8 +81,20 @@ function calcularVenta(opciones = {}) {
   const precioUnitarioCents = hayManual ? toCents(manualNum) : sugeridoCents;
 
   const totalCobradoCents = precioUnitarioCents * cant;
-  const costoTotalCents = costoUnitarioCents * cant;
-  const gananciaCents = totalCobradoCents - costoTotalCents;
+  const accesorios = Array.isArray(accesoriosRecibidos) ? accesoriosRecibidos : [];
+  let precioAccesoriosCents = 0;
+  let costoAccesoriosCents = 0;
+
+  for (const accesorio of accesorios) {
+    if (!accesorio || !String(accesorio.nombre || '').trim()) continue;
+    precioAccesoriosCents += toCents(accesorio.precioBs);
+    costoAccesoriosCents += toCents(accesorio.costoBs);
+  }
+
+  const totalConAccesoriosCents = totalCobradoCents + precioAccesoriosCents;
+  const costoTotalCents = costoUnitarioCents * cant + costoAccesoriosCents;
+  const gananciaAccesoriosCents = precioAccesoriosCents - costoAccesoriosCents;
+  const gananciaCents = totalConAccesoriosCents - costoTotalCents;
 
   const tasaNum = Number(tasaComision);
   const tasa = Number.isFinite(tasaNum) && tasaNum >= 0 ? tasaNum : 0;
@@ -99,11 +112,16 @@ function calcularVenta(opciones = {}) {
     precioSugeridoBs: fromCents(sugeridoCents),
     costoUnitarioBs: fromCents(costoUnitarioCents),
     costoTotalBs: fromCents(costoTotalCents),
-    totalCobradoBs: fromCents(totalCobradoCents),
+    totalCobradoBs: fromCents(totalConAccesoriosCents),
     gananciaBs: fromCents(gananciaCents),
     comisionBs: fromCents(comisionCents),
+    precioAccesoriosBs: fromCents(precioAccesoriosCents),
+    costoAccesoriosBs: fromCents(costoAccesoriosCents),
+    gananciaAccesoriosBs: fromCents(gananciaAccesoriosCents),
     margenPct:
-      totalCobradoCents > 0 ? Math.round((gananciaCents / totalCobradoCents) * 10000) / 100 : 0,
+      totalConAccesoriosCents > 0
+        ? Math.round((gananciaCents / totalConAccesoriosCents) * 10000) / 100
+        : 0,
   };
 }
 
