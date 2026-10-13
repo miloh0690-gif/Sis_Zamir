@@ -307,15 +307,20 @@ async function diagnostico() {
     // Cuando falta el permiso, Google no muestra ninguna pantalla: hay que
     // darle una URL al humano para que la abra y acepte a mano. El paso 6 la
     // trae tal cual para que no tenga que buscarla en otro lado.
-    if (d && d.ok === true && d.driveAuth && d.driveAuth.ok !== true) {
+    //
+    // Solo tiene sentido si Drive NO responde. Cuando Drive ya funciona,
+    // getAuthorizationInfo puede seguir diciendo que no reconoce el permiso
+    // (responde por su cuenta, no por el token de la peticion), asi que
+    // mirar solo driveAuth pinta un rojo donde no hay nada que arreglar.
+    if (d && d.ok === true && d.drive && d.drive.ok === false) {
       pasos.push({
         paso: 6,
         nombre: 'URL para autorizar Drive a mano',
         ok: false,
         detalle:
-          (d.driveAuth.detalle || 'abre esta URL y acepta el permiso: ') +
-          ' ' +
-          String(d.driveAuth.url || '(el script no devolvio ninguna URL)'),
+          ((d.driveAuth && d.driveAuth.detalle) || 'falta el permiso de Drive.') +
+          ' Abre esta URL en el navegador y acepta el permiso: ' +
+          String((d.driveAuth && d.driveAuth.url) || '(el script no devolvio ninguna URL)'),
       });
     }
   } catch (e) {

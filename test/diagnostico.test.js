@@ -197,3 +197,59 @@ test('diagnostico: si el permiso ya esta concedido no inventa un paso 6 en rojo'
     t.restaurar();
   }
 });
+
+test('diagnostico: Drive funcionando aunque driveAuth diga que no, no sale en rojo', async () => {
+  // Asi responde el script de verdad: Drive funciona (drive.ok true) pero
+  // getAuthorizationInfo no reconoce el permiso y driveAuth.ok viene false.
+  // El fixture del test de arriba ponia driveAuth.ok true, que es lo que el
+  // codigoiba a esperar y nunca pasa: por eso el paso 6 salia en rojo con
+  // todo bien y hacia perseguir un problema inexistente.
+  const t = cargarConStub(function (url) {
+    if (url.indexOf('action=SALUD') >= 0) {
+      return {
+        cuerpo: {
+          ok: true,
+          version: 9,
+          drive: { ok: true, detalle: 'con acceso a Drive. Corriendo como: dueno@jhsel.com' },
+          driveAuth: { ok: false, url: '', detalle: 'el script no devolvio ninguna URL' },
+        },
+      };
+    }
+    return { cuerpo: [{ modelo: 'A' }] };
+  });
+  try {
+    const d = await t.inventory.diagnostico();
+    const paso6 = d.pasos.filter((p) => p.paso === 6)[0];
+    assert.equal(paso6, undefined, 'si Drive ya responde, no hay nada que autorizar a mano');
+    assert.equal(d.ok, true, 'driveAuth no puede ensuciar el veredicto si Drive funciona');
+    assert.equal(d.accion, null);
+  } finally {
+    t.restaurar();
+  }
+});
+
+test('diagnostico: el paso 6 solo aparece cuando Drive NO responde de verdad', async () => {
+  const URL = 'https://accounts.google.com/o/oauth2/auth?scope=drive';
+  const t = cargarConStub(function (url) {
+    if (url.indexOf('action=SALUD') >= 0) {
+      return {
+        cuerpo: {
+          ok: true,
+          version: 9,
+          drive: { ok: false, detalle: 'sin acceso a Drive. Lo que respondio Google: no permitted' },
+          driveAuth: { ok: false, url: URL, detalle: 'abre esta URL y acepta el permiso' },
+        },
+      };
+    }
+    return { cuerpo: [{ modelo: 'A' }] };
+  });
+  try {
+    const d = await t.inventory.diagnostico();
+    const paso6 = d.pasos.filter((p) => p.paso === 6)[0];
+    assert.ok(paso6, 'con Drive caido tiene que aparecer la URL para autorizarlo');
+    assert.equal(paso6.ok, false);
+    assert.ok(paso6.detalle.indexOf(URL) >= 0, 'y tiene que traer la URL literal');
+  } finally {
+    t.restaurar();
+  }
+});
