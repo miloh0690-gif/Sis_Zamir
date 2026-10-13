@@ -340,8 +340,27 @@ async function diagnostico() {
 
   const okTodo = pasos.every((p) => p.ok);
 
+  // El arreglo NO esta ordenado por numero de paso (el de Drive se agrega
+  // junto al 3), asi que hay que buscar por numero y no por posicion.
+  const buscarPaso = function (n) {
+    for (let i = 0; i < pasos.length; i++) {
+      if (pasos[i].paso === n) return pasos[i];
+    }
+    return null;
+  };
+  const pasoClave = buscarPaso(4);
+  const pasoDrive = buscarPaso(5);
+
   let accion = null;
-  if (!okTodo && pasos[1].ok && pasos[2].ok && !pasos[3].ok) {
+  if (!okTodo && pasoDrive && !pasoDrive.ok) {
+    accion =
+      'Al script le falta el permiso de Drive. En Apps Script: Configuracion del ' +
+      'proyecto > Mostrar el manifiesto appsscript.json > oauthScopes, agrega ' +
+      '"https://www.googleapis.com/auth/drive" (Drive completo, NO drive.file), ' +
+      'guarda, y despues Implementar > Nueva version para que el permiso tome ' +
+      'efecto. Las ventas SI se estan guardando; lo que se pierde es la foto de ' +
+      'la nota.';
+  } else if (!okTodo && pasoClave && !pasoClave.ok && pasos[1].ok && pasos[2].ok) {
     accion =
       'La propiedad SHEETS_API_KEY del script NO coincide con la de Render. ' +
       'En Apps Script: Configuracion del proyecto > Propiedades del script > ' +
