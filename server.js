@@ -21,7 +21,7 @@ const TRAMOS_MAYOR = money.parseTramos(process.env.MAYOR_TIERS);
 
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
-app.use(express.json({ limit: '32kb' }));
+app.use(express.json({ limit: '2mb' }));
 
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -227,6 +227,15 @@ function construirCalculo(producto, cuerpo) {
     tasaComision: TASA_COMISION,
     descuentoMayorPct: DESCUENTO_MAYOR_PCT,
     tramosMayor: TRAMOS_MAYOR,
+    accesorios: Array.isArray(c.accesorios)
+      ? c.accesorios
+        .filter((a) => a && String(a.nombre || '').trim())
+        .map((a) => ({
+          nombre: String(a.nombre).slice(0, 300),
+          precioBs: Number(a.precioBs) || 0,
+          costoBs: Number(a.costoBs) || 0,
+        }))
+      : [],
   });
 }
 
@@ -436,6 +445,12 @@ app.post('/api/ventas', limitar(60, 60000), exigirLlaveTienda, async (req, res) 
       gananciaBs: calculo.gananciaBs,
       comisionBs: calculo.comisionBs,
       descuentoAplicadoPct: calculo.descuentoAplicadoPct,
+      cliente: String(cuerpo.cliente || '').slice(0, 500),
+      nota: String(cuerpo.nota || '').slice(0, 500),
+      accesoriosTexto: (Array.isArray(cuerpo.accesorios) ? cuerpo.accesorios : [])
+        .map((a) => String((a && a.nombre) || '').trim().slice(0, 300))
+        .filter(Boolean)
+        .join(', '),
       filaExcel: producto ? producto.filaExcel : null,
     };
 
@@ -460,6 +475,14 @@ app.post('/api/ventas', limitar(60, 60000), exigirLlaveTienda, async (req, res) 
       costoTotalBs: calculo.costoTotalBs,
       totalCobrado: calculo.totalCobradoBs,
       gananciaRegistrada: calculo.gananciaBs,
+      cliente: String(cuerpo.cliente || '').slice(0, 500),
+      nota: String(cuerpo.nota || '').slice(0, 500),
+      accesoriosTexto: (Array.isArray(cuerpo.accesorios) ? cuerpo.accesorios : [])
+        .map((a) => String((a && a.nombre) || '').trim().slice(0, 300))
+        .filter(Boolean)
+        .join(', '),
+      precioAccesoriosBs: calculo.precioAccesoriosBs,
+      costoAccesoriosBs: calculo.costoAccesoriosBs,
       comision: calculo.comisionBs,
       claveIdempotencia: clave,
     });

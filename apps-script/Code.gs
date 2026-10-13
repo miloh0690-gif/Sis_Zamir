@@ -359,8 +359,10 @@ function doPost(e) {
       var totalBs = parseFloat(data.totalCobrado) || 0;
 
       // Aca estaba el bug: falta el tipo de cambio.
-      var costoTotalBs = costoUsd * tipoCambio * cantidad;
-      var gananciaBs = totalBs - costoTotalBs;
+      var costoTotalBs = parseFloat(data.costoTotalBs) > 0 || parseFloat(data.costoTotalBs) === 0
+        ? parseFloat(data.costoTotalBs)
+        : costoUsd * tipoCambio * cantidad;
+      var gananciaBs = parseFloat(data.gananciaRegistrada) || (totalBs - costoTotalBs);
 
       actualizarStock(hojaInventario, data.filaExcel, -cantidad);
       registrarVenta(ss, data, {
