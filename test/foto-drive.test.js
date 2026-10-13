@@ -262,12 +262,105 @@ test('driveDisponible no revienta aunque el error venga vacío', () => {
   assert.ok(resultado.detalle.length > 0, 'siempre tiene que devolver algo legible');
 });
 
-test('el SALUD declara la version 5, para saber si este codigo ya esta desplegado', () => {
+test('el SALUD declara la version, para saber si este codigo ya esta desplegado', () => {
   const { ctx } = crearContexto();
   const respuesta = ctx.doGet({ parameter: { action: 'SALUD' } });
   const cuerpo = JSON.parse(respuesta.getContent());
 
-  assert.equal(cuerpo.version, 5);
+  assert.equal(cuerpo.version, 6);
   assert.equal(cuerpo.drive.ok, true);
-  assert.equal(cuerpo.drive.detalle, 'con acceso a Drive');
+  assert.equal(cuerpo.drive.detalle, "con acceso a Drive");
+});
+
+// --- Autorizacion manual de Drive ---------------------------------------
+// El scope de Drive nunca se concedio y el dialogo de Google no aparece
+// nunca. getAuthorizationInfo() es la unica via de la propia plataforma
+// para sacar una URL de consentimiento y que el humano la abra a mano.
+
+function crearContextoConScriptApp(estado, llamadas) {
+  const base = crearContexto();
+  base.ctx.ScriptApp = {
+    AuthMode: { FULL: 'FULL' },
+    AuthorizationStatus: { AUTHORIZED: 'AUTHORIZED', NOT_AUTHORIZED: 'NOT_AUTHORIZED' },
+    getAuthorizationInfo(authMode, scopes) {
+      llamadas.push({ authMode, scopes });
+      return {
+        getAuthorizationStatus: () => estado,
+        getAuthorizationUrl: () => 'https://accounts.google.com/o/oauth2/auth?scope=drive&project=abc',
+      };
+    },
+  };
+  return base;
+}
+
+test('urlDeAutorizacionDrive devuelve la URL para dar permiso de Drive a mano', () => {
+  const llamadas = [];
+  const { ctx } = crearContextoConScriptApp('NOT_AUTHORIZED', llamadas);
+
+  const resultado = ctx.urlDeAutorizacionDrive();
+
+  assert.equal(resultado.ok, false, 'todavia NO hay permiso, eso es lo que informamos');
+  assert.match(resultado.url, /accounts\.google\.com/, 'tiene que ser la URL de consentimiento de Google');
+  assert.match(resultado.detalle, /permiso/i);
+});
+
+test('urlDeAutorizacionDrive pide el scope de Drive completo con AuthMode FULL', () => {
+  const llamadas = [];
+  const { ctx } = crearContextoConScriptApp('NOT_AUTHORIZED', llamadas);
+
+  ctx.urlDeAutorizacionDrive();
+
+  assert.equal(llamadas.length, 1, 'tiene que preguntar una sola vez');
+  assert.equal(llamadas[0].authMode, 'FULL');
+  // El array de scopes nace dentro del sandbox vm, asi que tiene otro prototipo
+  // y deepStrictEqual lo marca como distinto aunque los valores sean iguales.
+  assert.equal(llamadas[0].scopes.length, 1, 'un solo scope, el de Drive completo');
+  assert.equal(
+    llamadas[0].scopes[0],
+    'https://www.googleapis.com/auth/drive',
+    'el scope exacto que exige DriveApp.getFileById'
+  );
+});
+
+test('urlDeAutorizacionDrive avisa que ya hay permiso y no manda a autorizar de nuevo', () => {
+  const llamadas = [];
+  const { ctx } = crearContextoConScriptApp('AUTHORIZED', llamadas);
+
+  const resultado = ctx.urlDeAutorizacionDrive();
+
+  assert.equal(resultado.ok, true);
+  assert.equal(resultado.url, '', 'ya autorizado: no hay que mandar a ningun lado');
+});
+
+test('urlDeAutorizacionDrive no revienta si la plataforma no responde', () => {
+  const { ctx } = crearContexto();
+  // AuthMode y AuthorizationStatus van en el stub porque el codigo los lee
+  // ANTES de llamar a getAuthorizationInfo. Sin ellos el test reventaria por
+  // AuthMode undefined y probaria otra cosa: no que el catch no revienta.
+  ctx.ScriptApp = {
+    AuthMode: { FULL: 'FULL' },
+    AuthorizationStatus: { AUTHORIZED: 'AUTHORIZED' },
+    getAuthorizationInfo() {
+      throw new Error('no puedo preguntar los permisos');
+    },
+  };
+
+  const resultado = ctx.urlDeAutorizacionDrive();
+
+  assert.equal(resultado.ok, false);
+  assert.match(resultado.detalle, /no puedo preguntar los permisos/, 'el error real, no una suposicion');
+  assert.equal(resultado.url, '');
+});
+
+test('el SALUD declara la version 6 y trae la URL de autorizacion de Drive', () => {
+  const llamadas = [];
+  const { ctx } = crearContextoConScriptApp('NOT_AUTHORIZED', llamadas);
+
+  const respuesta = ctx.doGet({ parameter: { action: 'SALUD' } });
+  const cuerpo = JSON.parse(respuesta.getContent());
+
+  assert.equal(cuerpo.version, 6);
+  assert.equal(cuerpo.drive.ok, true);
+  assert.equal(cuerpo.driveAuth.ok, false);
+  assert.match(cuerpo.driveAuth.url, /accounts\.google\.com/);
 });

@@ -301,6 +301,20 @@ async function diagnostico() {
         detalle: d.drive.detalle || (d.drive.ok ? 'con acceso a Drive' : 'sin acceso'),
       });
     }
+    // Cuando falta el permiso, Google no muestra ninguna pantalla: hay que
+    // darle una URL al humano para que la abra y acepte a mano. El paso 6 la
+    // trae tal cual para que no tenga que buscarla en otro lado.
+    if (d && d.ok === true && d.driveAuth && d.driveAuth.ok !== true) {
+      pasos.push({
+        paso: 6,
+        nombre: 'URL para autorizar Drive a mano',
+        ok: false,
+        detalle:
+          (d.driveAuth.detalle || 'abre esta URL y acepta el permiso: ') +
+          ' ' +
+          String(d.driveAuth.url || '(el script no devolvio ninguna URL)'),
+      });
+    }
   } catch (e) {
     pasos.push({
       paso: 3,
@@ -350,6 +364,7 @@ async function diagnostico() {
   };
   const pasoClave = buscarPaso(4);
   const pasoDrive = buscarPaso(5);
+  const pasoAuth = buscarPaso(6);
 
   let accion = null;
   if (!okTodo && pasoDrive && !pasoDrive.ok) {
@@ -360,7 +375,14 @@ async function diagnostico() {
       ' Si el paso 5 dice que no encuentra el archivo de la hoja, el script ' +
       'perdio el acceso a Drive: revisa que oauthScopes tenga ' +
       '"https://www.googleapis.com/auth/drive" en el manifiesto appsscript.json ' +
-      'y despues Implementar > Nueva version.';
+      'y despues Implementar > Nueva version.' +
+      (pasoAuth && pasoAuth.detalle ? ' ' + pasoAuth.detalle : '');
+  } else if (!okTodo && pasoAuth && !pasoAuth.ok) {
+    accion =
+      'Las ventas SI se estan guardando, pero falta darle permiso de Drive al ' +
+      'script y Google no muestra ninguna pantalla para hacerlo. Abre esta URL ' +
+      'en el navegador y acepta el permiso, y despues vuelve a este diagnostico: ' +
+      String(pasoAuth.detalle || '');
   } else if (!okTodo && pasoClave && !pasoClave.ok && pasos[1].ok && pasos[2].ok) {
     accion =
       'La propiedad SHEETS_API_KEY del script NO coincide con la de Render. ' +

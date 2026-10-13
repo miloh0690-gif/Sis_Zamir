@@ -231,11 +231,15 @@ function doGet(e) {
       return responderJSON({
         ok: true,
         hora: new Date().toISOString(),
-        version: 5,
+        version: 6,
         // Si el scope de Drive no esta autorizado, guardarFotoEnDrive falla
         // en silencio y las ventas se registran sin foto. Esto lo hace
         // visible sin tener que adivinarlo por la columna vacia.
-        drive: driveDisponible()
+        drive: driveDisponible(),
+        // Y esto trae la URL de consentimiento para concederlo a mano: el
+        // dialogo de Google no aparece solo y el dueno necesita una forma
+        // de ir y autorizar sin depender de que Apps Script se acuerde.
+        driveAuth: urlDeAutorizacionDrive()
       });
     }
 
@@ -887,6 +891,35 @@ function driveDisponible() {
     return {
       ok: false,
       detalle: "sin acceso a Drive. Lo que respondio Google: " + mensaje.slice(0, 300)
+    };
+  }
+}
+
+// Devuelve la URL de consentimiento de Drive para concederlo A MANO.
+// Existe por una razon concreta: cuando el scope de Drive no esta en la
+// autorizacion guardada, el dialogo de Google no aparece nunca — ni al
+// ejecutar la funcion en el editor, ni al desplegar. Editar el manifiesto
+// alcanza si Google no tiene el token viejo cacheado; si lo tiene, el unico
+// camino es abrir esta URL y aceptar. Es la unica via de la propia plataforma
+// para pedir un permiso sin depender de que Apps Script lo ofrezca solo.
+function urlDeAutorizacionDrive() {
+  var SCOPE_DRIVE = "https://www.googleapis.com/auth/drive";
+  try {
+    var info = ScriptApp.getAuthorizationInfo(ScriptApp.AuthMode.FULL, [SCOPE_DRIVE]);
+    if (info.getAuthorizationStatus() === ScriptApp.AuthorizationStatus.AUTHORIZED) {
+      return { ok: true, url: "", detalle: "el permiso de Drive ya esta concedido" };
+    }
+    return {
+      ok: false,
+      url: info.getAuthorizationUrl(),
+      detalle: "abre esta URL en el navegador y acepta el permiso de Drive."
+    };
+  } catch (error) {
+    var mensaje = (error && error.message) ? String(error.message) : String(error);
+    return {
+      ok: false,
+      url: "",
+      detalle: "Google no dijo si falta el permiso: " + String(mensaje).slice(0, 200)
     };
   }
 }
