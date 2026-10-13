@@ -28,9 +28,15 @@ function crearContexto(opciones = {}) {
       return archivo;
     },
   };
+  // Drive de Apps Script NO tiene File.getParentFolder: un archivo puede
+  // tener varios padres y se piden con getParents(), que devuelve un iterador.
+  // El stub refleja la API real a proposito: si el codigo vuelve a llamar a
+  // getParentFolder, revienta con TypeError y el test lo delata, en vez de
+  // pasar verde contra un stub que miente.
   const hoja = {
-    getParentFolder: () => ({
-      createFolder: () => carpeta,
+    getParents: () => ({
+      hasNext: () => true,
+      next: () => ({ createFolder: () => carpeta }),
     }),
   };
   const ctx = {
@@ -110,12 +116,15 @@ test('carpetaFotos crea la carpeta hermana una vez y la reutiliza', () => {
   let creaciones = 0;
   const original = ctx.DriveApp.getFileById;
   ctx.DriveApp.getFileById = () => ({
-    getParentFolder: () => ({
-      createFolder: (nombre) => {
-        creaciones++;
-        assert.equal(nombre, 'Fotos de ventas');
-        return { getId: () => 'id-fotos' };
-      },
+    getParents: () => ({
+      hasNext: () => true,
+      next: () => ({
+        createFolder: (nombre) => {
+          creaciones++;
+          assert.equal(nombre, 'Fotos de ventas');
+          return { getId: () => 'id-fotos' };
+        },
+      }),
     }),
   });
 
@@ -163,13 +172,16 @@ test('una venta duplicada no sube una segunda foto a Drive', () => {
   const { ctx, archivos } = crearContexto();
   let crearArchivos = 0;
   ctx.DriveApp.getFileById = () => ({
-    getParentFolder: () => ({
-      createFolder: () => ({
-        createFile: () => {
-          crearArchivos++;
-          throw new Error('no debe llamarse');
-        },
-        getId: () => 'id-fotos',
+    getParents: () => ({
+      hasNext: () => true,
+      next: () => ({
+        createFolder: () => ({
+          createFile: () => {
+            crearArchivos++;
+            throw new Error('no debe llamarse');
+          },
+          getId: () => 'id-fotos',
+        }),
       }),
     }),
   });
@@ -294,12 +306,90 @@ test('driveDisponible no revienta aunque el error venga vacío', () => {
   assert.ok(resultado.detalle.length > 0, 'siempre tiene que devolver algo legible');
 });
 
+// --- La carpeta padre de la hoja: getParents(), no getParentFolder() -------
+// Drive de Apps Script no tiene File.getParentFolder. Un archivo puede tener
+// varios padres, asi que se piden con getParents(), que devuelve un iterador.
+// Cuando el codigo llamaba a la funcion inexistente, el try/catch se la tragaba
+// y la foto se perdia en silencio para siempre.
+
+test('driveDisponible pide los padres de la hoja, porque getParentFolder no existe', () => {
+  const { ctx } = crearContexto();
+  // El stub NO tiene getParentFolder a proposito: si el codigo lo llama,
+  // revienta con TypeError y este test falla con el error real.
+  let pedidos = 0;
+  ctx.DriveApp.getFileById = (id) => {
+    pedidos++;
+    return {
+      getParents: () => ({ hasNext: () => true, next: () => ({ id: 'carpeta-padre' }) }),
+    };
+  };
+
+  const resultado = ctx.driveDisponible();
+
+  assert.equal(resultado.ok, true, 'con la API real de Drive tiene que decir que SI hay acceso');
+  assert.match(resultado.detalle, /^con acceso a Drive\./);
+  assert.equal(pedidos, 1);
+});
+
+test('driveDisponible no confunde un TypeError de codigo con falta de permisos', () => {
+  const { ctx } = crearContexto();
+  ctx.DriveApp.getFileById = () => ({}); // objeto sin ningun metodo de Drive
+
+  const resultado = ctx.driveDisponible();
+
+  assert.equal(resultado.ok, false);
+  assert.match(
+    resultado.detalle,
+    /getParents|getParentFolder/,
+    'tiene que decir que fallo el codigo, no insinuar que faltan permisos'
+  );
+});
+
+test('carpetaFotos crea la carpeta en el padre REAL de la hoja, no en el raiz', () => {
+  const { ctx } = crearContexto();
+  let padrePedido = null;
+  ctx.DriveApp.getFileById = (id) => ({
+    getParents: () => ({
+      hasNext: () => true,
+      next: () => ({
+        createFolder: (nombre) => {
+          padrePedido = { id, nombre };
+          return { getId: () => 'id-en-el-padre' };
+        },
+      }),
+    }),
+  });
+  let seUsoElRoot = false;
+  ctx.DriveApp.getRootFolder = () => {
+    seUsoElRoot = true;
+    return { createFolder: () => ({ getId: () => 'id-en-el-root' }) };
+  };
+
+  const id = ctx.carpetaFotos({ getId: () => 'hoja-77' });
+
+  assert.equal(id, 'id-en-el-padre');
+  assert.equal(seUsoElRoot, false, 'la hoja tiene padre: caer al raiz seria perder la foto junto a la hoja');
+  assert.equal(padrePedido.id, 'hoja-77');
+  assert.equal(padrePedido.nombre, 'Fotos de ventas');
+});
+
+test('carpetaFotos cae al raiz cuando la hoja no tiene ningun padre', () => {
+  const { ctx } = crearContexto();
+  ctx.DriveApp.getFileById = () => ({
+    getParents: () => ({ hasNext: () => false, next: () => null }),
+  });
+
+  const id = ctx.carpetaFotos({ getId: () => 'hoja-sin-padre' });
+
+  assert.equal(id, 'carpeta-fotos', 'sin padre disponible la foto va al raiz, nunca se pierde la venta');
+});
+
 test('el SALUD declara la version, para saber si este codigo ya esta desplegado', () => {
   const { ctx } = crearContexto();
   const respuesta = ctx.doGet({ parameter: { action: 'SALUD' } });
   const cuerpo = JSON.parse(respuesta.getContent());
 
-  assert.equal(cuerpo.version, 8);
+  assert.equal(cuerpo.version, 9);
   assert.equal(cuerpo.drive.ok, true);
   assert.match(cuerpo.drive.detalle, /^con acceso a Drive\./);
 });
@@ -384,14 +474,14 @@ test('urlDeAutorizacionDrive no revienta si la plataforma no responde', () => {
   assert.equal(resultado.url, '');
 });
 
-test('el SALUD declara la version 8 y trae la URL de autorizacion de Drive', () => {
+test('el SALUD declara la version 9 y trae la URL de autorizacion de Drive', () => {
   const llamadas = [];
   const { ctx } = crearContextoConScriptApp('NOT_AUTHORIZED', llamadas);
 
   const respuesta = ctx.doGet({ parameter: { action: 'SALUD' } });
   const cuerpo = JSON.parse(respuesta.getContent());
 
-  assert.equal(cuerpo.version, 8);
+  assert.equal(cuerpo.version, 9);
   assert.equal(cuerpo.drive.ok, true);
   assert.equal(cuerpo.driveAuth.ok, false);
   assert.match(cuerpo.driveAuth.url, /accounts\.google\.com/);

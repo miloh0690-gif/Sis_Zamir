@@ -136,18 +136,26 @@ function decodificarFoto(base64) {
   }
 }
 
+// Drive de Apps Script NO tiene File.getParentFolder. Un archivo puede estar
+// en varias carpetas a la vez, asi que sus padres se piden con getParents(),
+// que devuelve un iterador. Pedir la funcion que no existe reventaba con
+// TypeError y el catch caia al Drive raiz: la foto se guardaba, pero lejos de
+// la hoja, y el dueno no la encontraba nunca.
+function carpetaPadreDe(archivo) {
+  if (!archivo || typeof archivo.getParents !== "function") return null;
+  var padres = archivo.getParents();
+  if (!padres || !padres.hasNext()) return null;
+  return padres.next();
+}
+
 function carpetaFotos(ss) {
   try {
     var propiedades = PropertiesService.getScriptProperties();
     var idGuardado = propiedades.getProperty("ID_CARPETA_FOTOS");
     if (idGuardado) return idGuardado;
 
-    var padre;
-    try {
-      padre = DriveApp.getFileById(ss.getId()).getParentFolder();
-    } catch (errorPadre) {
-      padre = DriveApp.getRootFolder();
-    }
+    var padre = carpetaPadreDe(DriveApp.getFileById(ss.getId()));
+    if (!padre) padre = DriveApp.getRootFolder();
 
     var carpeta = padre.createFolder("Fotos de ventas");
     var id = carpeta.getId();
@@ -234,7 +242,7 @@ function doGet(e) {
         // Subir el numero en cada cambio es lo que permite saber, desde
         // /api/diagnostico, si el codigo que corre es el que pegamos o el
         // anterior. Sin esto, un despliegue viejo pasa por nuevo.
-        version: 8,
+        version: 9,
         // Si el scope de Drive no esta autorizado, guardarFotoEnDrive falla
         // en silencio y las ventas se registran sin foto. Esto lo hace
         // visible sin tener que adivinarlo por la columna vacia.
@@ -890,7 +898,14 @@ function driveDisponible() {
   var cuenta = cuentaQueEjecuta();
   try {
     var hoja = SpreadsheetApp.getActiveSpreadsheet();
-    DriveApp.getFileById(hoja.getId()).getParentFolder();
+    if (!carpetaPadreDe(DriveApp.getFileById(hoja.getId()))) {
+      return {
+        ok: false,
+        cuenta: cuenta,
+        detalle: "Drive responde, pero getParents() no devolvio la carpeta padre de la hoja. " +
+          "La foto se guardaria en el Drive raiz, fuera de la carpeta del dueno."
+      };
+    }
     return {
       ok: true,
       cuenta: cuenta,
