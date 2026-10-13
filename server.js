@@ -207,6 +207,17 @@ setInterval(() => {
   }
 }, 5 * 60 * 1000).unref();
 
+// La foto llega del navegador como data URL. Solo se acepta una imagen real
+// (jpeg o png) y de tamaño acotado; cualquier otra cosa se descarta y la
+// venta se guarda igual. La foto es evidencia: nunca puede tumbar la venta.
+const FOTO_BASE64_MAXIMO = 1.5 * 1024 * 1024;
+function fotoBase64De(valor) {
+  if (typeof valor !== 'string') return '';
+  const datos = valor.trim();
+  if (!/^data:image\/(?:jpeg|png);base64,/i.test(datos)) return '';
+  return datos.length <= FOTO_BASE64_MAXIMO ? datos : '';
+}
+
 function construirCalculo(producto, cuerpo) {
   const c = cuerpo || {};
   // El costo lo escribe el vendedor y es 100% editable: el inventario solo
@@ -445,12 +456,20 @@ app.post('/api/ventas', limitar(60, 60000), exigirLlaveTienda, async (req, res) 
       gananciaBs: calculo.gananciaBs,
       comisionBs: calculo.comisionBs,
       descuentoAplicadoPct: calculo.descuentoAplicadoPct,
+      // Los campos nuevos van con el MISMO nombre que los lee
+      // ledger.normalizarVenta. Sin `accesorios` y `foto` aqui, el reporte
+      // del modo archivo perdia los accesorios y nunca tendria foto.
       cliente: String(cuerpo.cliente || '').slice(0, 500),
       nota: String(cuerpo.nota || '').slice(0, 500),
-      accesoriosTexto: (Array.isArray(cuerpo.accesorios) ? cuerpo.accesorios : [])
+      accesorios: (Array.isArray(cuerpo.accesorios) ? cuerpo.accesorios : [])
         .map((a) => String((a && a.nombre) || '').trim().slice(0, 300))
         .filter(Boolean)
         .join(', '),
+      accesoriosBs: calculo.precioAccesoriosBs,
+      accesoriosCostoBs: calculo.costoAccesoriosBs,
+      // La URL de la foto la resuelve el Apps Script guardando el archivo, asi
+      // que todavia no existe: se completa despues de escribir.
+      foto: '',
       filaExcel: producto ? producto.filaExcel : null,
     };
 
@@ -483,9 +502,18 @@ app.post('/api/ventas', limitar(60, 60000), exigirLlaveTienda, async (req, res) 
         .join(', '),
       precioAccesoriosBs: calculo.precioAccesoriosBs,
       costoAccesoriosBs: calculo.costoAccesoriosBs,
+      // La foto viaja en base64 y la guarda el Apps Script en Drive: el
+      // servidor no tiene credenciales de Google, solo la URL del web app.
+      // Si se pierde aqui, la columna Foto queda vacia para siempre.
+      fotoBase64: fotoBase64De(cuerpo.fotoBase64),
       comision: calculo.comisionBs,
       claveIdempotencia: clave,
     });
+
+    // El Apps Script guarda la foto en Drive y devuelve el link que si pudo
+    // guardar. Si no lo pudo (sin scope de Drive, foto rechazada), vuelve
+    // vacio: la venta esta escrita igual y no se pierde nada.
+    registro.foto = (escrito && typeof escrito.fotoUrl === 'string') ? escrito.fotoUrl : '';
 
     // El script encontro la clave en la hoja: la venta ya estaba
     // registrada (el servidor de Render reinicio entre el intento y el

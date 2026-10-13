@@ -291,6 +291,16 @@ async function diagnostico() {
           ? 'Code.gs desplegado, version ' + d.version
           : 'Respuesta inesperada: ' + JSON.stringify(d).slice(0, 140),
     });
+    // El scope de Drive es el paso que mas falla en silencio: sin el, cada
+    // foto se pierde y la venta se guarda igual. Que el diagnostico lo diga.
+    if (d && d.ok === true && d.drive) {
+      pasos.push({
+        paso: 5,
+        nombre: 'El script tiene acceso a Drive',
+        ok: d.drive.ok === true,
+        detalle: d.drive.detalle || (d.drive.ok ? 'con acceso a Drive' : 'sin acceso'),
+      });
+    }
   } catch (e) {
     pasos.push({
       paso: 3,

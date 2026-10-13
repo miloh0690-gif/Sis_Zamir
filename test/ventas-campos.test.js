@@ -37,9 +37,15 @@ test('ventas manda los campos ampliados a inventory.escribir', () => {
         'costoAccesoriosBs:',
         'costoTotalBs:',
         'gananciaRegistrada:',
+        // La foto viaja al Apps Script en base64 y ella la guarda en Drive.
+        // Si este campo falta, la columna Foto queda siempre vacia y la
+        // evidencia que el jefe tiene que verificar nunca existe.
+        'fotoBase64:',
     ]) {
         assert.match(handler, new RegExp(`inventory\\.escribir\\([\\s\\S]*${campo}`));
     }
+    // La URL la resuelve el Apps Script guardando el archivo: mandarla desde
+    // Node escribiria la columna vacia.
     assert.doesNotMatch(handler, /inventory\.escribir\([\s\S]*fotoUrl:/);
 });
 

@@ -231,7 +231,11 @@ function doGet(e) {
       return responderJSON({
         ok: true,
         hora: new Date().toISOString(),
-        version: 4
+        version: 4,
+        // Si el scope de Drive no esta autorizado, guardarFotoEnDrive falla
+        // en silencio y las ventas se registran sin foto. Esto lo hace
+        // visible sin tener que adivinarlo por la columna vacia.
+        drive: driveDisponible()
       });
     }
 
@@ -405,7 +409,13 @@ function doPost(e) {
       }
     }
 
-    return responderJSON({ status: "SUCCESS", message: "Procesado correctamente" });
+    return responderJSON({
+      status: "SUCCESS",
+      message: "Procesado correctamente",
+      // La URL de la foto se resuelve acá adentro. El servidor la necesita
+      // para devolverla en la respuesta de la venta.
+      fotoUrl: (typeof data !== "undefined" && data.fotoUrl) ? data.fotoUrl : ""
+    });
 
   } catch (error) {
     return responderJSON({ status: "ERROR", message: error.toString() });
@@ -854,6 +864,21 @@ function sanitizarTexto(valor) {
     return "'" + texto;
   }
   return texto;
+}
+
+// Dice si el script puede usar Drive. Si el scope no esta en oauthScopes,
+// DriveApp.createFile revienta y toda foto se pierde en silencio: la venta se
+// guarda, pero el jefe nunca ve la evidencia.
+function driveDisponible() {
+  try {
+    DriveApp.getFoldersByName("Fotos de ventas").hasNext();
+    return { ok: true, detalle: "con acceso a Drive" };
+  } catch (error) {
+    return {
+      ok: false,
+      detalle: "sin acceso a Drive: agrega el scope https://www.googleapis.com/auth/drive al manifiesto appsscript.json y reautoriza. Las ventas se guardan, pero SIN foto."
+    };
+  }
 }
 
 function textoCelda(valor) {
