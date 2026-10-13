@@ -231,7 +231,7 @@ function doGet(e) {
       return responderJSON({
         ok: true,
         hora: new Date().toISOString(),
-        version: 4,
+        version: 5,
         // Si el scope de Drive no esta autorizado, guardarFotoEnDrive falla
         // en silencio y las ventas se registran sin foto. Esto lo hace
         // visible sin tener que adivinarlo por la columna vacia.
@@ -866,17 +866,27 @@ function sanitizarTexto(valor) {
   return texto;
 }
 
-// Dice si el script puede usar Drive. Si el scope no esta en oauthScopes,
-// DriveApp.createFile revienta y toda foto se pierde en silencio: la venta se
-// guarda, pero el jefe nunca ve la evidencia.
+// Dice si el script puede usar Drive. Si no puede, guardarFotoEnDrive falla en
+// silencio: la venta se guarda, pero el jefe nunca ve la foto de la nota.
+//
+// Hace la MISMA llamada que carpetaFotos para poder guardar la foto. Antes
+// usaba getFoldersByName, que recorre el Drive entero y no prueba nada de lo
+// que la foto necesita. Y cuando falla devuelve el mensaje REAL de Google en
+// vez de un texto que supone la causa: un catch que se come el error hace que
+// uno persiga permisos que ya estan bien.
 function driveDisponible() {
   try {
-    DriveApp.getFoldersByName("Fotos de ventas").hasNext();
+    var hoja = SpreadsheetApp.getActiveSpreadsheet();
+    DriveApp.getFileById(hoja.getId()).getParentFolder();
     return { ok: true, detalle: "con acceso a Drive" };
   } catch (error) {
+    var mensaje = (error && error.message) ? String(error.message) : String(error);
+    if (!mensaje || mensaje === "undefined" || mensaje === "[object Object]") {
+      mensaje = "Google no devolvio un mensaje de error.";
+    }
     return {
       ok: false,
-      detalle: "sin acceso a Drive: agrega el scope https://www.googleapis.com/auth/drive al manifiesto appsscript.json y reautoriza. Las ventas se guardan, pero SIN foto."
+      detalle: "sin acceso a Drive. Lo que respondio Google: " + mensaje.slice(0, 300)
     };
   }
 }

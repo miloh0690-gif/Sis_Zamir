@@ -197,3 +197,77 @@ test('una venta duplicada no sube una segunda foto a Drive', () => {
   assert.equal(crearArchivos, 0);
   assert.equal(archivos.length, 0);
 });
+
+test('driveDisponible dice que SI hay acceso a Drive cuando la carpeta de la hoja responde', () => {
+  const { ctx } = crearContexto();
+  // deepEqual no sirve: el objeto sale del sandbox de vm, con otro prototipo.
+  const resultado = ctx.driveDisponible();
+  assert.equal(resultado.ok, true);
+  assert.equal(resultado.detalle, 'con acceso a Drive');
+});
+
+test('driveDisponible usa la MISMA llamada que necesita la foto, no getFoldersByName', () => {
+  const { ctx } = crearContexto();
+  let getFoldersByName = 0;
+  const getFileByIdReal = ctx.DriveApp.getFileById;
+  let idPedido = null;
+  ctx.DriveApp.getFoldersByName = () => {
+    getFoldersByName += 1;
+    throw new Error('no debe llamarse: recorre el Drive entero');
+  };
+  ctx.DriveApp.getFileById = (id) => {
+    idPedido = id;
+    return getFileByIdReal(id);
+  };
+
+  const resultado = ctx.driveDisponible();
+
+  assert.equal(getFoldersByName, 0, 'getFoldersByName no debe usarse para diagnosticar');
+  assert.equal(idPedido, 'hoja-1', 'debe pedir la carpeta de la hoja, como hace carpetaFotos');
+  assert.equal(resultado.ok, true);
+});
+
+test('driveDisponible devuelve el ERROR REAL de Google, no un texto que supone la causa', () => {
+  const { ctx } = crearContexto();
+  ctx.DriveApp.getFileById = () => {
+    throw new Error(
+      'Exception: Access denied: DriveApp.getFileById(). The caller does not have permission.'
+    );
+  };
+
+  const resultado = ctx.driveDisponible();
+
+  assert.equal(resultado.ok, false);
+  assert.match(
+    resultado.detalle,
+    /Access denied/,
+    'el detalle debe traer el mensaje real de Google, no un texto que adivine la causa'
+  );
+  assert.doesNotMatch(
+    resultado.detalle,
+    /agrega el scope/,
+    'no debe afirmar una causa que el script no conoce'
+  );
+});
+
+test('driveDisponible no revienta aunque el error venga vacío', () => {
+  const { ctx } = crearContexto();
+  ctx.DriveApp.getFileById = () => {
+    throw {};
+  };
+
+  const resultado = ctx.driveDisponible();
+
+  assert.equal(resultado.ok, false);
+  assert.ok(resultado.detalle.length > 0, 'siempre tiene que devolver algo legible');
+});
+
+test('el SALUD declara la version 5, para saber si este codigo ya esta desplegado', () => {
+  const { ctx } = crearContexto();
+  const respuesta = ctx.doGet({ parameter: { action: 'SALUD' } });
+  const cuerpo = JSON.parse(respuesta.getContent());
+
+  assert.equal(cuerpo.version, 5);
+  assert.equal(cuerpo.drive.ok, true);
+  assert.equal(cuerpo.drive.detalle, 'con acceso a Drive');
+});

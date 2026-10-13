@@ -354,12 +354,13 @@ async function diagnostico() {
   let accion = null;
   if (!okTodo && pasoDrive && !pasoDrive.ok) {
     accion =
-      'Al script le falta el permiso de Drive. En Apps Script: Configuracion del ' +
-      'proyecto > Mostrar el manifiesto appsscript.json > oauthScopes, agrega ' +
-      '"https://www.googleapis.com/auth/drive" (Drive completo, NO drive.file), ' +
-      'guarda, y despues Implementar > Nueva version para que el permiso tome ' +
-      'efecto. Las ventas SI se estan guardando; lo que se pierde es la foto de ' +
-      'la nota.';
+      'El script no puede usar Drive, asi que las ventas se estan guardando SIN ' +
+      'la foto de la nota. Lo que respondio Google esta en el paso 5 de arriba: ' +
+      String(pasoDrive.detalle || '') +
+      ' Si el paso 5 dice que no encuentra el archivo de la hoja, el script ' +
+      'perdio el acceso a Drive: revisa que oauthScopes tenga ' +
+      '"https://www.googleapis.com/auth/drive" en el manifiesto appsscript.json ' +
+      'y despues Implementar > Nueva version.';
   } else if (!okTodo && pasoClave && !pasoClave.ok && pasos[1].ok && pasos[2].ok) {
     accion =
       'La propiedad SHEETS_API_KEY del script NO coincide con la de Render. ' +

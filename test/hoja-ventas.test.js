@@ -15,8 +15,8 @@ test('las 6 columnas nuevas estan en ENCABEZADO_VENTAS', () => {
         .forEach((nombre) => assert.ok(ctx.ENCABEZADO_VENTAS.includes(nombre), nombre));
 });
 
-test('el version declarado es 4', () => {
-    assert.match(code, /version:\s*4/);
+test('el version declarado es 5', () => {
+  assert.match(code, /version:\s*5/);
 });
 
 test('textoCelda sanea una formula de Sheets', () => {

@@ -39,7 +39,7 @@ test('diagnostico: si el scope de Drive falta, la accion lo dice y NO culpa a la
         cuerpo: {
           ok: true,
           version: 4,
-          drive: { ok: false, detalle: 'sin acceso a Drive: agrega el scope https://www.googleapis.com/auth/drive' },
+          drive: { ok: false, detalle: 'sin acceso a Drive. Lo que respondio Google: Access denied: DriveApp.getFileById(). The caller does not have permission.' },
         },
       };
     }
@@ -63,6 +63,11 @@ test('diagnostico: si el scope de Drive falta, la accion lo dice y NO culpa a la
       d.accion,
       /SHEETS_API_KEY/,
       'la accion NO puede culpar a la llave: la llave si coincide'
+    );
+    assert.match(
+      d.accion,
+      /Access denied/,
+      'la accion tiene que traer el error REAL de Google que ya esta en el paso 5'
     );
   } finally {
     t.restaurar();
