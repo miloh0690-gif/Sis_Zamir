@@ -144,6 +144,37 @@
 
                 <p id="detallePrecio" class="text-[11px] font-data text-[#5B6472] text-center">Selecciona un modelo del inventario.</p>
 
+                <div>
+                    <label for="clienteVenta" class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Cliente (opcional)</label>
+                    <input type="text" id="clienteVenta" placeholder="Ej: Doña María" maxlength="500" autocomplete="off"
+                        class="w-full h-12 px-4 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF] placeholder:text-[#5B6472]">
+                </div>
+
+                <div>
+                    <label for="notaVenta" class="block text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide mb-1.5">Nota (opcional)</label>
+                    <textarea id="notaVenta" rows="1" placeholder="Ej: se le regaló un vidrio" maxlength="500"
+                        class="w-full min-h-12 px-4 py-3 rounded-xl bg-[#1B2029] border border-[#2A2F3A] text-[15px] resize-none focus:outline-none focus:ring-2 focus:ring-[#4C8DFF] placeholder:text-[#5B6472]"></textarea>
+                </div>
+
+                <div class="rounded-2xl bg-[#1B2029] border border-[#2A2F3A] p-4 space-y-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <span class="text-[11px] font-bold text-[#8B95A7] uppercase tracking-wide">Accesorios (opcional)</span>
+                        <button type="button" id="btnAgregarAccesorio" class="tap h-9 px-3 rounded-xl bg-[#182236] text-[#4C8DFF] border border-[#4C8DFF]/40 text-xs font-bold">+ Agregar</button>
+                    </div>
+                    <div id="listaAccesorios" class="space-y-2"></div>
+                    <div class="flex justify-between text-xs font-data text-[#8B95A7]">
+                        <span>Total accesorios</span>
+                        <span><span id="txtAccesoriosTotal">0.00</span> Bs</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <input type="file" id="inputFoto" accept="image/*" class="hidden">
+                    <button type="button" id="btnTomarFoto" class="tap flex-1 h-10 rounded-xl bg-[#1B2029] text-[#34D399] border border-[#2A2F3A] text-xs font-bold">Tomar foto</button>
+                    <img id="miniaturaFoto" class="hidden h-10 w-10 rounded-lg object-cover border border-[#2A2F3A]" alt="Miniatura de la foto">
+                    <button type="button" id="btnQuitarFoto" class="tap hidden h-10 px-3 rounded-xl bg-[#1B2029] text-[#FBBF24] border border-[#2A2F3A] text-xs font-bold">Quitar foto</button>
+                </div>
+
                 <button type="submit" id="btnRegistrarVenta" class="tap w-full bg-[#4C8DFF] text-white py-3.5 rounded-2xl font-bold text-[15px] shadow-lg shadow-[#4C8DFF]/20">
                     Registrar venta
                 </button>
@@ -297,6 +328,7 @@
             reporteActual: null,
             claveVenta: null,
             claveConsignacion: null,
+            fotoBase64: null,
         };
 
         const PESTANAS = ['vendedor', 'consignacion', 'dueno', 'reportes'];
@@ -509,6 +541,83 @@
             ESTADO.temporizador = setTimeout(pedirPreview, 250);
         }
 
+        function leerAccesorios() {
+            return Array.from($('listaAccesorios').querySelectorAll('[data-accesorio]'))
+                .map((fila) => ({
+                    nombre: fila.querySelector('.accesorio-nombre').value.trim(),
+                    precioBs: Number(fila.querySelector('.accesorio-precio').value) || 0,
+                    costoBs: Number(fila.querySelector('.accesorio-costo').value) || 0,
+                }))
+                .filter((accesorio) => accesorio.nombre);
+        }
+
+        function actualizarTotalAccesorios() {
+            const total = leerAccesorios().reduce((suma, accesorio) => suma + accesorio.precioBs, 0);
+            $('txtAccesoriosTotal').textContent = fmt(total);
+        }
+
+        function agregarAccesorio() {
+            const id = String(Date.now()) + Math.random().toString(16).slice(2);
+            const fila = document.createElement('div');
+            fila.setAttribute('data-accesorio', id);
+            fila.className = 'grid grid-cols-[1.4fr_0.8fr_0.8fr_auto] gap-1.5 items-center';
+            fila.innerHTML =
+                '<input type="text" value="' + escapeHtml('') + '" placeholder="Nombre" class="accesorio-nombre w-full h-10 px-2 rounded-lg bg-[#1B2029] border border-[#2A2F3A] text-xs focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">' +
+                '<input type="number" min="0" step="0.01" placeholder="Precio Bs" class="accesorio-precio w-full h-10 px-2 rounded-lg bg-[#1B2029] border border-[#2A2F3A] text-xs font-data focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">' +
+                '<input type="number" min="0" step="0.01" placeholder="Costo Bs" class="accesorio-costo w-full h-10 px-2 rounded-lg bg-[#1B2029] border border-[#2A2F3A] text-xs font-data focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">' +
+                '<button type="button" class="btnQuitarAccesorio tap h-10 px-2 rounded-lg text-[#FBBF24] border border-[#2A2F3A] text-xs font-bold">Quitar</button>';
+            $('listaAccesorios').appendChild(fila);
+            actualizarTotalAccesorios();
+            programarPreview();
+        }
+
+        function mostrarFotoProcesada(dataUrl) {
+            ESTADO.fotoBase64 = dataUrl;
+            $('miniaturaFoto').src = dataUrl;
+            $('miniaturaFoto').classList.remove('hidden');
+            $('btnQuitarFoto').classList.remove('hidden');
+        }
+
+        function procesarFoto(archivo) {
+            if (!archivo) return;
+            const lector = new FileReader();
+            lector.onerror = () => {
+                ESTADO.fotoBase64 = null;
+                alert('No se pudo leer la foto. La venta se guardará sin foto.');
+            };
+            lector.onload = () => {
+                const imagen = new Image();
+                imagen.onerror = () => {
+                    ESTADO.fotoBase64 = null;
+                    alert('No se pudo procesar la foto. La venta se guardará sin foto.');
+                };
+                imagen.onload = () => {
+                    try {
+                        const ladoMayor = Math.max(imagen.width, imagen.height);
+                        const escala = Math.min(1, 1200 / ladoMayor);
+                        const canvas = document.createElement('canvas');
+                        canvas.width = Math.max(1, Math.round(imagen.width * escala));
+                        canvas.height = Math.max(1, Math.round(imagen.height * escala));
+                        canvas.getContext('2d').drawImage(imagen, 0, 0, canvas.width, canvas.height);
+                        mostrarFotoProcesada(canvas.toDataURL('image/jpeg', 0.7));
+                    } catch (e) {
+                        ESTADO.fotoBase64 = null;
+                        alert('No se pudo procesar la foto. La venta se guardará sin foto.');
+                    }
+                };
+                imagen.src = lector.result;
+            };
+            lector.readAsDataURL(archivo);
+        }
+
+        function quitarFoto() {
+            ESTADO.fotoBase64 = null;
+            $('inputFoto').value = '';
+            $('miniaturaFoto').src = '';
+            $('miniaturaFoto').classList.add('hidden');
+            $('btnQuitarFoto').classList.add('hidden');
+        }
+
         function cuerpoVenta() {
             return {
                 modelo: $('ventaModelo').value.trim(),
@@ -517,6 +626,10 @@
                 tipoCambio: $('ventaTipoCambio').value,
                 costoUsd: $('ventaCostoUsd').value,
                 precioManualBs: ESTADO.precioManual ? $('ventaPrecioCobrado').value : null,
+                cliente: $('clienteVenta').value.trim(),
+                nota: $('notaVenta').value.trim(),
+                accesorios: leerAccesorios(),
+                fotoBase64: ESTADO.fotoBase64 || null,
             };
         }
 
@@ -617,6 +730,11 @@
                 $('ventaPrecioCobrado').classList.add('campo-calculado');
                 $('ventaPrecioCobrado').classList.remove('campo-manual');
                 $('fichaPanel').classList.add('hidden');
+                $('clienteVenta').value = '';
+                $('notaVenta').value = '';
+                $('listaAccesorios').innerHTML = '';
+                $('txtAccesoriosTotal').textContent = '0.00';
+                quitarFoto();
                 limpiarPanelPrecio();
                 cerrarSugerencias();
                 renderizarInventarioDueno();
@@ -1156,6 +1274,26 @@
             $('ventaTipo').addEventListener('change', programarPreview);
             $('ventaCantidad').addEventListener('input', programarPreview);
             $('ventaTipoCambio').addEventListener('input', programarPreview);
+
+            $('clienteVenta').addEventListener('input', programarPreview);
+            $('notaVenta').addEventListener('input', programarPreview);
+            $('btnAgregarAccesorio').addEventListener('click', agregarAccesorio);
+            $('listaAccesorios').addEventListener('input', (evento) => {
+                if (evento.target.closest('[data-accesorio]')) {
+                    actualizarTotalAccesorios();
+                    programarPreview();
+                }
+            });
+            $('listaAccesorios').addEventListener('click', (evento) => {
+                if (!evento.target.classList.contains('btnQuitarAccesorio')) return;
+                evento.target.closest('[data-accesorio]').remove();
+                actualizarTotalAccesorios();
+                programarPreview();
+            });
+
+            $('btnTomarFoto').addEventListener('click', () => $('inputFoto').click());
+            $('inputFoto').addEventListener('change', (evento) => procesarFoto(evento.target.files[0]));
+            $('btnQuitarFoto').addEventListener('click', quitarFoto);
 
             $('ventaCostoUsd').addEventListener('input', () => {
                 ESTADO.costoManual = $('ventaCostoUsd').value !== '';
