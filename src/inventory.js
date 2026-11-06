@@ -2,7 +2,7 @@
 
 const URL_BASE = (process.env.SHEETS_WEBAPP_URL || '').trim();
 const API_KEY = (process.env.SHEETS_API_KEY || '').trim();
-const TTL_MS = Math.max(5, Number(process.env.STOCK_CACHE_SEG) || 60) * 1000;
+const TTL_MS = Math.max(5, Number(process.env.STOCK_CACHE_SEG) || 30) * 1000;
 const TIMEOUT_MS = 20000;
 
 let cache = { datos: null, expira: 0 };
@@ -213,16 +213,17 @@ async function listar(opciones) {
   if (!opciones || !opciones.forzar) {
     if (cache.datos && Date.now() < cache.expira) return cache.datos;
   }
-  if (enCurso) return enCurso;
 
-  enCurso = leerRemoto()
-    .then((datos) => {
-      cache = { datos: datos, expira: Date.now() + TTL_MS };
-      return datos;
-    })
-    .finally(() => {
-      enCurso = null;
-    });
+  if (!enCurso) {
+    enCurso = leerRemoto()
+      .then((datos) => {
+        cache = { datos: datos, expira: Date.now() + TTL_MS };
+        return datos;
+      })
+      .finally(() => {
+        enCurso = null;
+      });
+  }
 
   return enCurso;
 }
