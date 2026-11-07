@@ -2,6 +2,13 @@
 
 // Orquesta la ficha tecnica. Fuentes, en orden de preferencia:
 //
+//   0. src/tienda.js  -> src/fichas-tienda.json: tabla curada a mano contra
+//                        GSMArena para los SKUs que ninguna base resuelve
+//                        (167 SKUs, medido el 2026-11-06). La clave de la
+//                        tabla es el SKU normalizado, asi que la busqueda es
+//                        exacta: no hay "se parece" y NO pasa por el gate de
+//                        src/modelo.js (romperia en tablets, ZFold/ZFlip y
+//                        sufijos de caja). Ver el comentario de src/tienda.js.
 //   1. src/indice.js  -> src/fichas.json: indice horneado y verificado.
 //                        Sin GITHUB_TOKEN y sin rate limit. Cubre 89 de
 //                        los 225 SKUs reales de la tienda.
@@ -33,6 +40,7 @@
 // y con argumentosError explicando por que.
 
 const indice = require('./indice');
+const tienda = require('./tienda');
 const gsm = require('./gsm');
 const dataset = require('./dataset');
 const specs = require('./specs');
@@ -77,14 +85,34 @@ function verificar(ficha, pedido) {
  * almacenamiento y 4 de RAM, no al reves.
  */
 function memoriaDelSku(texto) {
-  const m = String(texto === undefined || texto === null ? '' : texto).match(
-    /(\d+)\s*\/\s*(\d+)\b/
-  );
-  if (!m) return null;
-  const almacenamiento = Number(m[1]);
-  const ram = Number(m[2]);
-  if (!almacenamiento || !ram) return null;
-  return { ram: ram, almacenamiento: almacenamiento };
+  const crudo = String(texto === undefined || texto === null ? '' : texto);
+  const m = crudo.match(/(\d+)\s*\/\s*(\d+)\b/);
+  if (m) {
+    const almacenamiento = Number(m[1]);
+    const ram = Number(m[2]);
+    if (!almacenamiento || !ram) return null;
+    return { ram: ram, almacenamiento: almacenamiento };
+  }
+  // Hay SKUs que solo dicen el almacenamiento: "IPHONE 15 PRO MAX 256 CHIP
+  // caja blanca", "OB 14 NORMAL 128GB". Antes se ignoraban y la ficha
+  // mostraba la variante que tuviera la base (128 GB para un telefono de
+  // 256). El almacenamiento de la etiqueta es el que se vende.
+  const solo = crudo.match(/\b(\d{2,4})\s*GB\b/i) || crudo.match(/\b(1)\s*TB\b/i);
+  if (solo) {
+    const gb = Number(solo[1]) * (/\bTB\b/i.test(solo[0]) ? 1024 : 1);
+    if (!gb) return null;
+    return { ram: 0, almacenamiento: gb };
+  }
+  // Los iPhone de la hoja dicen el almacenamiento pelado y despues el estado
+  // de la caja: "IPHONE 14 PRO MAX 256 CHIP caja blanca". Solo se busca en
+  // SKUs de Apple para no confundir un numero de modelo con una capacidad.
+  if (/^\s*(iphone|ob)\b/i.test(crudo)) {
+    const cifra = crudo.match(/\b(\d{3,4})\b/);
+    if (cifra && /^(64|128|256|512|1024)$/.test(cifra[1])) {
+      return { ram: 0, almacenamiento: Number(cifra[1]) };
+    }
+  }
+  return null;
 }
 
 /**
@@ -109,17 +137,29 @@ function aplicarMemoriaDelSku(ficha, texto) {
   const mem = memoriaDelSku(texto);
   if (!mem) return;
 
-  const textoMemoria = mem.ram + ' GB RAM \u00b7 ' + mem.almacenamiento + ' GB almacenamiento';
+  // Cuando el SKU solo dice el almacenamiento, la RAM se queda con la que
+  // traia la base (o con la del propio SKU si coinciden).
+  let ram = mem.ram;
+  if (!ram) {
+    const mRam = String(ficha.ramAlmacenamiento || '').match(/(\d+)\s*GB\s*RAM/i);
+    if (mRam) ram = Number(mRam[1]);
+  }
 
-  ficha.ramAlmacenamiento = textoMemoria;
+  ficha.ramAlmacenamiento = [
+    ram ? ram + ' GB RAM' : '',
+    mem.almacenamiento + ' GB almacenamiento',
+  ].filter(Boolean).join(' \u00b7 ');
+
   // El resumen arrastra la memoria de la base y el panel lo muestra, asi
   // que hay que corregirlo tambien. Ojo: en el resumen el almacenamiento
   // NO dice "almacenamiento", dice "256 / 512 GB" a secas, y va al final.
   if (ficha.resumen) {
-    ficha.resumen = ficha.resumen.replace(
-      /\d+\s*GB\s*RAM/gi,
-      mem.ram + ' GB RAM'
-    );
+    if (mem.ram) {
+      ficha.resumen = ficha.resumen.replace(
+        /\d+\s*GB\s*RAM/gi,
+        mem.ram + ' GB RAM'
+      );
+    }
     // Forma con la palabra: "64 GB almacenamiento".
     ficha.resumen = ficha.resumen.replace(
       /[\d\s/]*\d+\s*GB\s*almacenamiento/gi,
@@ -173,6 +213,14 @@ async function fichaTecnica(modelo, ip) {
   }
 
   const razones = [];
+
+  // 0) tabla curada de la tienda. La clave exacta ES la verificacion: si el
+  //    SKU no normaliza a una entrada, no hay ficha. No se aplica el gate.
+  const rT = tienda.buscar(texto);
+  if (rT) {
+    aplicarMemoriaDelSku(rT.ficha, texto);
+    return finalizar(rT.ficha, rT.cache, ip);
+  }
 
   // 1) indice horneado: la via que no depende de ninguna llave
   if (indice.tiene(texto)) {
@@ -300,4 +348,6 @@ module.exports = {
   aplicarMemoriaDelSku: aplicarMemoriaDelSku,
   enIndice: indice.tiene,
   indiceCuantos: indice.cuantos,
+  enTienda: tienda.tiene,
+  tiendaCuantos: tienda.cuantos,
 };

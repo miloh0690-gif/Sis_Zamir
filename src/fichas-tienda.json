@@ -1,0 +1,2482 @@
+{
+ "a07": {
+  "nombre": "Samsung Galaxy A07",
+  "marca": "Samsung",
+  "procesador": "Mediatek Dimensity 6300 (6 nm)",
+  "pantalla": "PLS LCD, 120Hz, 650 nits (typ), 800 nits (HBM) · 6.7\" · 720 x 1600 px",
+  "camaras": "50 MP, f/1.8, (wide), PDAF | Camara 2: Auxiliary lens | Frontal: 8 MP, f/2.0, 26mm (wide), 1/4.0\", 1.12µm",
+  "bateria": "6000 mAh",
+  "carga": "25 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 64 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.3 · USB: 2.0",
+  "sistema": "Android 16, One UI 8",
+  "resumen": "Mediatek Dimensity 6300, pantalla 6.7\", 6000 mAh, camara 50 MP, 4 GB RAM, 64 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-a07-5g-1.jpg",
+  "releaseDate": "Released 2026, January 13",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_a07_5g-14409.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "a15": {
+  "nombre": "Samsung Galaxy A15",
+  "marca": "Samsung",
+  "procesador": "Mediatek Helio G99 (6 nm)",
+  "pantalla": "Super AMOLED, 90Hz, 800 nits (HBM) · 6.5\" · 1080 x 2340 px",
+  "camaras": "50 MP, f/1.8, 26mm (wide), 1/2.8\", 0.64µm, PDAF | Ultra gran angular: 5 MP, f/2.2, 17mm (ultrawide), 1/5.0\", 1.12µm | Macro: 2 MP (macro) | Frontal: 13 MP, f/2.0, 26mm (wide), 1/3.06\", 1.12µm",
+  "bateria": "5000 mAh",
+  "carga": "25 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.3 · NFC · USB: 2.0",
+  "sistema": "Android 14, One UI 7",
+  "resumen": "Mediatek Helio G99, pantalla 6.5\", 5000 mAh, camara 50 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-a15-lte-1.jpg",
+  "releaseDate": "Released 2023, December 16",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_a15-12637.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "a16": {
+  "nombre": "Samsung Galaxy A16",
+  "marca": "Samsung",
+  "procesador": "Mediatek Helio G99 (6 nm)",
+  "pantalla": "Super AMOLED, 90Hz · 6.7\" · 1080 x 2340 px",
+  "camaras": "50 MP, f/1.8, (wide), 1/2.76\", 0.64µm, AF | Ultra gran angular: 5 MP, f/2.2, (ultrawide), 1/5.0\", 1.12µm | Macro: 2 MP (macro) | Frontal: 13 MP, f/2.0, (wide), 1/3.1\", 1.12µm",
+  "bateria": "5000 mAh",
+  "carga": "25 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.3 · NFC · USB: 2.0",
+  "sistema": "Android 14, One UI 8",
+  "resumen": "Mediatek Helio G99, pantalla 6.7\", 5000 mAh, camara 50 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-a16-lte-1.jpg",
+  "releaseDate": "Released 2024, November 20",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_a16-13383.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "a25": {
+  "nombre": "Samsung Galaxy A25",
+  "marca": "Samsung",
+  "procesador": "Exynos 1280 (5 nm)",
+  "pantalla": "Super AMOLED, 120Hz, 1000 nits (HBM) · 6.5\" · 1080 x 2340 px",
+  "camaras": "50 MP, f/1.8, 27mm (wide), 1/2.76\", 0.64µm, PDAF, OIS | Ultra gran angular: 8 MP, f/2.2, 120˚ (ultrawide), 1/4\", 1.12µm | Macro: 2 MP (macro) | Frontal: 13 MP, f/2.2, (wide), 1/3.06\", 1.12µm",
+  "bateria": "5000 mAh",
+  "carga": "25 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.3 · NFC · USB: 2.0",
+  "sistema": "Android 14, One UI 7",
+  "resumen": "Exynos 1280, pantalla 6.5\", 5000 mAh, camara 50 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-a25-1.jpg",
+  "releaseDate": "Released 2023, December 16",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_a25-12555.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "a54": {
+  "nombre": "Samsung Galaxy A54",
+  "marca": "Samsung",
+  "procesador": "Exynos 1380 (5 nm)",
+  "pantalla": "Super AMOLED, 120Hz, HDR10+, 1000 nits (HBM) · 6.4\" · 1080 x 2340 px",
+  "camaras": "50 MP, f/1.8, 23mm (wide), 1/1.56\", 1.0µm, PDAF, OIS | Ultra gran angular: 12 MP, f/2.2, 13mm, 123˚ (ultrawide), 1/3.X\", 1.12µm | Macro: 5 MP (macro) | Frontal: 32 MP, f/2.2, 26mm (wide), 1/2.8\", 0.8µm",
+  "bateria": "5000 mAh",
+  "carga": "25 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band, Wi-Fi Direct · Bluetooth: 5.3 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 13, One UI 7",
+  "resumen": "Exynos 1380, pantalla 6.4\", 5000 mAh, camara 50 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-a54-5.jpg",
+  "releaseDate": "Released 2023, March 24",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_a54-12070.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "camon 30 pro": {
+  "nombre": "Tecno Camon 30 Pro",
+  "marca": "Tecno",
+  "procesador": "Mediatek Dimensity 8200 Ultimate (4 nm)",
+  "pantalla": "AMOLED, 144Hz · 6.78\" · 1080 x 2436 px",
+  "camaras": "50 MP, f/1.9, 23mm (wide), 1/1.56\", 1.0µm, PDAF, OIS | Ultra gran angular: 50 MP, f/2.2, 14mm, 114˚ (ultrawide), 1/2.76\", 0.64µm, PDAF | Camara 3: Auxiliary lens | Frontal: 50 MP, f/2.5, 24mm (wide), 1/2.8\", 0.64µm, PDAF",
+  "bateria": "5000 mAh",
+  "carga": "70 W con cable",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.3 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 14, HIOS 14",
+  "resumen": "Mediatek Dimensity 8200 Ultimate, pantalla 6.78\", 5000 mAh, camara 50 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/tecno/tecno-camon-30-pro-1.jpg",
+  "releaseDate": "Released 2024, April 02",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/tecno_camon_30_pro-12846.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "cubot kingkong 11": {
+  "nombre": "Cubot KingKong 11",
+  "marca": "Cubot",
+  "procesador": "Mediatek Dimensity 7025 (6 nm)",
+  "pantalla": "IPS LCD, 120Hz · 6.72\" · 1080 x 2400 px",
+  "camaras": "108 MP, (wide), PDAF | Ultra gran angular: 8 MP, (ultrawide), AF | Frontal: 32 MP",
+  "bateria": "10200 mAh",
+  "carga": "33 W con cable",
+  "ramAlmacenamiento": "16 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.1 · NFC · USB: , OTG",
+  "sistema": "Android 15",
+  "resumen": "Mediatek Dimensity 7025, pantalla 6.72\", 10200 mAh, camara 108 MP, 16 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/cubot/cubot-kingkong-11-1.jpg",
+  "releaseDate": "Released 2025, August",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/cubot_kingkong_11_5g-14063.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "cubot kingkong es 5": {
+  "nombre": "Cubot KingKong ES5",
+  "marca": "Cubot",
+  "procesador": "Unisoc T620 (12 nm)",
+  "pantalla": "IPS LCD, 120Hz · 6.88\" · 720 x 1640 px",
+  "camaras": "64 MP, (wide), PDAF | Macro: 2 MP (macro) | Camara 3: Auxiliary lens | Frontal: 16 MP",
+  "bateria": "7000 mAh",
+  "carga": "",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.2 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16",
+  "resumen": "Unisoc T620, pantalla 6.88\", 7000 mAh, camara 64 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/cubot/cubot-kk-es5-1.jpg",
+  "releaseDate": "Released 2026, June",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/cubot_kingkong_es5-14732.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "cubot kingkong es pro": {
+  "nombre": "Cubot KingKong ES Pro",
+  "marca": "Cubot",
+  "procesador": "Unisoc Tiger T616 (12 nm)",
+  "pantalla": "IPS LCD, 90Hz · 6.56\" · 720 x 1612 px",
+  "camaras": "64 MP, (wide), PDAF | Macro: 2 MP (macro) | Frontal: 16 MP",
+  "bateria": "5100 mAh",
+  "carga": "10 W con cable",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.2 · USB: ",
+  "sistema": "Android 16",
+  "resumen": "Unisoc Tiger T616, pantalla 6.56\", 5100 mAh, camara 64 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/cubot/cubot-kingkong-es-pro-1.jpg",
+  "releaseDate": "Released 2026, July",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/cubot_kingkong_es_pro-14855.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "cubot mini 4": {
+  "nombre": "Cubot KingKong Mini 4",
+  "marca": "Cubot",
+  "procesador": "Unisoc Tiger T616 (12 nm)",
+  "pantalla": "IPS LCD, 90Hz · 4.7\" · 720 x 1600 px",
+  "camaras": "48 MP, (wide), AF | Frontal: 16 MP",
+  "bateria": "4700 mAh",
+  "carga": "10 W con cable",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.0 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 15",
+  "resumen": "Unisoc Tiger T616, pantalla 4.7\", 4700 mAh, camara 48 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/cubot/cubot-kingkong-mini-4-1.jpg",
+  "releaseDate": "Released 2025, August",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/cubot_kingkong_mini_4-14099.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "cubot note 60": {
+  "nombre": "Cubot Note 60",
+  "marca": "Cubot",
+  "procesador": "Unisoc T615 (12 nm)",
+  "pantalla": "IPS LCD, 120Hz · 7.2\" · 720 x 1560 px",
+  "camaras": "48 MP (wide), PDAF | Ultra gran angular: 5 MP (ultrawide) | Macro: 2 MP (macro) | Frontal: 16 MP",
+  "bateria": "7000 mAh",
+  "carga": "",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.0 · NFC · USB: , OTG",
+  "sistema": "Android 15",
+  "resumen": "Unisoc T615, pantalla 7.2\", 7000 mAh, camara 48 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/cubot/cubot-note60-1.jpg",
+  "releaseDate": "Released 2025, November",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/cubot_note_60-14287.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "cubot p90": {
+  "nombre": "Cubot P90",
+  "marca": "Cubot",
+  "procesador": "Mediatek Helio G100 (6 nm)",
+  "pantalla": "IPS LCD, 120Hz · 6.88\" · 720 x 1640 px",
+  "camaras": "64 MP, (wide), PDAF | Ultra gran angular: 5 MP, (ultrawide) | Frontal: 16 MP",
+  "bateria": "5100 mAh",
+  "carga": "18 W con cable",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac · Bluetooth: 5.2 · NFC · USB: , OTG",
+  "sistema": "Android 15",
+  "resumen": "Mediatek Helio G100, pantalla 6.88\", 5100 mAh, camara 64 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/cubot/cubot-p90-1.jpg",
+  "releaseDate": "Released 2025, June",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/cubot_p90-13962.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "cubot tab kingkong": {
+  "nombre": "Cubot Tab KingKong",
+  "marca": "Cubot",
+  "procesador": "Mediatek MT8788 (12 nm)",
+  "pantalla": "IPS LCD · 10.1\" · 1200 x 1920 px",
+  "camaras": "16 MP, AF | Frontal: 8 MP",
+  "bateria": "10600 mAh",
+  "carga": "18 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 4.2 · USB: , OTG",
+  "sistema": "Android 13",
+  "resumen": "Mediatek MT8788, pantalla 10.1\", 10600 mAh, camara 16 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/cubot/cubot-tab-kingkong-1.jpg",
+  "releaseDate": "Released 2023, August 07",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/cubot_tab_kingkong-12434.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "cubot tab kingkong 2": {
+  "nombre": "Cubot Tab KingKong 2",
+  "marca": "Cubot",
+  "procesador": "Mediatek Helio G99 (6 nm)",
+  "pantalla": "IPS LCD · 10.95\" · 1200 x 1920 px",
+  "camaras": "64 MP, PDAF | Frontal: 32 MP",
+  "bateria": "20400 mAh",
+  "carga": "33 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.2 · USB: , OTG",
+  "sistema": "Android 14",
+  "resumen": "Mediatek Helio G99, pantalla 10.95\", 20400 mAh, camara 64 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/cubot/cubot-tab-kingkong2-1.jpg",
+  "releaseDate": "Released 2024, December 01",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/cubot_tab_kingkong_2-13561.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor 600": {
+  "nombre": "Honor 600",
+  "marca": "Honor",
+  "procesador": "Qualcomm SM7750-AB Snapdragon 7 Gen 4 (4 nm)",
+  "pantalla": "AMOLED, 1B colors, 120Hz, 3840Hz PWM, HDR Vivid, 8000 nits (peak) · 6.57\" · 1264 x 2728 px",
+  "camaras": "200 MP, f/1.9, 24mm (wide), 1/1.4\", 0.56µm, PDAF (9cm - ∞), OIS | Ultra gran angular: 12 MP, f/2.2, 16mm, 112˚ (ultrawide), PDAF | Frontal: 50 MP, f/2.0, 21mm (wide), 1/2.88\", 0.61µm",
+  "bateria": "7000 mAh",
+  "carga": "80 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6/7, dual-band or tri-band, Wi-Fi Direct · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, MagicOS 10",
+  "resumen": "Qualcomm SM7750-AB Snapdragon 7 Gen 4, pantalla 6.57\", 7000 mAh, camara 200 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-600-1.jpg",
+  "releaseDate": "Released 2026, May 18",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_600_5g-14605.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor 600 pro": {
+  "nombre": "Honor 600 Pro",
+  "marca": "Honor",
+  "procesador": "Qualcomm SM8750-AB Snapdragon 8 Elite (3 nm)",
+  "pantalla": "AMOLED, 1B colors, 120Hz, 3840Hz PWM, HDR Vivid, 8000 nits (peak) · 6.57\" · 1264 x 2728 px",
+  "camaras": "200 MP, f/1.9, 24mm (wide), 1/1.4\", 0.56µm, PDAF (9cm - ∞), OIS | Tele: 50 MP, f/2.8, 80mm (telephoto), PDAF, OIS, 3.5x optical zoom | Ultra gran angular: 12 MP, f/2.2, 16mm, 112˚ (ultrawide), PDAF | Frontal: 50 MP, f/2.0, 21mm (wide), 1/2.88\", 0.61µm",
+  "bateria": "7000 mAh",
+  "carga": "80 W con cable · 50 W inalambrico",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6/7, dual-band or tri-band, Wi-Fi Direct · Bluetooth: 6.0 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, MagicOS 10",
+  "resumen": "Qualcomm SM8750-AB Snapdragon 8 Elite, pantalla 6.57\", 7000 mAh, camara 200 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-600-pro-1.jpg",
+  "releaseDate": "Released 2026, April 29",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_600_pro_5g-14604.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor 600e": {
+  "nombre": "Honor 600e",
+  "marca": "Honor",
+  "procesador": "Mediatek Dimensity 7100 Elite (6 nm)",
+  "pantalla": "AMOLED, 1B colors, 120Hz, 3840Hz PWM, 800 nits (typ), 2000 nits (HBM), 6500 nits (peak) · 6.6\" · 1200 x 2600 px",
+  "camaras": "108 MP, f/1.8, (wide), 1/1.67\", PDAF | Ultra gran angular: 5 MP, f/2.2, (ultrawide) | Frontal: 16 MP, f/2.5, (wide)",
+  "bateria": "6520 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 512 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 6.0 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, MagicOS 10",
+  "resumen": "Mediatek Dimensity 7100 Elite, pantalla 6.6\", 6520 mAh, camara 108 MP, 8 GB RAM, 512 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-600-lite-1.jpg",
+  "releaseDate": "Released 2026, May",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_600e_5g-14688.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor magic 8 lite": {
+  "nombre": "Honor Magic8 Lite",
+  "marca": "Honor",
+  "procesador": "Qualcomm Snapdragon 6 Gen 4 (4 nm)",
+  "pantalla": "AMOLED, 1B colors, 120Hz, 3840Hz PWM, HDR, 800 nits (typ), 1800 nits (HBM), 6000 nits (peak) · 6.79\" · 1200 x 2640 px",
+  "camaras": "108 MP, f/1.8, 24mm (wide), PDAF, 1/1.67\", 1.0µm, OIS | Ultra gran angular: 5 MP, f/2.2, 17mm (ultrawide), 1/5.0\", 1.12µm | Frontal: 16 MP, f/2.5, 24mm (wide)",
+  "bateria": "7500 mAh",
+  "carga": "66 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band, Wi-Fi Direct · Bluetooth: 5.2 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 15, Magic OS 9",
+  "resumen": "Qualcomm Snapdragon 6 Gen 4, pantalla 6.79\", 7500 mAh, camara 108 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-x9d-5g-3.jpg",
+  "releaseDate": "Released 2025, December",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_magic8_lite_5g-14341.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor pad 10": {
+  "nombre": "Honor Pad 10",
+  "marca": "Honor",
+  "procesador": "Qualcomm SM7550-AB Snapdragon 7 Gen 3 (4 nm)",
+  "pantalla": "IPS LCD, 1B colors, 120Hz, HDR · 12.1\" · 1600 x 2560 px",
+  "camaras": "8 MP, f/2.0, (wide), AF | Frontal: 8 MP, f/2.2, (wide)",
+  "bateria": "10100 mAh",
+  "carga": "35 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band, Wi-Fi Direct · Bluetooth: 5.3 · USB: ",
+  "sistema": "Android 15, MagicOS 9",
+  "resumen": "Qualcomm SM7550-AB Snapdragon 7 Gen 3, pantalla 12.1\", 10100 mAh, camara 8 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-pad10-1.jpg",
+  "releaseDate": "Released 2025, May 29",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_pad_10-13897.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor pad x7": {
+  "nombre": "Honor Pad X7",
+  "marca": "Honor",
+  "procesador": "Qualcomm SM6225 Snapdragon 680 (6 nm)",
+  "pantalla": "IPS LCD, 90Hz, 500 nits (typ), 625 nits (HBM) · 8.7\" · 800 x 1340 px",
+  "camaras": "8 MP, f/2.0, AF | Frontal: 5 MP, f/2.2",
+  "bateria": "7020 mAh",
+  "carga": "10 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.0 · USB: , OTG",
+  "sistema": "Android 15, MagicOS 9",
+  "resumen": "Qualcomm SM6225 Snapdragon 680, pantalla 8.7\", 7020 mAh, camara 8 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-pad-x7-01.jpg",
+  "releaseDate": "Released 2025, July 24",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_pad_x7-14026.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor pad x8b": {
+  "nombre": "Honor Pad X8b",
+  "marca": "Honor",
+  "procesador": "Qualcomm SM6225 Snapdragon 680 4G (6 nm)",
+  "pantalla": "TFT LCD, 90Hz, 500 nits · 11.0\" · 1200 x 1920 px",
+  "camaras": "5 MP, f/2.0, AF | Frontal: 5 MP, f/2.0",
+  "bateria": "10100 mAh",
+  "carga": "",
+  "ramAlmacenamiento": "4 GB RAM · 64 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.0 · USB: , OTG",
+  "sistema": "Android 16, MagicOS 10",
+  "resumen": "Qualcomm SM6225 Snapdragon 680 4G, pantalla 11.0\", 10100 mAh, camara 5 MP, 4 GB RAM, 64 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-pad-x8b-1.jpg",
+  "releaseDate": "Released 2026, February 13",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_pad_x8b-14489.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor play 10": {
+  "nombre": "Honor Play10",
+  "marca": "Honor",
+  "procesador": "Qualcomm SM6375 Snapdragon 6s Gen 3 (6 nm)",
+  "pantalla": "TFT LCD, 120Hz · 6.8\" · 1080 x 2412 px",
+  "camaras": "50 MP, f/1.8, (wide), PDAF | Camara 2: Auxiliary lens | Frontal: 5 MP, f/2.2, (wide)",
+  "bateria": "7000 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.1 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 15, Magic OS 9",
+  "resumen": "Qualcomm SM6375 Snapdragon 6s Gen 3, pantalla 6.8\", 7000 mAh, camara 50 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-play10-5g-1.jpg",
+  "releaseDate": "Released 2026, May",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_play10_5g-14713.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor play 20a": {
+  "nombre": "Honor Play20A",
+  "marca": "Honor",
+  "procesador": "Mediatek Helio G81 (12 nm)",
+  "pantalla": "TFT LCD, 90Hz · 6.9\" · 720 x 1600 px",
+  "camaras": "13 MP | Frontal: 5 MP",
+  "bateria": "6000 mAh",
+  "carga": "15 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 64 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: Yes · Bluetooth: Yes · USB: 2.0, OTG",
+  "sistema": "Android 15, MagicOS 9",
+  "resumen": "Mediatek Helio G81, pantalla 6.9\", 6000 mAh, camara 13 MP, 4 GB RAM, 64 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-play-20a-1.jpg",
+  "releaseDate": "Released 2026, August",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_play20a-14897.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor play 20c": {
+  "nombre": "Honor Play20C",
+  "marca": "Honor",
+  "procesador": "Unisoc T610 (12 nm)",
+  "pantalla": "TFT LCD, 90Hz, 600 nits · 6.78\" · 720 x 1576 px",
+  "camaras": "13 MP | Frontal: 5 MP",
+  "bateria": "6000 mAh",
+  "carga": "15 W con cable",
+  "ramAlmacenamiento": "3 GB RAM · 32 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.0 · USB: 2.0, OTG",
+  "sistema": "Android 16 (Go edition)",
+  "resumen": "Unisoc T610, pantalla 6.78\", 6000 mAh, camara 13 MP, 3 GB RAM, 32 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-x5d-s-1.jpg",
+  "releaseDate": "Released 2026, October 06",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_play20c-14994.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor x5c": {
+  "nombre": "Honor X5c",
+  "marca": "Honor",
+  "procesador": "Mediatek Helio G81 (12 nm)",
+  "pantalla": "TFT LCD, 90Hz · 6.74\" · 720 x 1600 px",
+  "camaras": "· 50 MP, f/1.8, (wide), PDAF - LATAM only | Camara 2: · 13 MP, f/2.2, (wide) - MEA, SEA, AF, Eurasia | Camara 3: Auxiliary lens | Frontal: 5 MP, f/2.2, (wide)",
+  "bateria": "5260 mAh",
+  "carga": "15 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 64 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.1 · USB: 2.0, OTG",
+  "sistema": "Android 15, MagicOS 9",
+  "resumen": "Mediatek Helio G81, pantalla 6.74\", 5260 mAh, camara 50 MP, 4 GB RAM, 64 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-x5c-plus-1.jpg",
+  "releaseDate": "Released 2025, October 05",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_x5c-14251.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor x5d": {
+  "nombre": "Honor X5d",
+  "marca": "Honor",
+  "procesador": "Mediatek Helio G81 (12 nm)",
+  "pantalla": "TFT LCD, 90Hz · 6.74\" · 720 x 1600 px",
+  "camaras": "13 MP, f/2.2, (wide), AF | Camara 2: Auxiliary lens | Frontal: 5 MP, f/2.2, (wide)",
+  "bateria": "5260 mAh",
+  "carga": "15 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.1 · USB: 2.0, OTG",
+  "sistema": "Android 15, MagicOS 9",
+  "resumen": "Mediatek Helio G81, pantalla 6.74\", 5260 mAh, camara 13 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-x5d-1.jpg",
+  "releaseDate": "Released 2026, April 09",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_x5d-14583.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor x6e": {
+  "nombre": "Honor X6e",
+  "marca": "Honor",
+  "procesador": "Mediatek Helio G81 Ultra (12 nm)",
+  "pantalla": "TFT LCD, 120Hz, 1010 nits (peak) · 6.61\" · 720 x 1604 px",
+  "camaras": "50 MP, f/1.8, (wide), AF | Frontal: 5 MP, f/2.2, (wide)",
+  "bateria": "7500 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.1 · USB: 2.0, OTG",
+  "sistema": "Android 16, MagicOS 10",
+  "resumen": "Mediatek Helio G81 Ultra, pantalla 6.61\", 7500 mAh, camara 50 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-x6e-1.jpg",
+  "releaseDate": "Released 2026, July 30",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_x6e-14843.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor x7d": {
+  "nombre": "Honor X7d",
+  "marca": "Honor",
+  "procesador": "Qualcomm SM6375 Snapdragon 6s Gen 3 (6 nm)",
+  "pantalla": "TFT LCD, 120Hz, 850 nits (HBM) · 6.77\" · 720 x 1610 px",
+  "camaras": "50 MP, f/1.8, (wide), PDAF | Camara 2: Auxiliary lens | Frontal: 5 MP, f/2.2, (wide)",
+  "bateria": "6500 mAh",
+  "carga": "35 W con cable",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.1 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 15, Magic OS 9",
+  "resumen": "Qualcomm SM6375 Snapdragon 6s Gen 3, pantalla 6.77\", 6500 mAh, camara 50 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-400-smart-1.jpg",
+  "releaseDate": "Released 2025, September 24",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_x7d_5g-14175.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor x7e": {
+  "nombre": "Honor X7e",
+  "marca": "Honor",
+  "procesador": "Mediatek Helio G81 Ultra (12 nm)",
+  "pantalla": "TFT LCD, 120Hz, 1010 nits (peak) · 6.61\" · 720 x 1604 px",
+  "camaras": "50 MP, f/1.8, (wide), AF | Frontal: 5 MP, f/2.2, (wide)",
+  "bateria": "7500 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.1 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, MagicOS 10",
+  "resumen": "Mediatek Helio G81 Ultra, pantalla 6.61\", 7500 mAh, camara 50 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-x7e-3.jpg",
+  "releaseDate": "Released 2026, May",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_x7e-14677.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "honor x8d": {
+  "nombre": "Honor X8d",
+  "marca": "Honor",
+  "procesador": "Qualcomm Snapdragon 6s 4G Gen 2",
+  "pantalla": "AMOLED, 1B colors, 120Hz, 3840Hz PWM, 800 nits (typ), 1300 nits (HBM), 3000 nits (peak) · 6.77\" · 1080 x 2392 px",
+  "camaras": "108 MP, f/1.8, 24mm (wide), 1/1.67\", PDAF, OIS | Ultra gran angular: 5 MP, f/2.2, (ultrawide) | Frontal: 16 MP, f/2.5, (wide)",
+  "bateria": "7000 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.0 or 5.1 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, MagicOS 10",
+  "resumen": "Qualcomm Snapdragon 6s 4G Gen 2, pantalla 6.77\", 7000 mAh, camara 108 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/honor/honor-x8d-1.jpg",
+  "releaseDate": "Released 2025, December",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/honor_x8d-14351.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "infinix gt 30": {
+  "nombre": "Infinix GT 30",
+  "marca": "Infinix",
+  "procesador": "Mediatek Dimensity 7400 (4 nm)",
+  "pantalla": "AMOLED, 1B colors, 144Hz, 2304Hz PWM, 700 nits (typ), 1600 nits (peak), 4500 nits (peak) · 6.78\" · 1224 x 2720 px",
+  "camaras": "64 MP, f/1.8, 23mm (wide), 1/1.73\", 0.8μm, PDAF | Ultra gran angular: 8 MP, f/2.2, 111˚, (ultrawide), AF | Frontal: 13 MP, f/2.2, 25mm (wide)",
+  "bateria": "5500 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 15, XOS 15",
+  "resumen": "Mediatek Dimensity 7400, pantalla 6.78\", 5500 mAh, camara 64 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/infinix/infinix-gt30-5g-1.jpg",
+  "releaseDate": "Released 2025, August 11",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/infinix_gt_30_5g-14044.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "infinix gt50 pro": {
+  "nombre": "Infinix GT 50 Pro",
+  "marca": "Infinix",
+  "procesador": "Mediatek Dimensity 8400 Ultimate (4 nm)",
+  "pantalla": "AMOLED, 1B colors, 144Hz, 2304Hz PWM, 700 nits (typ), 1600 nits (peak), 4500 nits (peak) · 6.78\" · 1208 x 2644 px",
+  "camaras": "50 MP, f/1.8, (wide), 0.8µm, PDAF, OIS | Ultra gran angular: 8 MP, f/2.2, 111˚ (ultrawide), 1/4.0\", 1.0µm, AF | Frontal: 13 MP, f/2.2, (wide), 1/3.1\", 1.12µm",
+  "bateria": "6150 mAh",
+  "carga": "45 W con cable · 30 W inalambrico",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band, Wi-Fi Direct · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, XOS 16",
+  "resumen": "Mediatek Dimensity 8400 Ultimate, pantalla 6.78\", 6150 mAh, camara 50 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/infinix/infinix-gt50-pro-1.jpg",
+  "releaseDate": "Released 2026, April 25",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/infinix_gt_50_pro_5g-14497.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "infinix hot 60 pro": {
+  "nombre": "Infinix Hot 60 Pro",
+  "marca": "Infinix",
+  "procesador": "Mediatek Helio G200 (6 nm)",
+  "pantalla": "AMOLED, 144Hz, 2160Hz PWM, 700 nits (typ), 1600 nits (HBM), 4500 nits (peak) · 6.78\" · 1224 x 2720 px",
+  "camaras": "50 MP, f/1.6, 27mm (wide), 1/2.8\", 0.64µm, PDAF | Camara 2: Auxiliary lens | Frontal: 13 MP, f/2.2, 24mm (wide), 1/3.1\", 1.12µm",
+  "bateria": "5160 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 15, XOS 15.1",
+  "resumen": "Mediatek Helio G200, pantalla 6.78\", 5160 mAh, camara 50 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/infinix/infinix-hot-60-pro-2.jpg",
+  "releaseDate": "Released 2025, July 13",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/infinix_hot_60_pro-14003.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "infinix hot 70": {
+  "nombre": "Infinix Hot 70",
+  "marca": "Infinix",
+  "procesador": "Mediatek Helio G100 Ultimate (6 nm)",
+  "pantalla": "IPS LCD, 120Hz, 700 nits (HBM) · 6.78\" · 720 x 1576 px",
+  "camaras": "50 MP, f/1.9, (wide), AF | Camara 2: Auxiliary lens | Frontal: 8 MP, f/2.0, (wide)",
+  "bateria": "6000 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, XOS 16",
+  "resumen": "Mediatek Helio G100 Ultimate, pantalla 6.78\", 6000 mAh, camara 50 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/infinix/infinix-hot70-4g-11.jpg",
+  "releaseDate": "Released 2026, May 25",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/infinix_hot_70-14683.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "infinix note 60": {
+  "nombre": "Infinix Note 60",
+  "marca": "Infinix",
+  "procesador": "Mediatek Dimensity 7400 Ultimate (4 nm)",
+  "pantalla": "AMOLED, 144Hz, 2304Hz PWM, 700 nits (typ), 1600 nits (HBM), 4500 nits (peak) · 6.78\" · 1208 x 2644 px",
+  "camaras": "50 MP, f/1.6, (wide), 0.8µm, PDAF, OIS | Ultra gran angular: 8 MP, f/2.2, 112˚ (ultrawide), 1.12µm | Frontal: 13 MP, f/2.2, (wide), 1.12µm",
+  "bateria": "6150 mAh",
+  "carga": "45 W con cable · 30 W inalambrico",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, XOS 16",
+  "resumen": "Mediatek Dimensity 7400 Ultimate, pantalla 6.78\", 6150 mAh, camara 50 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/infinix/infinix-note60-1.jpg",
+  "releaseDate": "Released 2026, March",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/infinix_note_60_5g-14498.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "infinix note 60 pro": {
+  "nombre": "Infinix Note 60 Pro",
+  "marca": "Infinix",
+  "procesador": "Qualcomm SM7635-AC Snapdragon 7s Gen 4 (4 nm)",
+  "pantalla": "AMOLED, 144Hz, 2304Hz PWM, 700 nits (typ), 1600 nits (HBM), 4500 nits (peak) · 6.78\" · 1208 x 2644 px",
+  "camaras": "50 MP, f/1.6, 27mm (wide), 1/1.95\", 0.8µm, PDAF (9cm - ∞), OIS | Ultra gran angular: 8 MP, f/2.2, 15mm, 112˚ (ultrawide), 1/4.0\", 1.12µm | Frontal: 13 MP, f/2.2, 24mm (wide), 1/3.1\", 1.12µm",
+  "bateria": "6000 mAh",
+  "carga": "90 W con cable · 30 W inalambrico",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, XOS 16",
+  "resumen": "Qualcomm SM7635-AC Snapdragon 7s Gen 4, pantalla 6.78\", 6000 mAh, camara 50 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/infinix/infinix-note60-pro-12.jpg",
+  "releaseDate": "Released 2026, March",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/infinix_note_60_pro_5g-14499.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "infinix smart 20": {
+  "nombre": "Infinix Smart 20",
+  "marca": "Infinix",
+  "procesador": "Mediatek Helio G81 Ultimate (12 nm)",
+  "pantalla": "IPS LCD, 120Hz, 700 nits (HBM) · 6.78\" · 720 x 1576 px",
+  "camaras": "8 MP, f/2.0, (wide), 1/4.0\", 1.12µm, AF | Frontal: 8 MP, f/2.0, (wide), 1/4.0\", 1.12µm",
+  "bateria": "5200 mAh",
+  "carga": "15 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 64 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: Yes · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, XOS 16",
+  "resumen": "Mediatek Helio G81 Ultimate, pantalla 6.78\", 5200 mAh, camara 8 MP, 4 GB RAM, 64 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/infinix/infinix-smart20-1.jpg",
+  "releaseDate": "Released 2026, March",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/infinix_smart_20-14502.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "iphone 12 pro": {
+  "nombre": "Apple iPhone 12 Pro",
+  "marca": "Apple",
+  "procesador": "Apple A14 Bionic (5 nm)",
+  "pantalla": "Super Retina XDR OLED, HDR10, Dolby Vision, 800 nits (HBM), 1200 nits (peak) · 6.1\" · 1170 x 2532 px",
+  "camaras": "12 MP, f/1.6, 26mm (wide), 1/2.55\", 1.4µm, dual pixel PDAF, OIS | Tele: 12 MP, f/2.0, 52mm (telephoto), 1/3.4\", 1.0µm, PDAF, OIS, 2x optical zoom | Ultra gran angular: 12 MP, f/2.4, 13mm, 120˚ (ultrawide), 1/3.4\", 1.0µm | Profundidad: TOF 3D LiDAR scanner (depth) | Frontal: 12 MP, f/2.2, 23mm (wide), 1/3.6\", 1.0µm",
+  "bateria": "2815 mAh",
+  "carga": "15 W con cable · 15 W inalambrico",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band, hotspot · Bluetooth: 5.0 · NFC · USB: Lightning, USB 2.0",
+  "sistema": "iOS 14.1, upgradable to iOS 26.5",
+  "resumen": "Apple A14 Bionic, pantalla 6.1\", 2815 mAh, camara 12 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-12-pro-r1.jpg",
+  "releaseDate": "Released 2020, October 23",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/apple_iphone_12_pro-10508.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "iphone 14": {
+  "nombre": "Apple iPhone 14",
+  "marca": "Apple",
+  "procesador": "Apple A15 Bionic (5 nm)",
+  "pantalla": "Super Retina XDR OLED, HDR10, Dolby Vision, 800 nits (HBM), 1200 nits (peak) · 6.1\" · 1170 x 2532 px",
+  "camaras": "12 MP, f/1.5, 26mm (wide), 1/1.7\", 1.9µm, dual pixel PDAF, sensor-shift OIS | Ultra gran angular: 12 MP, f/2.4, 13mm, 120˚ (ultrawide) | Frontal: 12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF",
+  "bateria": "3279 mAh",
+  "carga": "15 W con cable · 15 W inalambrico",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band, hotspot · Bluetooth: 5.3 · NFC · USB: Lightning, USB 2.0",
+  "sistema": "iOS 16, upgradable to iOS 26.5",
+  "resumen": "Apple A15 Bionic, pantalla 6.1\", 3279 mAh, camara 12 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-14-3.jpg",
+  "releaseDate": "Released 2022, September 16",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/apple_iphone_14-11861.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "iphone 14 pro max": {
+  "nombre": "Apple iPhone 14 Pro Max",
+  "marca": "Apple",
+  "procesador": "Apple A16 Bionic (4 nm)",
+  "pantalla": "LTPO Super Retina XDR OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (typ), 2000 nits (HBM) · 6.7\" · 1290 x 2796 px",
+  "camaras": "48 MP, f/1.8, 24mm (wide), 1/1.28\", 1.22µm, dual pixel PDAF, sensor-shift OIS | Tele: 12 MP, f/2.8, 77mm (telephoto), 1/3.5\", 1.0µm, PDAF, OIS, 3x optical zoom | Ultra gran angular: 12 MP, f/2.2, 13mm, 120˚ (ultrawide), 1/2.55\", 1.4µm, dual pixel PDAF | Profundidad: TOF 3D LiDAR scanner (depth) | Frontal: 12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF, OIS",
+  "bateria": "4323 mAh",
+  "carga": "15 W con cable · 15 W inalambrico",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band, hotspot · Bluetooth: 5.3 · NFC · USB: Lightning, USB 2.0",
+  "sistema": "iOS 16, upgradable to iOS 26.5",
+  "resumen": "Apple A16 Bionic, pantalla 6.7\", 4323 mAh, camara 48 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-14-pro-max-1.jpg",
+  "releaseDate": "Released 2022, September 16",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/apple_iphone_14_pro_max-11773.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "iphone 15 pro max": {
+  "nombre": "Apple iPhone 15 Pro Max",
+  "marca": "Apple",
+  "procesador": "Apple A17 Pro (3 nm)",
+  "pantalla": "LTPO Super Retina XDR OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (typ), 2000 nits (HBM) · 6.7\" · 1290 x 2796 px",
+  "camaras": "48 MP, f/1.8, 24mm (wide), 1/1.28\", 1.22µm, dual pixel PDAF, sensor-shift OIS | Tele: 12 MP, f/2.8, 120mm (periscope telephoto), 1/3.06\", 1.12µm, dual pixel PDAF, 3D sensor‑shift OIS, 5x optical zoom | Ultra gran angular: 12 MP, f/2.2, 13mm, 120˚ (ultrawide), 1/2.55\", 1.4µm, dual pixel PDAF | Profundidad: TOF 3D LiDAR scanner (depth) | Frontal: 12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF, OIS",
+  "bateria": "4441 mAh",
+  "carga": "15 W con cable · 15 W inalambrico",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e, tri-band, hotspot · Bluetooth: 5.3 · NFC · USB: 3.2 Gen 2, DisplayPort",
+  "sistema": "iOS 17, upgradable to iOS 26.5",
+  "resumen": "Apple A17 Pro, pantalla 6.7\", 4441 mAh, camara 48 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-15-pro-max-1.jpg",
+  "releaseDate": "Released 2023, September 22",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/apple_iphone_15_pro_max-12548.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "iphone 16 pro max": {
+  "nombre": "Apple iPhone 16 Pro Max",
+  "marca": "Apple",
+  "procesador": "Apple A18 Pro (3 nm)",
+  "pantalla": "LTPO Super Retina XDR OLED, 120Hz, HDR10, Dolby Vision, 1000 nits (typ), 2000 nits (HBM) · 6.9\" · 1320 x 2868 px",
+  "camaras": "48 MP, f/1.8, 24mm (wide), 1/1.28\", 1.22µm, dual pixel PDAF, sensor-shift OIS | Tele: 12 MP, f/2.8, 120mm (periscope telephoto), 1/3.06\", 1.12µm, dual pixel PDAF, 3D sensor‑shift OIS, 5x optical zoom | Ultra gran angular: 48 MP, f/2.2, 13mm (ultrawide), 1/2.55\", 0.7µm, PDAF | Profundidad: TOF 3D LiDAR scanner (depth) | Frontal: 12 MP, f/1.9, 23mm (wide), 1/3.6\", 1.0µm, PDAF, OIS",
+  "bateria": "4685 mAh",
+  "carga": "25 W con cable · 25 W inalambrico",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e/7, tri-band, hotspot · Bluetooth: 5.3 · NFC · USB: 3.2 Gen 2, DisplayPort",
+  "sistema": "iOS 18, upgradable to iOS 26.5",
+  "resumen": "Apple A18 Pro, pantalla 6.9\", 4685 mAh, camara 48 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/apple/apple-iphone-16-pro-max-1.jpg",
+  "releaseDate": "Released 2024, September 20",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/apple_iphone_16_pro_max-13123.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "meizu note 21": {
+  "nombre": "Meizu Note 21",
+  "marca": "Meizu",
+  "procesador": "Unisoc T606 (12 nm)",
+  "pantalla": "IPS LCD, 90Hz, 450 nits · 6.74\" · 720 x 1600 px",
+  "camaras": "50 MP, AF | Camara 2: 2 MP | Frontal: 8 MP",
+  "bateria": "6000 mAh",
+  "carga": "18 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.3 · USB: ",
+  "sistema": "Flyme OS",
+  "resumen": "Unisoc T606, pantalla 6.74\", 6000 mAh, camara 50 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/meizu/meizu-note-21-1.jpg",
+  "releaseDate": "Released 2024, October",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/meizu_note_21-13342.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "moto 50 razr ultra": {
+  "nombre": "Motorola Razr 50 Ultra",
+  "marca": "Motorola",
+  "procesador": "Qualcomm SM8635 Snapdragon 8s Gen 3 (4 nm)",
+  "pantalla": "Foldable LTPO AMOLED, 1B colors, Dolby Vision, 165Hz, HDR10+, 3000 nits (peak) · 6.9\" · 1080 x 2640 px",
+  "camaras": "50 MP, f/1.7, 24mm (wide), 1/1.95\", 0.8µm, dual pixel PDAF, OIS | Tele: 50 MP, f/2.0, 47mm (telephoto), 1/2.76\", 0.64µm, PDAF, 2x optical zoom | Frontal: 32 MP, f/2.4, 25mm (wide), 1/3.14\", 0.7µm",
+  "bateria": "4000 mAh",
+  "carga": "45 W con cable · 15 W inalambrico",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e/7, dual-band or tri-band (region dependent) · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 14",
+  "resumen": "Qualcomm SM8635 Snapdragon 8s Gen 3, pantalla 6.9\", 4000 mAh, camara 50 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/motorola/motorola-razr-50-ultra-1.jpg",
+  "releaseDate": "Released 2024, June 25",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/motorola_razr_50_ultra-13150.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "moto 60 fusion": {
+  "nombre": "Motorola Edge 60 Fusion",
+  "marca": "Motorola",
+  "procesador": "Mediatek Dimensity 7300 (4 nm) - Global Mediatek Dimensity 7400 (4 nm) - India, Indonesia",
+  "pantalla": "P-OLED, 1B colors, 120Hz, HDR10+, 1500 nits (HBM), 4500 nits (peak) · 6.67\" · 1220 x 2712 px",
+  "camaras": "50 MP, f/1.9, (wide), 1/1.56\", 1.0µm, multi-directional PDAF, OIS | Ultra gran angular: 13 MP, f/2.2, 120˚ (ultrawide), 1/3.0\", 1.12µm, AF | Frontal: 32 MP, f/2.2, (wide), 1/3.14\", 0.7µm",
+  "bateria": "5200 mAh",
+  "carga": "68 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 15",
+  "resumen": "Mediatek Dimensity 7300- Global Mediatek Dimensity 7400 (4 nm) - India, Indonesia, pantalla 6.67\", 5200 mAh, camara 50 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/motorola/motorola-edge-60-fusion-1.jpg",
+  "releaseDate": "Released 2025, April 09",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/motorola_edge_60_fusion-13752.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "moto 60 razr": {
+  "nombre": "Motorola Razr 60",
+  "marca": "Motorola",
+  "procesador": "Mediatek Dimensity 7400X (4 nm)",
+  "pantalla": "Foldable LTPO AMOLED, 1B colors, 120Hz, HDR10+, 3000 nits (peak) · 6.9\" · 1080 x 2640 px",
+  "camaras": "50 MP, f/1.7, 25mm (wide), 1/1.95\", 0.8µm, dual pixel PDAF, OIS | Ultra gran angular: 13 MP, f/2.2, 120˚ (ultrawide), 1/3.0\", 1.12µm, AF | Frontal: 32 MP, f/2.4, 25mm (wide), 1/3.14\", 0.7µm",
+  "bateria": "4500 mAh",
+  "carga": "30 W con cable · 15 W inalambrico",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6 or 6e, dual-band or tri-band (region dependent) · Bluetooth: 5.4 · NFC · USB: 2.0",
+  "sistema": "Android 15",
+  "resumen": "Mediatek Dimensity 7400X, pantalla 6.9\", 4500 mAh, camara 50 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/bigpic/motorola-razr-60.jpg",
+  "releaseDate": "Released 2025, April 25",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/motorola_razr_60-13749.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "moto 70 fusion": {
+  "nombre": "Motorola Edge 70 Fusion",
+  "marca": "Motorola",
+  "procesador": "Qualcomm SM7635 Snapdragon 7s Gen 3 (4 nm) - International Qualcomm SM7635-AC Snapdragon 7s Gen 4 (4 nm) - India",
+  "pantalla": "AMOLED, 1B colors, 144Hz, HDR10+, 5200 nits (peak) · 6.78\" · 1272 x 2772 px",
+  "camaras": "50 MP, f/1.8, (wide), 1/1.56\", 1.0µm, multi-directional PDAF, OIS | Ultra gran angular: 13 MP, f/2.2, 120˚ (ultrawide), 1/3.0\", 1.12µm, PDAF | Frontal: 32 MP, f/2.2, (wide), 1/3.14\", 0.7µm",
+  "bateria": "5200 mAh",
+  "carga": "68 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e, dual-band or tri-band · Bluetooth: 6.0 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16",
+  "resumen": "Qualcomm SM7635 Snapdragon 7s Gen 3- International Qualcomm SM7635-AC Snapdragon 7s Gen 4 (4 nm) - India, pantalla 6.78\", 5200 mAh, camara 50 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/motorola/motorola-edge-70-fusion-1.jpg",
+  "releaseDate": "Released 2026, March 02",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/motorola_edge_70_fusion_5g-14432.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "moto g54": {
+  "nombre": "Motorola Moto G54",
+  "marca": "Motorola",
+  "procesador": "Mediatek Dimensity 7020 (6 nm)",
+  "pantalla": "IPS LCD, 120Hz · 6.5\" · 1080 x 2400 px",
+  "camaras": "50 MP, f/1.8 (wide), 0.61µm, PDAF, OIS | Macro: 2 MP (macro) | Frontal: 16 MP, f/2.4, (wide), 1.0µm",
+  "bateria": "5000 mAh",
+  "carga": "15 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.3 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 13, upgradable to Android 15",
+  "resumen": "Mediatek Dimensity 7020, pantalla 6.5\", 5000 mAh, camara 50 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/motorola/motorola-moto-g54-1.jpg",
+  "releaseDate": "Released 2023, September 05",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/motorola_moto_g54-12543.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "moto razr 60": {
+  "nombre": "Motorola Razr 60",
+  "marca": "Motorola",
+  "procesador": "Mediatek Dimensity 7400X (4 nm)",
+  "pantalla": "Foldable LTPO AMOLED, 1B colors, 120Hz, HDR10+, 3000 nits (peak) · 6.9\" · 1080 x 2640 px",
+  "camaras": "50 MP, f/1.7, 25mm (wide), 1/1.95\", 0.8µm, dual pixel PDAF, OIS | Ultra gran angular: 13 MP, f/2.2, 120˚ (ultrawide), 1/3.0\", 1.12µm, AF | Frontal: 32 MP, f/2.4, 25mm (wide), 1/3.14\", 0.7µm",
+  "bateria": "4500 mAh",
+  "carga": "30 W con cable · 15 W inalambrico",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6 or 6e, dual-band or tri-band (region dependent) · Bluetooth: 5.4 · NFC · USB: 2.0",
+  "sistema": "Android 15",
+  "resumen": "Mediatek Dimensity 7400X, pantalla 6.9\", 4500 mAh, camara 50 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/bigpic/motorola-razr-60.jpg",
+  "releaseDate": "Released 2025, April 25",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/motorola_razr_60-13749.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "motorola g06": {
+  "nombre": "Motorola Moto G06",
+  "marca": "Motorola",
+  "procesador": "Mediatek Helio G81 Ultra (12 nm)",
+  "pantalla": "IPS LCD, 120Hz · 6.88\" · 720 x 1640 px",
+  "camaras": "50 MP, f/1.8, (wide), PDAF | Frontal: 8 MP, f/2.1, (wide), 1.12µm",
+  "bateria": "5200 mAh",
+  "carga": "10 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 64 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: Yes · NFC · USB: 2.0",
+  "sistema": "Android 15",
+  "resumen": "Mediatek Helio G81 Ultra, pantalla 6.88\", 5200 mAh, camara 50 MP, 4 GB RAM, 64 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/motorola/motorola-moto-g06-1.jpg",
+  "releaseDate": "Released 2025, September 23",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/motorola_moto_g06-14115.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "motorola g17": {
+  "nombre": "Motorola Moto G17",
+  "marca": "Motorola",
+  "procesador": "Mediatek Helio G81 Extreme (12 nm)",
+  "pantalla": "IPS LCD, 800 nits (typ), 1050 nits (HBM) · 6.72\" · 1080 x 2400 px",
+  "camaras": "50 MP, f/1.9, 26mm (wide), 1/2.0\", 0.8µm, PDAF | Ultra gran angular: 5 MP, f/2.2, 19mm (ultrawide), 1/5.0\", 1.12µm | Frontal: 32 MP, f/2.2, 22mm (wide), 1/3.1\", 0.7µm",
+  "bateria": "5200 mAh",
+  "carga": "18 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0",
+  "sistema": "Android 15",
+  "resumen": "Mediatek Helio G81 Extreme, pantalla 6.72\", 5200 mAh, camara 50 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/motorola/motorola-moto-g17-1.jpg",
+  "releaseDate": "Released 2026, January 29",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/motorola_moto_g17-14455.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "motorola g17 power": {
+  "nombre": "Motorola Moto G17 Power",
+  "marca": "Motorola",
+  "procesador": "Mediatek Helio G81 Extreme (12 nm)",
+  "pantalla": "IPS LCD, 800 nits (typ), 1050 nits (HBM) · 6.72\" · 1080 x 2400 px",
+  "camaras": "50 MP, f/1.9, 26mm (wide), 1/2.0\", 0.8µm, PDAF | Ultra gran angular: 5 MP, f/2.2, 19mm (ultrawide), 1/5.0\", 1.12µm | Frontal: 32 MP, f/2.2, 22mm (wide), 1/3.1\", 0.7µm",
+  "bateria": "6000 mAh",
+  "carga": "30 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0",
+  "sistema": "Android 15",
+  "resumen": "Mediatek Helio G81 Extreme, pantalla 6.72\", 6000 mAh, camara 50 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/motorola/motorola-moto-g17-power-1.jpg",
+  "releaseDate": "Released 2026, January 29",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/motorola_moto_g17_power-14452.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "motorola g56": {
+  "nombre": "Motorola Moto G56",
+  "marca": "Motorola",
+  "procesador": "Mediatek Dimensity 7060 (6 nm)",
+  "pantalla": "IPS LCD, 120Hz · 6.72\" · 1080 x 2400 px",
+  "camaras": "50 MP, f/1.8, 25mm (wide), 1/1.95\", 0.8µm, PDAF | Ultra gran angular: 8 MP, f/2.2, 12mm, 118˚ (ultrawide), 1.12µm | Frontal: 32 MP, f/2.2, (wide), 0.7µm",
+  "bateria": "5200 mAh",
+  "carga": "30 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.3 · NFC · USB: 2.0",
+  "sistema": "Android 15",
+  "resumen": "Mediatek Dimensity 7060, pantalla 6.72\", 5200 mAh, camara 50 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/motorola/motorola-moto-g56-1.jpg",
+  "releaseDate": "Released 2025, May 29",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/motorola_moto_g56_5g-13841.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "motorola g67": {
+  "nombre": "Motorola Moto G67",
+  "marca": "Motorola",
+  "procesador": "Mediatek Dimensity 6300 (6 nm)",
+  "pantalla": "AMOLED, 1B colors, 120Hz, HDR, 5000 nits (peak) · 6.78\" · 1272 x 2772 px",
+  "camaras": "50 MP, f/1.8 (wide), 1/1.95\", 0.8µm, PDAF | Ultra gran angular: 8 MP, f/2.2, 118˚ (ultrawide), 1/4.0\", 1.12µm | Frontal: 32 MP, f/2.2, (wide), 0.64µm",
+  "bateria": "5200 mAh",
+  "carga": "30 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0",
+  "sistema": "Android 16",
+  "resumen": "Mediatek Dimensity 6300, pantalla 6.78\", 5200 mAh, camara 50 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/motorola/motorola-moto-g67-1.jpg",
+  "releaseDate": "Released 2026, January 29",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/motorola_moto_g67_5g-14434.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "motorola g86": {
+  "nombre": "Motorola Moto G86",
+  "marca": "Motorola",
+  "procesador": "Mediatek Dimensity 7300 (4 nm)",
+  "pantalla": "P-OLED, 1B colors, 120Hz, HDR10+, 4500 nits peak · 6.67\" · 1220 x 2712 px",
+  "camaras": "50 MP, f/1.9, 25mm (wide), 1/1.95\", 0.8µm, dual pixel PDAF, OIS | Ultra gran angular: 8 MP, f/2.2, 12mm, 118˚ (ultrawide), 1.12µm, AF | Frontal: 32 MP, f/2.2, (wide), 0.7µm",
+  "bateria": "5200 mAh",
+  "carga": "30 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0",
+  "sistema": "Android 15, upgradable to Android 16",
+  "resumen": "Mediatek Dimensity 7300, pantalla 6.67\", 5200 mAh, camara 50 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/motorola/motorola-moto-g86-1.jpg",
+  "releaseDate": "Released 2025, July 07",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/motorola_moto_g86_5g-13917.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "motorola signature": {
+  "nombre": "Motorola Signature",
+  "marca": "Motorola",
+  "procesador": "Qualcomm SM8845 Snapdragon 8 Gen 5 (3 nm)",
+  "pantalla": "LTPO AMOLED, 1B colors, 165Hz, Dolby Vision, HDR10+, 6200 nits (peak) · 6.8\" · 1264 x 2780 px",
+  "camaras": "50 MP, f/1.6, 23mm (wide), 1/1.28\", 1.22µm, multi-directional PDAF, OIS | Tele: 50 MP, 71mm (periscope telephoto), 1/1.95\", 0.8µm, dual-pixel PDAF, OIS, 3x optical zoom | Ultra gran angular: 50 MP, f/2.0, 12mm, 122˚ (ultrawide), 1/2.76\", 0.64µm, PDAF | Frontal: 50 MP, f/2.0, 21mm (wide), 1/2.93\", 0.6µm, dual-pixel PDAF",
+  "bateria": "5200 mAh",
+  "carga": "90 W con cable · 50 W inalambrico",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e/7, tri-band, Wi-Fi Direct · Bluetooth: 6.0 · NFC · USB: 3.1 Gen2, OTG, DisplayPort 1.4",
+  "sistema": "Android 16",
+  "resumen": "Qualcomm SM8845 Snapdragon 8 Gen 5, pantalla 6.8\", 5200 mAh, camara 50 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/motorola/motorola-signature-1.jpg",
+  "releaseDate": "Released 2026, January 30",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/motorola_signature_5g-14397.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "nubia focus": {
+  "nombre": "ZTE nubia Focus",
+  "marca": "ZTE",
+  "procesador": "Unisoc T760 (6 nm)",
+  "pantalla": "IPS LCD, 120Hz (90Hz - LATAM) · 6.56\" · 720 x 1612 px",
+  "camaras": "108 MP, f/1.8, 24mm (wide), 1/1.67\", PDAF | Camara 2: Auxiliary lens | Frontal: 5 MP, f/2.2, (wide)",
+  "bateria": "5000 mAh",
+  "carga": "22.5 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.2 · NFC · USB: 2.0",
+  "sistema": "Android 14",
+  "resumen": "Unisoc T760, pantalla 6.56\", 5000 mAh, camara 108 MP, 4 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/zte/zte-nubia-focus-5g-1.jpg",
+  "releaseDate": "Released 2024, Q2",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/zte_nubia_focus-12849.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "nubia v80 max": {
+  "nombre": "ZTE Blade V80 Max",
+  "marca": "ZTE",
+  "procesador": "Unisoc T7250 (12 nm)",
+  "pantalla": "IPS LCD, 120Hz, 780 nits · 6.9\" · 720 x 1640 px",
+  "camaras": "50 MP, f/1.8, (wide), PDAF | Camara 2: Auxiliary lenses | Frontal: 16 MP",
+  "bateria": "6000 mAh",
+  "carga": "22.5 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.2 · NFC · USB: 2.0",
+  "sistema": "Android 16",
+  "resumen": "Unisoc T7250, pantalla 6.9\", 6000 mAh, camara 50 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/zte/zte-blade-nubia-v80-max-3.jpg",
+  "releaseDate": "Released 2026, January 31",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/zte_blade_v80_max-14449.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "pad 2 pro": {
+  "nombre": "Xiaomi Redmi Pad 2 Pro",
+  "marca": "Xiaomi",
+  "procesador": "Qualcomm SM7635-AC Snapdragon 7s Gen 4 (4 nm)",
+  "pantalla": "IPS LCD, 1B colors, 120Hz, Dolby Vision, 600 nits (HBM) · 12.1\" · 1600 x 2560 px",
+  "camaras": "8 MP, f/2.0, (wide), 1/4.0\", 1.12µm - Wi-Fi model | Camara 2: 13 MP, f/2.2, (wide), 1/3.06\", 1.12µm, AF - 5G model | Frontal: 8 MP, f/2.3, (wide), 1/4.0\", 1.12µm",
+  "bateria": "12000 mAh",
+  "carga": "33 W con cable",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/a/6, dual-band, Wi-Fi Direct · Bluetooth: 5.4 · USB: 2.0, OTG",
+  "sistema": "Android 15, HyperOS 2",
+  "resumen": "Qualcomm SM7635-AC Snapdragon 7s Gen 4, pantalla 12.1\", 12000 mAh, camara 8 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-redmi-pad2-pro-2.jpg",
+  "releaseDate": "Released 2025, September 24",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_redmi_pad_2_pro-14174.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "pad 8": {
+  "nombre": "Xiaomi Pad 8",
+  "marca": "Xiaomi",
+  "procesador": "Qualcomm SM8735 Snapdragon 8s Gen 4 (4 nm)",
+  "pantalla": "IPS LCD, 68B colors, 144Hz, HDR10, Dolby Vision, HDR Vivid, 800 nits (peak) · 11.2\" · 2136 x 3200 px",
+  "camaras": "13 MP, f/2.2, (wide), 1/3.06\", 1.12µm, PDAF | Frontal: 8 MP, f/2.3, (wide), 1/4.0\", 1.12µm",
+  "bateria": "9200 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "Wi-Fi: 802.11 a/b/g/n/ac/6/7, dual-band, Wi-Fi Direct · Bluetooth: 5.4 · USB: 3.2, accessory connector",
+  "sistema": "Android 16, HyperOS 3",
+  "resumen": "Qualcomm SM8735 Snapdragon 8s Gen 4, pantalla 11.2\", 9200 mAh, camara 13 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-pad-8-2.jpg",
+  "releaseDate": "Released 2025, September 25",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_pad_8-14184.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "pad 8 pro": {
+  "nombre": "Xiaomi Pad 8 Pro",
+  "marca": "Xiaomi",
+  "procesador": "Qualcomm SM8750-AB Snapdragon 8 Elite (3 nm)",
+  "pantalla": "IPS LCD, 68B colors, 144Hz, HDR10, Dolby Vision, HDR Vivid, 800 nits (peak) · 11.2\" · 2136 x 3200 px",
+  "camaras": "50 MP, f/1.8, (wide), 1/2.76\", 0.64µm, PDAF | Frontal: 32 MP, f/2.2, 19mm (ultrawide), 1/3.6\", 0.61µm",
+  "bateria": "9200 mAh",
+  "carga": "67 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "Wi-Fi: 802.11 a/b/g/n/ac/6/7, dual-band, Wi-Fi Direct · Bluetooth: 5.4 · USB: 3.2, accessory connector",
+  "sistema": "Android 16, HyperOS 3",
+  "resumen": "Qualcomm SM8750-AB Snapdragon 8 Elite, pantalla 11.2\", 9200 mAh, camara 50 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-pad-8-pro-1.jpg",
+  "releaseDate": "Released 2025, September 25",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_pad_8_pro-14183.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "poco c71": {
+  "nombre": "Xiaomi Poco C71",
+  "marca": "Xiaomi",
+  "procesador": "Unisoc T7250 (12 nm)",
+  "pantalla": "IPS LCD, 120Hz, 450 nits (typ), 600 nits (HBM) · 6.88\" · 720 x 1640 px",
+  "camaras": "32 MP, f/1.8, (wide) | Camara 2: Auxiliary lens | Frontal: 8 MP, f/2.0, (wide)",
+  "bateria": "5200 mAh",
+  "carga": "15 W con cable",
+  "ramAlmacenamiento": "3 GB RAM · 64 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.2 · USB: 2.0",
+  "sistema": "Android 15 or Android 15 (Go edition)",
+  "resumen": "Unisoc T7250, pantalla 6.88\", 5200 mAh, camara 32 MP, 3 GB RAM, 64 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-poco-c71-1.jpg",
+  "releaseDate": "Released 2025, April 08",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_poco_c71_4g-13767.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "poco c81 pro": {
+  "nombre": "Xiaomi Poco C81 Pro",
+  "marca": "Xiaomi",
+  "procesador": "Unisoc T7250 (12 nm)",
+  "pantalla": "IPS LCD, 120Hz, 650 nits (typ), 800 nits (peak) · 6.9\" · 720 x 1600 px",
+  "camaras": "13 MP, f/2.2, (wide), 1/3.06\" | Frontal: 8 MP, f/2.0, (wide)",
+  "bateria": "6000 mAh",
+  "carga": "15 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 64 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.2 · NFC · USB: 2.0",
+  "sistema": "Android 15, HyperOS 3",
+  "resumen": "Unisoc T7250, pantalla 6.9\", 6000 mAh, camara 13 MP, 4 GB RAM, 64 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-poco-c81-pro-1.jpg",
+  "releaseDate": "Released 2026, April 27",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_poco_c81_pro-14635.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "poco c85": {
+  "nombre": "Xiaomi Poco C85",
+  "marca": "Xiaomi",
+  "procesador": "Mediatek Dimensity 6300 (6 nm)",
+  "pantalla": "IPS LCD, 120Hz, 810 nits (HBM) · 6.9\" · 720 x 1600 px",
+  "camaras": "50 MP, f/1.8, 26mm (wide), 1/2.76\", 0.64µm, PDAF | Camara 2: Auxiliary lens | Frontal: 8 MP, f/2.0, (wide), 1/4.0\", 1.12µm",
+  "bateria": "6000 mAh",
+  "carga": "33 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.4 · USB: 2.0, OTG",
+  "sistema": "Android 15, HyperOS 2",
+  "resumen": "Mediatek Dimensity 6300, pantalla 6.9\", 6000 mAh, camara 50 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-poco-c85-5g-1.jpg",
+  "releaseDate": "Released 2025, December 16",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_poco_c85_5g-14337.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "poco m8 pro": {
+  "nombre": "Xiaomi Poco M8 Pro",
+  "marca": "Xiaomi",
+  "procesador": "Qualcomm SM7635-AC Snapdragon 7s Gen 4 (4 nm)",
+  "pantalla": "AMOLED, 68B colors, 120Hz, 3840Hz PWM, HDR10+, Dolby Vision, 1800 nits (HBM), 3200 nits (peak) · 6.83\" · 1280 x 2772 px",
+  "camaras": "50 MP, f/1.6, 24mm (wide), 1/1.55\", 1.0µm, dual pixel PDAF, OIS | Ultra gran angular: 8 MP, f/2.2, 15mm, 120˚ (ultrawide), 1/4.0\", 1.12µm | Frontal: 32 MP, f/2.2, (wide), 1/3.6\"",
+  "bateria": "6500 mAh",
+  "carga": "100 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6 or 6e, dual-band, Wi-Fi Direct · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 15, HyperOS 2",
+  "resumen": "Qualcomm SM7635-AC Snapdragon 7s Gen 4, pantalla 6.83\", 6500 mAh, camara 50 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/bigpic/xiaomi-poco-x8-pro.jpg",
+  "releaseDate": "2026, January 08",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_poco_m8_pro_5g-14390.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "poco x8 pro": {
+  "nombre": "Xiaomi Poco X8 Pro",
+  "marca": "Xiaomi",
+  "procesador": "Mediatek Dimensity 8500 Ultra (4 nm)",
+  "pantalla": "AMOLED, 68B colors, 120Hz, 3840Hz PWM, Dolby Vision, HDR10+, 2000 nits (HBM), 3500 nits (peak) · 6.59\" · 1268 x 2756 px",
+  "camaras": "50 MP, f/1.5, 26mm (wide), 1/1.95\", 0.8µm, PDAF, OIS | Ultra gran angular: 8 MP, f/2.2, 15mm (ultrawide), 1/4.0\", 1.12µm | Frontal: 20 MP, f/2.2, (wide), 1/4\"",
+  "bateria": "6500 mAh",
+  "carga": "100 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band, Wi-Fi Direct · Bluetooth: 6.0 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, HyperOS 3",
+  "resumen": "Mediatek Dimensity 8500 Ultra, pantalla 6.59\", 6500 mAh, camara 50 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-poco-x8-pro-1.jpg",
+  "releaseDate": "Released 2026, March 17",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_poco_x8_pro_5g-14506.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "poco x8 pro max": {
+  "nombre": "Xiaomi Poco X8 Pro Max",
+  "marca": "Xiaomi",
+  "procesador": "Mediatek Dimensity 9500s (3 nm)",
+  "pantalla": "AMOLED, 68B colors, 120Hz, 3840Hz PWM, Dolby Vision, HDR10+, 2000 nits (HBM), 3500 nits (peak) · 6.83\" · 1280 x 2772 px",
+  "camaras": "50 MP, f/1.5, 26mm (wide), 1/1.95\", 0.8µm, PDAF, OIS | Ultra gran angular: 8 MP, f/2.2, 15mm (ultrawide), 1/4.0\", 1.12µm | Frontal: 20 MP, f/2.2, (wide), 1/4\"",
+  "bateria": "8500 mAh",
+  "carga": "100 W con cable",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6/7, dual-band, Wi-Fi Direct · Bluetooth: 6.0 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, HyperOS 3",
+  "resumen": "Mediatek Dimensity 9500s, pantalla 6.83\", 8500 mAh, camara 50 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-poco-x8-pro-max-1.jpg",
+  "releaseDate": "Released 2026, March 17",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_poco_x8_pro_max_5g-14507.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "pova curve 2": {
+  "nombre": "Tecno Pova Curve 2",
+  "marca": "Tecno",
+  "procesador": "Mediatek Dimensity 7100 (6 nm)",
+  "pantalla": "AMOLED, 1B colors, 144Hz, 2304Hz PWM, 1600 nits (HBM), 4500 nits (peak) · 6.78\" · 1080 x 2364 px",
+  "camaras": "50 MP, f/1.8, (wide), PDAF | Macro: 2 MP (macro) | Frontal: 13 MP",
+  "bateria": "8000 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, HIOS 16",
+  "resumen": "Mediatek Dimensity 7100, pantalla 6.78\", 8000 mAh, camara 50 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/tecno/tecno-pova-curve2-1.jpg",
+  "releaseDate": "Released 2026, February 20",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/tecno_pova_curve_2_5g-14384.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "pova slim": {
+  "nombre": "Tecno Pova Slim",
+  "marca": "Tecno",
+  "procesador": "Mediatek Dimensity 6400 (6 nm)",
+  "pantalla": "AMOLED, 144Hz, 1600 nits (HBM), 4500 nits (peak) · 6.78\" · 1224 x 2720 px",
+  "camaras": "50 MP, (wide), PDAF | Camara 2: 2 MP | Frontal: 13 MP, (wide)",
+  "bateria": "5160 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.4 · NFC · USB: ",
+  "sistema": "Android 15, HIOS 15",
+  "resumen": "Mediatek Dimensity 6400, pantalla 6.78\", 5160 mAh, camara 50 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/tecno/tecno-pova-slim-1.jpg",
+  "releaseDate": "Released 2025, October 08",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/tecno_pova_slim_5g-14111.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "realme 11": {
+  "nombre": "Realme 11",
+  "marca": "Realme",
+  "procesador": "Mediatek Dimensity 6100+ (6 nm)",
+  "pantalla": "IPS LCD, 120Hz, 550 nits (typ), 680 nits (HBM) · 6.72\" · 1080 x 2400 px",
+  "camaras": "108 MP, f/1.8, 24mm (wide), 1/1.67\", 0.64µm, PDAF | Camara 2: Auxiliary lens | Frontal: 16 MP, f/2.5, 23mm (wide)",
+  "bateria": "5000 mAh",
+  "carga": "67 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.2 · NFC · USB: 2.0",
+  "sistema": "Android 13, Realme UI 4.0",
+  "resumen": "Mediatek Dimensity 6100+, pantalla 6.72\", 5000 mAh, camara 108 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/bigpic/realme-11x-5g.jpg",
+  "releaseDate": "2023, July 31",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/realme_11-12444.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "realme 14t": {
+  "nombre": "Realme 14T",
+  "marca": "Realme",
+  "procesador": "Mediatek Dimensity 6300 (6 nm)",
+  "pantalla": "AMOLED, 120Hz, 2100 nits (peak) · 6.67\" · 1080 x 2400 px",
+  "camaras": "50 MP, f/1.8, 27mm (wide), 1/2.88\", PDAF | Camara 2: 2 MP, f/2.4 | Frontal: 16 MP, f/2.4, 23mm (wide), 1/3.09\"",
+  "bateria": "6000 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.3 · NFC · USB: ",
+  "sistema": "Android 15, Realme UI 6.0",
+  "resumen": "Mediatek Dimensity 6300, pantalla 6.67\", 6000 mAh, camara 50 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/realme/realme-14t-1.jpg",
+  "releaseDate": "Released 2025, April 25",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/realme_14t-13748.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "realme 16": {
+  "nombre": "Realme 16",
+  "marca": "Realme",
+  "procesador": "Mediatek Dimensity 6400 Turbo (6 nm)",
+  "pantalla": "AMOLED, 1B colors, 120Hz, 2160Hz PWM, HDR, 1000 nits (typ), 1400 nits (HBM), 4500 nits (peak) · 6.57\" · 1080 x 2372 px",
+  "camaras": "50 MP, f/1.8, 26mm (wide), 1/2.93\", 0.60µm, PDAF | Camara 2: Auxiliary lens | Frontal: 50 MP, f/2.4, 23mm (wide)",
+  "bateria": "7000 mAh",
+  "carga": "60 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac dual-band · Bluetooth: 5.3 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, Realme UI 7.0",
+  "resumen": "Mediatek Dimensity 6400 Turbo, pantalla 6.57\", 7000 mAh, camara 50 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/realme/realme-16-1.jpg",
+  "releaseDate": "Released 2025, January 29",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/realme_16_5g-14419.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "realme 16 pro": {
+  "nombre": "Realme 16 Pro",
+  "marca": "Realme",
+  "procesador": "Mediatek Dimensity 7300 Max (4 nm)",
+  "pantalla": "AMOLED, 1B colors, 144Hz, HDR10+, PWM, 1000 nits (typ), 1400 nits (HBM), 6500 nits (peak) · 6.78\" · 1272 x 2772 px",
+  "camaras": "200 MP, f/1.9, 23mm (wide), 1/1.56\", 0.5µm, dual-pixel PDAF, OIS | Ultra gran angular: 8 MP, 112˚, (ultrawide), 1/4.0\", 1.12µm | Frontal: 50 MP, f/2.4, 23mm (wide), 1/2.88\", 0.61µm",
+  "bateria": "7000 mAh",
+  "carga": "80 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, up to 5 (EU) / 3 (IN) major Android upgrades, Realme UI 7.0",
+  "resumen": "Mediatek Dimensity 7300 Max, pantalla 6.78\", 7000 mAh, camara 200 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/realme/realme-16-pro-1.jpg",
+  "releaseDate": "Released 2026, January 08",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/realme_16_pro_5g-14400.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "realme 16 pro plus": {
+  "nombre": "Realme 16 Pro+",
+  "marca": "Realme",
+  "procesador": "Qualcomm SM7750-AB Snapdragon 7 Gen 4 (4 nm)",
+  "pantalla": "AMOLED, 1B colors, 144Hz, HDR10+, 4608Hz PWM, 600 nits (typ), 1800 nits (HBM), 6500 nits (peak) · 6.8\" · 1280 x 2800 px",
+  "camaras": "200 MP, f/1.9, 23mm (wide), 1/1.56\", 0.5µm, dual-pixel PDAF, OIS | Tele: 50 MP, f/2.8, (periscope telephoto), 1/2.76\", 0.64µm, PDAF, OIS, 3.5x optical zoom | Ultra gran angular: 8 MP, 116˚, (ultrawide), 1/4.0\", 1.12µm, AF | Frontal: 50 MP, f/2.4, 23mm (wide), 1/2.88\", 0.61µm",
+  "bateria": "7000 mAh",
+  "carga": "80 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, up to 5 (EU) / 3 (IN) major Android upgrades, Realme UI 7.0",
+  "resumen": "Qualcomm SM7750-AB Snapdragon 7 Gen 4, pantalla 6.8\", 7000 mAh, camara 200 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/realme/realme-16-pro-plus-1.jpg",
+  "releaseDate": "Released 2026, January 08",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/realme_16_pro+_5g-14363.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "realme c85": {
+  "nombre": "Realme C85",
+  "marca": "Realme",
+  "procesador": "Mediatek Dimensity 6300 (6 nm)",
+  "pantalla": "IPS LCD, 144Hz, 1200 nits (HBM) · 6.8\" · 720 x 1570 px",
+  "camaras": "50 MP, f/1.8, 28mm (wide), 1/2.96\", PDAF | Frontal: 8 MP, f/2.0, 26mm (wide), 1/4.0\", 1.12µm",
+  "bateria": "7000 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.3 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 15, Realme UI 6.0",
+  "resumen": "Mediatek Dimensity 6300, pantalla 6.8\", 7000 mAh, camara 50 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/realme/realme-c85-1.jpg",
+  "releaseDate": "Released 2025, November 13",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/realme_c85_5g-14274.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "realme note 70": {
+  "nombre": "Realme Note 70",
+  "marca": "Realme",
+  "procesador": "Unisoc T7250 (12 nm)",
+  "pantalla": "LCD, 90Hz · 6.74\" · 720 x 1600 px",
+  "camaras": "13 MP, f/2.2, 27mm (wide), AF | Frontal: 5 MP, f/2.2, 27mm (wide)",
+  "bateria": "6300 mAh",
+  "carga": "15 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 64 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.2 · USB: 2.0",
+  "sistema": "Android 15, Realme UI 5.0",
+  "resumen": "Unisoc T7250, pantalla 6.74\", 6300 mAh, camara 13 MP, 4 GB RAM, 64 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/realme/realme-note70-2.jpg",
+  "releaseDate": "Released 2025, September",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/realme_note_70-14436.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "redmi 15c": {
+  "nombre": "Xiaomi Redmi 15C",
+  "marca": "Xiaomi",
+  "procesador": "Mediatek Dimensity 6300 (6 nm)",
+  "pantalla": "IPS LCD, 120Hz, 810 nits (HBM) · 6.9\" · 720 x 1600 px",
+  "camaras": "50 MP, f/1.8, 28mm (wide), 1/2.76\", 0.64µm, PDAF | Camara 2: Auxiliary lens | Frontal: 8 MP, f/2.0, (wide), 1/4.0\", 1.12µm",
+  "bateria": "6000 mAh",
+  "carga": "33 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 15, HyperOS 2",
+  "resumen": "Mediatek Dimensity 6300, pantalla 6.9\", 6000 mAh, camara 50 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-redmi-15c-1.jpg",
+  "releaseDate": "Released 2025, September 18",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_redmi_15c_5g-14039.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "redmi note 15": {
+  "nombre": "Xiaomi Redmi Note 15",
+  "marca": "Xiaomi",
+  "procesador": "Qualcomm SM6475-AB Snapdragon 6 Gen 3 (4 nm)",
+  "pantalla": "AMOLED, 68B colors, 120Hz, 3840Hz PWM, HDR10+, 800 nits (typ), 3200 nits (peak) · 6.77\" · 1080 x 2392 px",
+  "camaras": "108 MP, f/1.7, 24mm (wide), 1/1.67\", 0.64µm, PDAF, OIS | Ultra gran angular: 8 MP, f/2.2, 16mm (ultrawide), 1/4.0\", 1.12µm | Frontal: 20 MP, f/2.2, 21mm (wide), 1/4.0\"",
+  "bateria": "5520 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.1 or 5.3 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 15, HyperOS 2",
+  "resumen": "Qualcomm SM6475-AB Snapdragon 6 Gen 3, pantalla 6.77\", 5520 mAh, camara 108 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-redmi-note-15-global-1.jpg",
+  "releaseDate": "Released 2026, January 06",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_redmi_note_15_5g_(global)-14328.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "redmi note 15 pro": {
+  "nombre": "Xiaomi Redmi Note 15 Pro",
+  "marca": "Xiaomi",
+  "procesador": "Mediatek Dimensity 7400 Ultra (4 nm)",
+  "pantalla": "AMOLED, 68B colors, 120Hz, 3840Hz PWM, HDR10+, Dolby Vision, 1800 nits (HBM), 3200 nits (peak) · 6.83\" · 1280 x 2772 px",
+  "camaras": "200 MP, f/1.7, 23mm (wide), 1/1.4\", 0.56µm, multi-directional PDAF, OIS | Ultra gran angular: 8 MP, f/2.2, 15mm, 120˚ (ultrawide), 1/4.0\", 1.12µm | Frontal: 20 MP, f/2.2, 25mm (wide), 1/4.0\", 0.7µm",
+  "bateria": "6580 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band, Wi-Fi Direct · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 15, HyperOS 2",
+  "resumen": "Mediatek Dimensity 7400 Ultra, pantalla 6.83\", 6580 mAh, camara 200 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-redmi-note-15-pro-global-1.jpg",
+  "releaseDate": "Released 2026, January 06",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_redmi_note_15_pro_5g_(global)-14327.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "redmi note 17": {
+  "nombre": "Xiaomi Redmi Note 17",
+  "marca": "Xiaomi",
+  "procesador": "Qualcomm SM4450-AF Snapdragon 4 Gen 4 (4 nm)",
+  "pantalla": "AMOLED, 120Hz, 700 nits (typ), 1200 nits (HBM), 1800 nits (peak) · 6.99\" · 1080 x 2396 px",
+  "camaras": "50 MP, f/1.8, 26mm (wide), 1/2.76\", 0.64µm, PDAF | Frontal: 16 MP, f/2.5, (wide), 1/3.0\"",
+  "bateria": "7700 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.1 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, HyperOS 3",
+  "resumen": "Qualcomm SM4450-AF Snapdragon 4 Gen 4, pantalla 6.99\", 7700 mAh, camara 50 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-redmi-note-17-1.jpg",
+  "releaseDate": "Released 2026, August 28",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_redmi_note_17_5g-14846.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "redmi note 17 pro": {
+  "nombre": "Xiaomi Redmi Note 17 Pro",
+  "marca": "Xiaomi",
+  "procesador": "Qualcomm SM6435-AA Snapdragon 6s Gen 4 (4 nm)",
+  "pantalla": "AMOLED, 68B colors, 120Hz, 3840Hz PWM, 1060 nits (typ), 1800 nits (HBM), 3500 nits (peak) · 6.83\" · 1280 x 2772 px",
+  "camaras": "50 MP, f/1.8, 26mm (wide), 1/2.76\", 0.64µm, PDAF, OIS | Ultra gran angular: 8 MP, f/2.2, 15mm, 120˚ (ultrawide), 1/4.0\", 1.12µm | Frontal: 16 MP, f/2.4, (wide), 1.0µm",
+  "bateria": "8340 mAh",
+  "carga": "67 W con cable",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.1 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, HyperOS 3",
+  "resumen": "Qualcomm SM6435-AA Snapdragon 6s Gen 4, pantalla 6.83\", 8340 mAh, camara 50 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-redmi-note-17-pro-1.jpg",
+  "releaseDate": "Released 2026, August 28",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_redmi_note_17_pro_5g-14844.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "redmi note 17 pro max": {
+  "nombre": "Xiaomi Redmi Note 17 Pro Max",
+  "marca": "Xiaomi",
+  "procesador": "Qualcomm SM6850 Snapdragon 6 Gen 5 (4 nm)",
+  "pantalla": "AMOLED, 68B colors, 120Hz, 3840Hz PWM, HDR10+, Dolby Vision, 1800 nits (HBM), 3500 nits (peak) · 6.83\" · 1280 x 2772 px",
+  "camaras": "50 MP, f/1.8, 26mm (wide), 1/2.76\", 0.64µm, PDAF, OIS | Ultra gran angular: 8 MP, f/2.2, 15mm, 120˚ (ultrawide), 1/4.0\", 1.12µm | Frontal: 32 MP, (wide)",
+  "bateria": "9210 mAh",
+  "carga": "100 W con cable",
+  "ramAlmacenamiento": "12 GB RAM · 512 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band, Wi-Fi Direct · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, HyperOS 3",
+  "resumen": "Qualcomm SM6850 Snapdragon 6 Gen 5, pantalla 6.83\", 9210 mAh, camara 50 MP, 12 GB RAM, 512 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-redmi-note-17-pro-max-11.jpg",
+  "releaseDate": "Not announced yet",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_redmi_note_17_pro_max_5g-14845.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "redmi pad 2": {
+  "nombre": "Xiaomi Redmi Pad 2",
+  "marca": "Xiaomi",
+  "procesador": "Mediatek Helio G100 Ultra (6 nm)",
+  "pantalla": "IPS LCD, 1B colors, 90Hz, 600 nits (HBM) · 11.0\" · 1600 x 2560 px",
+  "camaras": "8 MP, f/2.0, (wide), 1/4.0\", 1.12µm | Frontal: 5 MP, f/2.2, (wide), 1/5.0\", 1.12µm",
+  "bateria": "9000 mAh",
+  "carga": "18 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.3 · USB: 2.0, OTG",
+  "sistema": "Android 15, HyperOS 2",
+  "resumen": "Mediatek Helio G100 Ultra, pantalla 11.0\", 9000 mAh, camara 8 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-redmi-pad2-1.jpg",
+  "releaseDate": "Released 2025, June 05",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_redmi_pad_2-13908.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "samsung a27": {
+  "nombre": "Samsung Galaxy A27",
+  "marca": "Samsung",
+  "procesador": "Qualcomm SM6475-AB Snapdragon 6 Gen 3 (4 nm)",
+  "pantalla": "Super AMOLED, 120Hz · 6.7\" · 1080 x 2340 px",
+  "camaras": "50 MP, f/1.8, (wide), 1/2.76\", 0.64µm, PDAF, OIS | Ultra gran angular: 5 MP, f/2.2, (ultrawide), 1/5.0\", 1.12µm | Macro: 2 MP (macro) | Frontal: 12 MP, f/2.2, (wide)",
+  "bateria": "5000 mAh",
+  "carga": "25 W con cable",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.1 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, One UI 8.5",
+  "resumen": "Qualcomm SM6475-AB Snapdragon 6 Gen 3, pantalla 6.7\", 5000 mAh, camara 50 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-a27-1.jpg",
+  "releaseDate": "Released 2026, July 03",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_a27_5g-14606.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "samsung s25 ultra": {
+  "nombre": "Samsung Galaxy S25 Ultra",
+  "marca": "Samsung",
+  "procesador": "Qualcomm SM8750-AC Snapdragon 8 Elite (3 nm)",
+  "pantalla": "Dynamic LTPO AMOLED 2X, 120Hz, HDR10+, 2600 nits (peak) · 6.9\" · 1440 x 3120 px",
+  "camaras": "200 MP, f/1.7, 24mm (wide), 1/1.3\", 0.6µm, multi-directional PDAF, OIS | Tele: 10 MP, f/2.4, 67mm (telephoto), 1/3.52\", 1.12µm, PDAF, OIS, 3x optical zoom | Tele: 50 MP, f/3.4, 111mm (periscope telephoto), 1/2.52\", 0.7µm, PDAF, OIS, 5x optical zoom | Ultra gran angular: 50 MP, f/1.9, 120˚ (ultrawide), 1/2.5\", 0.7µm, dual pixel PDAF, Super Steady video | Frontal: 12 MP, f/2.2, 26mm (wide), 1/3.2\", 1.12µm, dual pixel PDAF",
+  "bateria": "5000 mAh",
+  "carga": "45 W con cable · 15 W inalambrico",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e/7, tri-band, Wi-Fi Direct · Bluetooth: 5.4 · NFC · USB: 3.2, DisplayPort 1.2, OTG",
+  "sistema": "Android 15, One UI 8",
+  "resumen": "Qualcomm SM8750-AC Snapdragon 8 Elite, pantalla 6.9\", 5000 mAh, camara 200 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-s25-ultra-sm-s938-1.jpg",
+  "releaseDate": "Released 2025, February 03",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_s25_ultra-13322.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "samsung z flip 5": {
+  "nombre": "Samsung Galaxy Z Flip5",
+  "marca": "Samsung",
+  "procesador": "Qualcomm SM8550-AC Snapdragon 8 Gen 2 (4 nm)",
+  "pantalla": "Foldable Dynamic AMOLED 2X, 120Hz, HDR10+, 1750 nits (peak) · 6.7\" · 1080 x 2640 px",
+  "camaras": "12 MP, f/1.8, 24mm (wide), 1/1.76\", 1.8µm, dual pixel PDAF, OIS | Ultra gran angular: 12 MP, f/2.2, 13mm, 123˚ (ultrawide), 1/3.06\", 1.12µm | Frontal: 10 MP, f/2.2, 23mm (wide), 1/3.0\", 1.22µm",
+  "bateria": "3700 mAh",
+  "carga": "25 W con cable · 15 W inalambrico",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e, tri-band, Wi-Fi Direct · Bluetooth: 5.3 · NFC · USB: 3.2, OTG",
+  "sistema": "Android 13, upgradable to Android 16, One UI 8.5",
+  "resumen": "Qualcomm SM8550-AC Snapdragon 8 Gen 2, pantalla 6.7\", 3700 mAh, camara 12 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-z-flip5-5g-r1.jpg",
+  "releaseDate": "Released 2023, August 11",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_z_flip5-12252.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "samsung z flip 7": {
+  "nombre": "Samsung Galaxy Z Flip7",
+  "marca": "Samsung",
+  "procesador": "Exynos 2500 (3 nm)",
+  "pantalla": "Foldable Dynamic LTPO AMOLED 2X, 120Hz, HDR10+, 2600 nits (peak) · 6.9\" · 1080 x 2520 px",
+  "camaras": "50 MP, f/1.8, 23mm (wide), 1/1.57\", 1.0µm, dual pixel PDAF, OIS | Ultra gran angular: 12 MP, f/2.2, 13mm, 123˚ (ultrawide), 1/3.2\", 1.12µm | Frontal: 10 MP, f/2.2, 23mm (wide), 1/3.0\", 1.22µm",
+  "bateria": "4300 mAh",
+  "carga": "25 W con cable · 15 W inalambrico",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e/7, tri-band, Wi-Fi Direct · Bluetooth: 5.4 · NFC · USB: 3.2, OTG",
+  "sistema": "Android 16, One UI 8",
+  "resumen": "Exynos 2500, pantalla 6.9\", 4300 mAh, camara 50 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-z-flip7-03.jpg",
+  "releaseDate": "Released 2025, July 25",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_z_flip7-13712.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "samsung z flip 8": {
+  "nombre": "Samsung Galaxy Z Flip8",
+  "marca": "Samsung",
+  "procesador": "Qualcomm SM8850-1-AD Snapdragon 8 Elite Gen 5 (3 nm) - US/CA/CN Exynos 2600 (2 nm) - ROW",
+  "pantalla": "Foldable Dynamic LTPO AMOLED 2X, 120Hz, HDR10+, 2600 nits (peak) · 6.9\" · 1080 x 2520 px",
+  "camaras": "50 MP, f/1.8, 23mm (wide), 1/1.57\", 1.0µm, dual pixel PDAF, OIS | Ultra gran angular: 12 MP, f/2.2, 13mm, 123˚ (ultrawide), 1/3.2\", 1.12µm | Frontal: 10 MP, f/2.2, 23mm (wide), 1.12µm",
+  "bateria": "4300 mAh",
+  "carga": "25 W con cable · 15 W inalambrico",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e/7, tri-band, Wi-Fi Direct · Bluetooth: 5.4 · NFC · USB: 3.2, OTG",
+  "sistema": "Android 17, One UI 9",
+  "resumen": "Qualcomm SM8850-1-AD Snapdragon 8 Elite Gen 5- US/CA/CN Exynos 2600 (2 nm) - ROW, pantalla 6.9\", 4300 mAh, camara 50 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-z-flip8-1.jpg",
+  "releaseDate": "Released 2026, July 22",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_z_flip8_5g-14803.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "samsung z fold 5": {
+  "nombre": "Samsung Galaxy Z Fold5",
+  "marca": "Samsung",
+  "procesador": "Qualcomm SM8550-AC Snapdragon 8 Gen 2 (4 nm)",
+  "pantalla": "Foldable Dynamic AMOLED 2X, 120Hz, HDR10+ · 7.6\" · 1812 x 2176 px",
+  "camaras": "50 MP, f/1.8, 23mm (wide), 1/1.56\", 1.0µm, dual pixel PDAF, OIS | Tele: 10 MP, f/2.4, 66mm (telephoto), 1/3.94\", 1.0µm, PDAF, OIS, 3x optical zoom | Ultra gran angular: 12 MP, f/2.2, 12mm, 123˚ (ultrawide), 1/3.06\", 1.12µm | Frontal: 4 MP, f/1.8, 26mm (wide), 1/3.0\", 2.0µm, under display",
+  "bateria": "4400 mAh",
+  "carga": "25 W con cable · 15 W inalambrico",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e, tri-band, Wi-Fi Direct · Bluetooth: 5.3 · NFC · USB: 3.2, OTG",
+  "sistema": "Android 13, One UI 8.5",
+  "resumen": "Qualcomm SM8550-AC Snapdragon 8 Gen 2, pantalla 7.6\", 4400 mAh, camara 50 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-z-fold5-5g-r0.jpg",
+  "releaseDate": "Released 2023, August 11",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_z_fold5-12418.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "samsung z fold 7": {
+  "nombre": "Samsung Galaxy Z Fold7",
+  "marca": "Samsung",
+  "procesador": "Qualcomm SM8750-AC Snapdragon 8 Elite (3 nm)",
+  "pantalla": "Foldable Dynamic LTPO AMOLED 2X, 120Hz, HDR10+, 2600 nits (peak) · 8.0\" · 1968 x 2184 px",
+  "camaras": "200 MP, f/1.7, 24mm (wide), 1/1.3\", 0.6µm, multi-directional PDAF, OIS | Tele: 10 MP, f/2.4, 67mm (telephoto), 1/3.94\", 1.0µm, PDAF, OIS, 3x optical zoom | Ultra gran angular: 12 MP, f/2.2, 13mm, 120˚ (ultrawide), 1/2.55\", 1.4µm, dual pixel PDAF | Frontal: 10 MP, f/2.2, 18mm (ultrawide), 1/3.0\", 1.12µm",
+  "bateria": "4400 mAh",
+  "carga": "25 W con cable · 15 W inalambrico",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e/7, tri-band, Wi-Fi Direct · Bluetooth: 5.4 · NFC · USB: 3.2, OTG",
+  "sistema": "Android 16, One UI 8",
+  "resumen": "Qualcomm SM8750-AC Snapdragon 8 Elite, pantalla 8.0\", 4400 mAh, camara 200 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-z-fold7-1.jpg",
+  "releaseDate": "Released 2025, July 25",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_z_fold7-13826.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "samsung z fold 8": {
+  "nombre": "Samsung Galaxy Z Fold8",
+  "marca": "Samsung",
+  "procesador": "Qualcomm SM8850-1-AD Snapdragon 8 Elite Gen 5 (3 nm)",
+  "pantalla": "Foldable Dynamic LTPO AMOLED 2X, 120Hz, HDR10+, 3000 nits (peak) · 7.6\" · 1828 x 2448 px",
+  "camaras": "50 MP, f/1.8, 23mm (wide), 1/1.56\", 1.0µm, dual pixel PDAF, OIS | Ultra gran angular: 50 MP, f/1.9, 120˚ (ultrawide), 1/2.51\", 0.7µm, multi-directional PDAF | Frontal: 10 MP, f/2.2, 18mm (ultrawide), 1/3.52\", 1.12µm",
+  "bateria": "4800 mAh",
+  "carga": "45 W con cable · 20 W inalambrico",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6/7, tri-band, Wi-Fi Direct · Bluetooth: 6.0 · NFC · USB: 3.2, OTG",
+  "sistema": "Android 17, One UI 9",
+  "resumen": "Qualcomm SM8850-1-AD Snapdragon 8 Elite Gen 5, pantalla 7.6\", 4800 mAh, camara 50 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-z-fold8-1.jpg",
+  "releaseDate": "Released 2026, July 22",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_z_fold_wide_5g-14673.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "samsung z fold 8 ultra": {
+  "nombre": "Samsung Galaxy Z Fold8 Ultra",
+  "marca": "Samsung",
+  "procesador": "Qualcomm SM8850-1-AD Snapdragon 8 Elite Gen 5 (3 nm)",
+  "pantalla": "Foldable Dynamic LTPO AMOLED 2X, 120Hz, HDR10+, 3000 nits (peak) · 8.0\" · 2256 x 2504 px",
+  "camaras": "200 MP, f/1.7, 24mm (wide), 1/1.3\", 0.6µm, multi-directional PDAF, OIS | Tele: 10 MP, f/2.4, 67mm (telephoto), 1/3.94\", 1.0µm, PDAF, OIS, 3x optical zoom | Ultra gran angular: 50 MP, f/1.9, 120˚ (ultrawide), 1/2.5\", 0.7µm, multi-directional PDAF | Frontal: 10 MP, f/2.2, 18mm (ultrawide), 1/3.52\", 1.12µm",
+  "bateria": "5000 mAh",
+  "carga": "45 W con cable · 20 W inalambrico",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e/7, tri-band, Wi-Fi Direct · Bluetooth: 6.0 · NFC · USB: 3.2, OTG",
+  "sistema": "Android 17, One UI 9",
+  "resumen": "Qualcomm SM8850-1-AD Snapdragon 8 Elite Gen 5, pantalla 8.0\", 5000 mAh, camara 200 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-z-fold8-ultra-1.jpg",
+  "releaseDate": "Released 2026, July 22",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_z_fold8_ultra_5g-14802.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tab a11": {
+  "nombre": "Samsung Galaxy Tab A11",
+  "marca": "Samsung",
+  "procesador": "Mediatek Helio G99 (6 nm)",
+  "pantalla": "TFT LCD, 90Hz · 8.7\" · 800 x 1340 px",
+  "camaras": "8 MP, AF | Frontal: 5 MP",
+  "bateria": "5100 mAh",
+  "carga": "15 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 64 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.3 · USB: 2.0",
+  "sistema": "Android 15, upgradable to Android 16, One UI 8",
+  "resumen": "Mediatek Helio G99, pantalla 8.7\", 5100 mAh, camara 8 MP, 4 GB RAM, 64 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-tab-a11-1.jpg",
+  "releaseDate": "Released 2025, September",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_tab_a11-14141.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tab a11 plus": {
+  "nombre": "Samsung Galaxy Tab A11+",
+  "marca": "Samsung",
+  "procesador": "Mediatek Dimensity 7300 (4 nm) Mediatek MT8775 - USA",
+  "pantalla": "TFT LCD, 90Hz · 11.0\" · 1200 x 1920 px",
+  "camaras": "8 MP, AF | Frontal: 5 MP",
+  "bateria": "7040 mAh",
+  "carga": "25 W con cable",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.3 · USB: 2.0",
+  "sistema": "Android 16, One UI 8",
+  "resumen": "Mediatek Dimensity 7300Mediatek MT8775 - USA, pantalla 11.0\", 7040 mAh, camara 8 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-tab-a11-plus-1.jpg",
+  "releaseDate": "Released 2025, November 02",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_tab_a11+-14192.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tab a9 plus": {
+  "nombre": "Samsung Galaxy Tab A9+",
+  "marca": "Samsung",
+  "procesador": "Qualcomm SM6375 Snapdragon 695 5G (6 nm)",
+  "pantalla": "TFT LCD, 90Hz · 11.0\" · 1200 x 1920 px",
+  "camaras": "8 MP, AF | Frontal: 5 MP",
+  "bateria": "7040 mAh",
+  "carga": "15 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 64 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.1 · USB: 2.0",
+  "sistema": "Android 13, upgradable to Android 16, One UI 8",
+  "resumen": "Qualcomm SM6375 Snapdragon 695 5G, pantalla 11.0\", 7040 mAh, camara 8 MP, 4 GB RAM, 64 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-tab-a9-plus-1.jpg",
+  "releaseDate": "Released 2023, October 17",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_tab_a9+-12617.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tab s10 fe": {
+  "nombre": "Samsung Galaxy Tab S10 FE",
+  "marca": "Samsung",
+  "procesador": "Exynos 1580 (4 nm)",
+  "pantalla": "IPS LCD, 90Hz · 10.9\" · 1440 x 2304 px",
+  "camaras": "13 MP, f/2.0, (wide) | Frontal: 12 MP, f/2.4, (ultrawide)",
+  "bateria": "8000 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e, dual-band, Wi-Fi Direct · Bluetooth: 5.3 · USB: 2.0, magnetic connector",
+  "sistema": "Android 15, upgradable to Android 16, One UI 8.5",
+  "resumen": "Exynos 1580, pantalla 10.9\", 8000 mAh, camara 13 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-tab-s10-fe-1.jpg",
+  "releaseDate": "Released 2025, April 03",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_tab_s10_fe-13761.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tab s10 fe plus": {
+  "nombre": "Samsung Galaxy Tab S10 FE+",
+  "marca": "Samsung",
+  "procesador": "Exynos 1580 (4 nm)",
+  "pantalla": "IPS LCD, 90Hz · 13.1\" · 1800 x 2880 px",
+  "camaras": "13 MP, f/2.0, (wide) | Frontal: 12 MP, f/2.4, (ultrawide)",
+  "bateria": "10090 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e, dual-band, Wi-Fi Direct · Bluetooth: 5.3 · USB: 2.0, magnetic connector",
+  "sistema": "Android 15, upgradable to Android 16, One UI 8.5",
+  "resumen": "Exynos 1580, pantalla 13.1\", 10090 mAh, camara 13 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-tab-s10-fe-plus-1.jpg",
+  "releaseDate": "Released 2025, April 03",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_tab_s10_fe+-13760.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tab s10 lite": {
+  "nombre": "Samsung Galaxy Tab S10 Lite",
+  "marca": "Samsung",
+  "procesador": "Exynos 1380 (5 nm)",
+  "pantalla": "TFT LCD, 90Hz · 10.9\" · 1320 x 2112 px",
+  "camaras": "8 MP, (wide), AF | Frontal: 5 MP, (wide)",
+  "bateria": "8000 mAh",
+  "carga": "25 W con cable",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band, Wi-Fi Direct · Bluetooth: 5.3 · USB: 2.0",
+  "sistema": "Android 15, One UI 7",
+  "resumen": "Exynos 1380, pantalla 10.9\", 8000 mAh, camara 8 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-tab-s10-lite-1.jpg",
+  "releaseDate": "Released 2025, August 25",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_tab_s10_lite_5g-14059.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tab s10 plus": {
+  "nombre": "Samsung Galaxy Tab S10+",
+  "marca": "Samsung",
+  "procesador": "Mediatek Dimensity 9300+ (4 nm)",
+  "pantalla": "Dynamic AMOLED 2X, 120Hz, HDR10+ · 12.4\" · 1752 x 2800 px",
+  "camaras": "13 MP, f/2.0, 26mm (wide), 1/3.4\", 1.0µm, AF | Ultra gran angular: 8 MP, f/2.2, (ultrawide) | Frontal: 12 MP, f/2.4, 120˚ (ultrawide)",
+  "bateria": "10090 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e, tri-band, Wi-Fi Direct · Bluetooth: 5.3 · USB: 3.2, magnetic connector",
+  "sistema": "Android 14, One UI 6.1",
+  "resumen": "Mediatek Dimensity 9300+, pantalla 12.4\", 10090 mAh, camara 13 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-tab-s10-plus-2.jpg",
+  "releaseDate": "Released 2024, October 03",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_tab_s10+-13363.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tab s10 ultra": {
+  "nombre": "Samsung Galaxy Tab S10 Ultra",
+  "marca": "Samsung",
+  "procesador": "Mediatek Dimensity 9300+ (4 nm)",
+  "pantalla": "Dynamic AMOLED 2X, 120Hz, HDR10+ · 14.6\" · 1848 x 2960 px",
+  "camaras": "13 MP, f/2.0, 26mm (wide), 1/3.4\", 1.0µm, AF | Ultra gran angular: 8 MP, f/2.2, (ultrawide) | Frontal: 12 MP, f/2.2, 26mm (wide)",
+  "bateria": "11200 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e/7, tri-band, Wi-Fi Direct · Bluetooth: 5.3 · USB: 3.2, magnetic connector",
+  "sistema": "Android 14, One UI 6.1",
+  "resumen": "Mediatek Dimensity 9300+, pantalla 14.6\", 11200 mAh, camara 13 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-tab-s10-ultra-2.jpg",
+  "releaseDate": "Released 2024, October 03",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_tab_s10_ultra-13362.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tab s11": {
+  "nombre": "Samsung Galaxy Tab S11",
+  "marca": "Samsung",
+  "procesador": "Mediatek Dimensity 9400+ (3 nm)",
+  "pantalla": "Dynamic AMOLED 2X, 120Hz, HDR10+, 1000 nits (typ), 1600 nits (peak) · 11.0\" · 1600 x 2560 px",
+  "camaras": "13 MP, f/2.0, 26mm (wide), 1/3.4\", 1.0µm, AF | Frontal: 12 MP, f/2.4, 120˚ (ultrawide)",
+  "bateria": "8400 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "12 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e, tri-band, Wi-Fi Direct · Bluetooth: 5.4 · USB: 3.2, magnetic connector",
+  "sistema": "Android 16, One UI 8.5",
+  "resumen": "Mediatek Dimensity 9400+, pantalla 11.0\", 8400 mAh, camara 13 MP, 12 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-tab-s11-01.jpg",
+  "releaseDate": "Released 2025, September 04",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_tab_s11_5g-14058.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tab s11 ultra": {
+  "nombre": "Samsung Galaxy Tab S11 Ultra",
+  "marca": "Samsung",
+  "procesador": "Mediatek Dimensity 9400+ (3 nm)",
+  "pantalla": "Dynamic AMOLED 2X, 120Hz, HDR10+, 1000 nits (typ), 1600 nits (peak) · 14.6\" · 1848 x 2960 px",
+  "camaras": "13 MP, f/2.0, 26mm (wide), 1/3.4\", 1.0µm, AF | Ultra gran angular: 8 MP, f/2.2, (ultrawide) | Frontal: 12 MP, f/2.4, 120˚ (ultrawide)",
+  "bateria": "11600 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "12 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e/7, tri-band, Wi-Fi Direct · Bluetooth: 5.4 · USB: 3.2, magnetic connector",
+  "sistema": "Android 16, One UI 8.5",
+  "resumen": "Mediatek Dimensity 9400+, pantalla 14.6\", 11600 mAh, camara 13 MP, 12 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-tab-s11-ultra-01.jpg",
+  "releaseDate": "Released 2025, September 04",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_tab_s11_ultra_5g-14057.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tab s6 lite": {
+  "nombre": "Samsung Galaxy Tab S6 Lite (2024)",
+  "marca": "Samsung",
+  "procesador": "Exynos 1280 (5 nm)",
+  "pantalla": "TFT LCD · 10.4\" · 1200 x 2000 px",
+  "camaras": "8 MP, (wide), 1/4.0\", 1.12µm, AF | Frontal: 5 MP, (wide), 1/5.0\", 1.12µm",
+  "bateria": "7040 mAh",
+  "carga": "15 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 64 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.3 · USB: 2.0",
+  "sistema": "Android 14, upgradable to Android 15, One UI 7",
+  "resumen": "Exynos 1280, pantalla 10.4\", 7040 mAh, camara 8 MP, 4 GB RAM, 64 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-tab-s6-lite-2024-1.jpg",
+  "releaseDate": "Released 2024, March 28",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_tab_s6_lite_(2024)-12897.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tab s8 ultra": {
+  "nombre": "Samsung Galaxy Tab S8 Ultra",
+  "marca": "Samsung",
+  "procesador": "Qualcomm SM8450 Snapdragon 8 Gen 1 (4 nm)",
+  "pantalla": "Super AMOLED, 120Hz, HDR10+ · 14.6\" · 1848 x 2960 px",
+  "camaras": "13 MP, f/2.0, 26mm (wide), 1/3.4\", 1.0µm, AF | Ultra gran angular: 6 MP, f/2.2, (ultrawide) | Frontal: 12 MP, f/2.2, 26mm (wide)",
+  "bateria": "11200 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e, dual-band, Wi-Fi Direct · Bluetooth: 5.2 · USB: 3.2, magnetic connector",
+  "sistema": "Android 12, One UI 6.1.1",
+  "resumen": "Qualcomm SM8450 Snapdragon 8 Gen 1, pantalla 14.6\", 11200 mAh, camara 13 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-tab-s8-ultra-1.jpg",
+  "releaseDate": "Released 2022, April 30",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_tab_s8_ultra-11274.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tab s9": {
+  "nombre": "Samsung Galaxy Tab S9",
+  "marca": "Samsung",
+  "procesador": "Qualcomm SM8550-AC Snapdragon 8 Gen 2 (4 nm)",
+  "pantalla": "Dynamic AMOLED 2X, 120Hz, HDR10+ · 11.0\" · 1600 x 2560 px",
+  "camaras": "13 MP, f/2.0, 26mm (wide), 1/3.4\", 1.0µm, AF | Frontal: 12 MP, f/2.4, 120˚ (ultrawide)",
+  "bateria": "8400 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e, tri-band, Wi-Fi Direct · Bluetooth: 5.3 · USB: 3.2, magnetic connector",
+  "sistema": "Android 13, One UI 6",
+  "resumen": "Qualcomm SM8550-AC Snapdragon 8 Gen 2, pantalla 11.0\", 8400 mAh, camara 13 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/samsung/galaxy-tab-s9-1.jpg",
+  "releaseDate": "Released 2023, August 11",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/samsung_galaxy_tab_s9-12439.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tcl 50 pro": {
+  "nombre": "TCL 50 Pro NxtPaper",
+  "marca": "TCL",
+  "procesador": "Mediatek Dimensity 6300 (6 nm)",
+  "pantalla": "IPS LCD, 120Hz · 6.8\" · 1080 x 2460 px",
+  "camaras": "108 MP, f/1.8, (wide), 1/1.67\", 0.64µm, PDAF | Ultra gran angular: 8 MP, f/2.2, 120˚ (ultrawide), 1/4.0\", 1.12µm | Macro: 2 MP (macro) | Frontal: 32 MP, f/2.0, (wide), 1/3.45\", 0.64µm",
+  "bateria": "5010 mAh",
+  "carga": "33 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 512 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.3 · NFC · USB: 2.0",
+  "sistema": "Android 14",
+  "resumen": "Mediatek Dimensity 6300, pantalla 6.8\", 5010 mAh, camara 108 MP, 8 GB RAM, 512 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/tcl/tcl-50-pro-nxtpaper-1.jpg",
+  "releaseDate": "Released 2024, September",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/tcl_50_pro_nxtpaper-13300.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tcl 60 nxtpaper": {
+  "nombre": "TCL 60 NxtPaper 4G",
+  "marca": "TCL",
+  "procesador": "Mediatek Helio G92 (12 nm)",
+  "pantalla": "IPS LCD, 90Hz, 550 nits (typ) · 6.8\" · 1080 x 2460 px",
+  "camaras": "108 MP, f/1.8, (wide), 1/1.67\", 0.64µm, PDAF | Camara 2: Auxiliary lens | Frontal: 32 MP, f/2.0, (wide), 1/3.35\", 0.65µm",
+  "bateria": "5200 mAh",
+  "carga": "33 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.1 · NFC · USB: 2.0",
+  "sistema": "Android 15",
+  "resumen": "Mediatek Helio G92, pantalla 6.8\", 5200 mAh, camara 108 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/tcl/tcl-60-nxtpaper-1.jpg",
+  "releaseDate": "Released 2025, May",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/tcl_60_nxtpaper_4g-13831.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tcl 60 ultra": {
+  "nombre": "TCL NxtPaper 60 Ultra",
+  "marca": "TCL",
+  "procesador": "Mediatek Dimensity 7400 (4 nm)",
+  "pantalla": "IPS LCD, 120Hz, 850 (HBM) · 7.2\" · 1080 x 2340 px",
+  "camaras": "50 MP, f/1.8, 24mm (wide), 1/1.55\", 1.0µm, PDAF, OIS | Tele: 50 MP, f/2.4, 71mm (periscope telephoto), 1/2.8\", 0.64µm, PDAF, OIS, 3x optical zoom | Ultra gran angular: 8 MP, f/2.2, 112˚ (ultrawide), 1/4.0\", 1.12µm | Frontal: 32 MP, f/2.0, 28mm (wide), 1/3.1\", 0.7µm",
+  "bateria": "5200 mAh",
+  "carga": "33 W con cable",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band, Wi-Fi Direct · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 15",
+  "resumen": "Mediatek Dimensity 7400, pantalla 7.2\", 5200 mAh, camara 50 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/tcl/tcl-60-ultra-nxtpaper-1.jpg",
+  "releaseDate": "Released 2025, September 18",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/tcl_nxtpaper_60_ultra_5g-14085.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tecno camon 50 pro": {
+  "nombre": "Tecno Camon 50 Pro",
+  "marca": "Tecno",
+  "procesador": "Mediatek Dimensity 7400 Ultimate (4 nm)",
+  "pantalla": "AMOLED, 144Hz · 6.78\" · 1208 x 2644 px",
+  "camaras": "50 MP, f/1.8, 23mm (wide), 1/1.56\", 1.0µm, PDAF, OIS | Tele: 50 MP, f/2.4, 70mm (telephoto), AF, OIS, 3x optical zoom | Ultra gran angular: 8 MP, f/2.2, 14mm, 112˚ (ultrawide), 1/4.0\", 1.12µm | Frontal: 50 MP, (wide)",
+  "bateria": "6500 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: Yes · Bluetooth: Yes · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, HIOS 16",
+  "resumen": "Mediatek Dimensity 7400 Ultimate, pantalla 6.78\", 6500 mAh, camara 50 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/tecno/tecno-camon-50-pro-1.jpg",
+  "releaseDate": "Released 2026, March 10",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/tecno_camon_50_pro_5g-14538.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tecno megapad pad pro": {
+  "nombre": "Tecno Megapad Pro",
+  "marca": "Tecno",
+  "procesador": "",
+  "pantalla": "IPS LCD, 90Hz, 450 nits · 12.0\" · 1200 x 2000 px",
+  "camaras": "13 MP | Frontal: Yes",
+  "bateria": "10000 mAh",
+  "carga": "33 W con cable",
+  "ramAlmacenamiento": "256 GB almacenamiento",
+  "conectividad": "Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: Yes · USB: ",
+  "sistema": "Android 15",
+  "resumen": "pantalla 12.0\", 10000 mAh, camara 13 MP, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/tecno/tecno-megapad-pro-1.jpg",
+  "releaseDate": "Released 2025, October 20",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/tecno_megapad_pro-14244.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tecno pova 8": {
+  "nombre": "Tecno Pova 8",
+  "marca": "Tecno",
+  "procesador": "Mediatek Dimensity 7100 (6 nm)",
+  "pantalla": "IPS LCD, 144Hz · 6.76\" · 1080 x 2344 px",
+  "camaras": "50 MP, f/1.8, 23mm (wide), 1/1.95\", 0.8µm, PDAF | Camara 2: Auxiliary lens | Frontal: 13 MP, f/2.2, 24mm (wide), 1/3.06\", 1.12µm",
+  "bateria": "8000 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "6 GB RAM · 128 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, HIOS 16",
+  "resumen": "Mediatek Dimensity 7100, pantalla 6.76\", 8000 mAh, camara 50 MP, 6 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/tecno/tecno-pova8-5g-01.jpg",
+  "releaseDate": "Released 2026, July 01",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/tecno_pova_8_5g-14714.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tecno pova 8 pro": {
+  "nombre": "Tecno Pova 8 Pro",
+  "marca": "Tecno",
+  "procesador": "Mediatek Dimensity 7400 Ultimate (4 nm)",
+  "pantalla": "AMOLED, 1B colors, 144Hz, HDR, 2592Hz PWM, 1600 nits (HBM), 4500 nits (peak) · 6.78\" · 1208 x 2644 px",
+  "camaras": "50 MP, f/1.8, (wide), 1/1.56\", 1.0µm, dual pixel PDAF, OIS | Ultra gran angular: 8 MP (ultrawide) | Frontal: 13 MP (wide)",
+  "bateria": "6500 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, dual-band · Bluetooth: 5.4 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, HIOS 16",
+  "resumen": "Mediatek Dimensity 7400 Ultimate, pantalla 6.78\", 6500 mAh, camara 50 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/tecno/tecno-pova8-pro-1.jpg",
+  "releaseDate": "Released 2026, August 18",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/tecno_pova_8_pro_5g-14875.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tecno spark 50": {
+  "nombre": "Tecno Spark 50",
+  "marca": "Tecno",
+  "procesador": "Mediatek Dimensity 6400 (6 nm)",
+  "pantalla": "IPS LCD, 120Hz · 6.78\" · 720 x 1576 px",
+  "camaras": "50 MP, f/1.9, (wide), PDAF | Frontal: 8 MP, f/2.0, (wide)",
+  "bateria": "6500 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.3 · USB: ",
+  "sistema": "Android 16, HIOS 16",
+  "resumen": "Mediatek Dimensity 6400, pantalla 6.78\", 6500 mAh, camara 50 MP, 4 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/tecno/tecno-spark50-2.jpg",
+  "releaseDate": "Released 2026, April 03",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/tecno_spark_50_5g-14566.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tecno spark 50 pro": {
+  "nombre": "Tecno Spark 50 Pro",
+  "marca": "Tecno",
+  "procesador": "Mediatek Helio G100 Ultimate (6 nm)",
+  "pantalla": "IPS LCD, 120Hz · 6.78\" · 720 x 1600 px",
+  "camaras": "50 MP, f/1.8, (wide), 1/1.95\" 0.8μm, PDAF | Frontal: 8 MP, f/2.0, (wide)",
+  "bateria": "6000 mAh",
+  "carga": "60 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.4 · NFC · USB: ",
+  "sistema": "Android 16, HIOS 16",
+  "resumen": "Mediatek Helio G100 Ultimate, pantalla 6.78\", 6000 mAh, camara 50 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/tecno/tecno-spark-50-pro-11.jpg",
+  "releaseDate": "Released 2026, June",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/tecno_spark_50_pro-14728.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "tecno spark go3": {
+  "nombre": "Tecno Spark Go 3",
+  "marca": "Tecno",
+  "procesador": "Unisoc T7250 (12 nm)",
+  "pantalla": "IPS LCD, 120Hz · 6.74\" · 720 x 1600 px",
+  "camaras": "13 MP | Frontal: 8 MP",
+  "bateria": "5000 mAh",
+  "carga": "15 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 64 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: Yes · USB: , OTG",
+  "sistema": "Android 15, HIOS 15",
+  "resumen": "Unisoc T7250, pantalla 6.74\", 5000 mAh, camara 13 MP, 4 GB RAM, 64 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/tecno/tecno-spark-go3-1.jpg",
+  "releaseDate": "Released 2026, January 23",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/tecno_spark_go_3-14420.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "xiaomi 17t": {
+  "nombre": "Xiaomi 17T",
+  "marca": "Xiaomi",
+  "procesador": "Mediatek Dimensity 8500 Ultra (4 nm)",
+  "pantalla": "AMOLED, 68B colors, 120Hz, 3840Hz PWM, Dolby Vision, HDR10+, 3500 nits (peak) · 6.59\" · 1268 x 2756 px",
+  "camaras": "50 MP, f/1.7, 23mm (wide), 1/1.55\", 1.0µm, PDAF (9cm - ∞), OIS | Tele: 50 MP, f/3.0, 115mm (periscope telephoto), 1/2.76\", 0.64µm, PDAF (30cm - ∞), OIS, 5x optical zoom | Ultra gran angular: 12 MP, f/2.2, 15mm, 120˚ (ultrawide), 1/3.06\", 1.12µm | Frontal: 32 MP, f/2.2, 21mm (wide), 1/3.42\", 0.64µm",
+  "bateria": "6500 mAh",
+  "carga": "67 W con cable",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e, dual-band or tri-band, Wi-Fi Direct · Bluetooth: 6.0 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, HyperOS 3",
+  "resumen": "Mediatek Dimensity 8500 Ultra, pantalla 6.59\", 6500 mAh, camara 50 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-17t-0.jpg",
+  "releaseDate": "Released 2026, May 28",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_17t_5g-14652.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "xiaomi 17t pro": {
+  "nombre": "Xiaomi 17T Pro",
+  "marca": "Xiaomi",
+  "procesador": "Mediatek Dimensity 9500 (3 nm)",
+  "pantalla": "AMOLED, 68B colors, 144Hz, 3840Hz PWM, Dolby Vision, HDR10+, 3500 nits (peak) · 6.83\" · 1280 x 2772 px",
+  "camaras": "50 MP, f/1.7, 23mm (wide), 1/1.31\", 1.2µm, multi-directional PDAF, OIS | Tele: 50 MP, f/3.0, 115mm (periscope telephoto), 1/2.76\", 0.64µm, PDAF (30cm - ∞), OIS, 5x optical zoom | Ultra gran angular: 12 MP, f/2.2, 15mm, 120˚ (ultrawide), 1/3.06\", 1.12µm | Frontal: 32 MP, f/2.2, 21mm (wide), 1/3.44\", 0.64µm",
+  "bateria": "7000 mAh",
+  "carga": "100 W con cable · 50 W inalambrico",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e/7, dual-band, Wi-Fi Direct · Bluetooth: 6.0 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, HyperOS 3",
+  "resumen": "Mediatek Dimensity 9500, pantalla 6.83\", 7000 mAh, camara 50 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-17t-pro-1.jpg",
+  "releaseDate": "Released 2026, May 28",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_17t_pro_5g-14651.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "xiaomi 17t pro 12": {
+  "nombre": "Xiaomi 17T Pro",
+  "marca": "Xiaomi",
+  "procesador": "Mediatek Dimensity 9500 (3 nm)",
+  "pantalla": "AMOLED, 68B colors, 144Hz, 3840Hz PWM, Dolby Vision, HDR10+, 3500 nits (peak) · 6.83\" · 1280 x 2772 px",
+  "camaras": "50 MP, f/1.7, 23mm (wide), 1/1.31\", 1.2µm, multi-directional PDAF, OIS | Tele: 50 MP, f/3.0, 115mm (periscope telephoto), 1/2.76\", 0.64µm, PDAF (30cm - ∞), OIS, 5x optical zoom | Ultra gran angular: 12 MP, f/2.2, 15mm, 120˚ (ultrawide), 1/3.06\", 1.12µm | Frontal: 32 MP, f/2.2, 21mm (wide), 1/3.44\", 0.64µm",
+  "bateria": "7000 mAh",
+  "carga": "100 W con cable · 50 W inalambrico",
+  "ramAlmacenamiento": "12 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6e/7, dual-band, Wi-Fi Direct · Bluetooth: 6.0 · NFC · USB: 2.0, OTG",
+  "sistema": "Android 16, HyperOS 3",
+  "resumen": "Mediatek Dimensity 9500, pantalla 6.83\", 7000 mAh, camara 50 MP, 12 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-17t-pro-1.jpg",
+  "releaseDate": "Released 2026, May 28",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/xiaomi_17t_pro_5g-14651.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "zte a36": {
+  "nombre": "ZTE Blade A36",
+  "marca": "ZTE",
+  "procesador": "Unisoc T7200 (12 nm)",
+  "pantalla": "IPS LCD, 90Hz · 6.75\" · 720 x 1600 px",
+  "camaras": "13 MP, AF | Camara 2: Auxiliary lens | Frontal: 5 MP",
+  "bateria": "5000 mAh",
+  "carga": "10 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 64 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac · Bluetooth: 5.2 · USB: 2.0",
+  "sistema": "Android 15",
+  "resumen": "Unisoc T7200, pantalla 6.75\", 5000 mAh, camara 13 MP, 4 GB RAM, 64 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/zte/zte-nubia-a36-1.jpg",
+  "releaseDate": "Released 2025, June",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/zte_blade_a36-13966.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "zte a56": {
+  "nombre": "ZTE Blade A56",
+  "marca": "ZTE",
+  "procesador": "Unisoc T7200 (12 nm)",
+  "pantalla": "IPS LCD, 90Hz · 6.75\" · 720 x 1600 px",
+  "camaras": "13 MP, AF | Camara 2: Auxiliary lenses | Frontal: 8 MP",
+  "bateria": "5000 mAh",
+  "carga": "10 W con cable",
+  "ramAlmacenamiento": "4 GB RAM · 64 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 b/g/n · Bluetooth: 5.2 · USB: 2.0, OTG",
+  "sistema": "Android 15",
+  "resumen": "Unisoc T7200, pantalla 6.75\", 5000 mAh, camara 13 MP, 4 GB RAM, 64 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/zte/zte-blade-a56-1.jpg",
+  "releaseDate": "Released 2025, July",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/zte_blade_a56-13948.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "zte gt neo 5": {
+  "nombre": "ZTE nubia Neo 5 GT",
+  "marca": "ZTE",
+  "procesador": "Mediatek Dimensity 7400 (4 nm)",
+  "pantalla": "AMOLED, 144Hz, 4500 nits (peak) · 6.8\" · 1224 x 2720 px",
+  "camaras": "50 MP, (wide), PDAF | Camara 2: Auxiliary lens | Frontal: 16 MP",
+  "bateria": "6210 mAh",
+  "carga": "80 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac/6, tri-band, Wi-Fi Direct · Bluetooth: 6.0 · NFC · USB: ",
+  "sistema": "Android 16",
+  "resumen": "Mediatek Dimensity 7400, pantalla 6.8\", 6210 mAh, camara 50 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/zte/zte-nubia-neo-5-gt-1.jpg",
+  "releaseDate": "Released 2026, April",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/zte_nubia_neo_5_gt_5g-14524.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "zte neo 5": {
+  "nombre": "ZTE nubia Neo 5",
+  "marca": "ZTE",
+  "procesador": "Unisoc T9300 (6 nm)",
+  "pantalla": "IPS LCD, 120Hz, 1000 nits (HBM) · 6.8\" · 900 x 1940 px",
+  "camaras": "50 MP, (wide), PDAF | Camara 2: Auxiliary lens | Frontal: 16 MP",
+  "bateria": "6050 mAh",
+  "carga": "45 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "5G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band, Wi-Fi Direct · Bluetooth: 5.4 · NFC · USB: ",
+  "sistema": "Android 16",
+  "resumen": "Unisoc T9300, pantalla 6.8\", 6050 mAh, camara 50 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/zte/zte-nubia-neo-5-5g-1.jpg",
+  "releaseDate": "Released 2026, April",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/zte_nubia_neo_5_5g-14595.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "zte v80 max": {
+  "nombre": "ZTE Blade V80 Max",
+  "marca": "ZTE",
+  "procesador": "Unisoc T7250 (12 nm)",
+  "pantalla": "IPS LCD, 120Hz, 780 nits · 6.9\" · 720 x 1640 px",
+  "camaras": "50 MP, f/1.8, (wide), PDAF | Camara 2: Auxiliary lenses | Frontal: 16 MP",
+  "bateria": "6000 mAh",
+  "carga": "22.5 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 128 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.2 · NFC · USB: 2.0",
+  "sistema": "Android 16",
+  "resumen": "Unisoc T7250, pantalla 6.9\", 6000 mAh, camara 50 MP, 8 GB RAM, 128 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/zte/zte-blade-nubia-v80-max-3.jpg",
+  "releaseDate": "Released 2026, January 31",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/zte_blade_v80_max-14449.php"
+  ],
+  "fuenteDatos": "tienda"
+ },
+ "zte v80 pro": {
+  "nombre": "ZTE Blade V80 Pro",
+  "marca": "ZTE",
+  "procesador": "Unisoc T7280 (12 nm)",
+  "pantalla": "IPS LCD, 120Hz, 1000 nits (HBM) · 6.75\" · 900 x 1940 px",
+  "camaras": "108 MP, f/1.8, (wide), PDAF | Camara 2: Auxiliary lenses | Frontal: 16 MP",
+  "bateria": "5000 mAh",
+  "carga": "22.5 W con cable",
+  "ramAlmacenamiento": "8 GB RAM · 256 GB almacenamiento",
+  "conectividad": "4G · Wi-Fi: 802.11 a/b/g/n/ac, dual-band · Bluetooth: 5.2 · USB: 2.0, OTG",
+  "sistema": "Android 16",
+  "resumen": "Unisoc T7280, pantalla 6.75\", 5000 mAh, camara 108 MP, 8 GB RAM, 256 GB.",
+  "imagenUrl": "https://fdn2.gsmarena.com/vv/pics/zte/zte-blade-nubia-v80-pro.jpg",
+  "releaseDate": "Released 2025, December",
+  "verificado": true,
+  "fuentes": [
+   "https://www.gsmarena.com/zte_blade_v80_pro-14305.php"
+  ],
+  "fuenteDatos": "tienda"
+ }
+}
