@@ -11,6 +11,7 @@ const ledger = require('./src/ledger');
 const money = require('./src/money');
 const ficha = require('./src/ficha');
 const auth = require('./src/auth');
+const acceso = require('./src/acceso');
 
 const app = express();
 const PUERTO = Number(process.env.PORT) || 10000;
@@ -263,7 +264,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-app.get('/api/diagnostico', async (req, res) => {
+app.get('/api/diagnostico', acceso.exigir, async (req, res) => {
   try {
     res.json(await inventory.diagnostico());
   } catch (e) {
@@ -333,6 +334,7 @@ app.get('/api/config', (req, res) => {
     argumentosVenta: ficha.hayArgumentos(),
     reportes: ledger.modo(),
     reportesEfimeros: ledger.esEfimero(),
+    candado: acceso.requerido(),
   };
   if (!auth.estaAutenticado(req)) return res.json(publico);
   res.json(Object.assign(publico, {
@@ -341,6 +343,30 @@ app.get('/api/config', (req, res) => {
     descuentoMayorPct: DESCUENTO_MAYOR_PCT,
     tramosMayor: TRAMOS_MAYOR,
   }));
+});
+
+// Candado de entrada: lo que ve el vendedor al abrir la app. Es una clave
+// compartida (CLAVE_ACCESO_HASH, hasheada con scrypt en Render) y NO da
+// privilegios de dueño: Dueño y Reportes siguen pidiendo el PIN.
+app.get('/api/acceso', (req, res) => {
+  res.json({ requerido: acceso.requerido(), abierto: acceso.abierto(req) });
+});
+
+app.post('/api/acceso', limitar(8, 60000), (req, res) => {
+  if (!acceso.requerido()) return res.json({ ok: true });
+  const clave = texto(req.body && req.body.clave, 200);
+  if (!acceso.comprobar(clave)) {
+    // Sin pistas sobre mayusculas, longitud ni parecido con el PIN: el que
+    // prueba al azar no aprende nada.
+    return res.status(401).json({ error: 'Clave incorrecta.' });
+  }
+  res.setHeader('Set-Cookie', acceso.crearCookie());
+  res.json({ ok: true });
+});
+
+app.post('/api/acceso/salir', (req, res) => {
+  res.setHeader('Set-Cookie', acceso.borrarCookie());
+  res.json({ ok: true });
 });
 
 app.post('/api/auth/login', limitar(10, 60000), (req, res) => {
@@ -366,7 +392,7 @@ app.get('/api/auth/session', (req, res) => {
   res.json({ autenticado: auth.estaAutenticado(req) });
 });
 
-app.get('/api/inventario', limitar(60, 60000), async (req, res) => {
+app.get('/api/inventario', limitar(60, 60000), acceso.exigir, async (req, res) => {
   try {
     if (!exigirSheets(res)) return;
     const lista = await inventory.listar();
@@ -377,7 +403,7 @@ app.get('/api/inventario', limitar(60, 60000), async (req, res) => {
   }
 });
 
-app.post('/api/ventas/preview', limitar(120, 60000), async (req, res) => {
+app.post('/api/ventas/preview', limitar(120, 60000), acceso.exigir, async (req, res) => {
   try {
     if (!exigirSheets(res)) return;
     const modelo = texto(req.body && req.body.modelo, 120);
@@ -399,7 +425,7 @@ app.post('/api/ventas/preview', limitar(120, 60000), async (req, res) => {
   }
 });
 
-app.post('/api/ventas', limitar(60, 60000), exigirLlaveTienda, async (req, res) => {
+app.post('/api/ventas', limitar(60, 60000), acceso.exigir, exigirLlaveTienda, async (req, res) => {
   try {
     if (!exigirSheets(res)) return;
     const cuerpo = req.body || {};
@@ -559,7 +585,7 @@ app.post('/api/ventas', limitar(60, 60000), exigirLlaveTienda, async (req, res) 
   }
 });
 
-app.get('/api/consignaciones', limitar(60, 60000), exigirLlaveTienda, async (req, res) => {
+app.get('/api/consignaciones', limitar(60, 60000), acceso.exigir, exigirLlaveTienda, async (req, res) => {
   try {
     const lista = await ledger.listarConsignaciones({
       desde: fecha(req.query.desde),
@@ -571,7 +597,7 @@ app.get('/api/consignaciones', limitar(60, 60000), exigirLlaveTienda, async (req
   }
 });
 
-app.post('/api/consignaciones', limitar(60, 60000), exigirLlaveTienda, async (req, res) => {
+app.post('/api/consignaciones', limitar(60, 60000), acceso.exigir, exigirLlaveTienda, async (req, res) => {
   try {
     if (!exigirSheets(res)) return;
     const cuerpo = req.body || {};
@@ -674,7 +700,7 @@ app.post('/api/consignaciones', limitar(60, 60000), exigirLlaveTienda, async (re
   }
 });
 
-app.post('/api/consignaciones/estado', limitar(60, 60000), exigirLlaveTienda, async (req, res) => {
+app.post('/api/consignaciones/estado', limitar(60, 60000), acceso.exigir, exigirLlaveTienda, async (req, res) => {
   try {
     const id = texto(req.body && req.body.id, 60);
     const todas = await ledger.listarConsignaciones({});
@@ -704,7 +730,7 @@ app.post('/api/consignaciones/estado', limitar(60, 60000), exigirLlaveTienda, as
   }
 });
 
-app.post('/api/consignaciones/devolver', limitar(60, 60000), exigirLlaveTienda, async (req, res) => {
+app.post('/api/consignaciones/devolver', limitar(60, 60000), acceso.exigir, exigirLlaveTienda, async (req, res) => {
   try {
     const id = texto(req.body && req.body.id, 60);
     const todas = await ledger.listarConsignaciones({});
@@ -759,7 +785,7 @@ app.get('/api/reportes', auth.exigirAuth, async (req, res) => {
   }
 });
 
-app.get('/api/ficha-tecnica', limitar(30, 60000), async (req, res) => {
+app.get('/api/ficha-tecnica', limitar(30, 60000), acceso.exigir, async (req, res) => {
   try {
     const modelo = texto(req.query.modelo, 120);
     if (!modelo) return res.status(400).json({ error: 'Indica el modelo a consultar.' });

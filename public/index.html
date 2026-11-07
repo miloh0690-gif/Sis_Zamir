@@ -313,6 +313,24 @@
         </div>
     </div>
 
+    <div id="pantallaCandado" class="hidden fixed inset-0 z-[80] bg-[#0F1115] flex items-center justify-center p-6">
+        <div class="w-full max-w-sm space-y-6">
+            <div class="text-center space-y-2">
+                <div class="text-4xl">🔒</div>
+                <h1 class="font-display font-bold text-2xl text-[#F1F5F9]">Jhsel Tech Mobiles</h1>
+                <p class="text-sm text-[#8B95A7]">Escribí la clave de acceso para entrar.</p>
+            </div>
+            <div class="space-y-3">
+                <input type="password" id="inputAcceso" autocomplete="current-password" placeholder="Clave de acceso"
+                    class="w-full h-12 px-4 rounded-xl bg-[#141821] border border-[#2A2F3A] text-[15px] text-[#F1F5F9] focus:outline-none focus:ring-2 focus:ring-[#4C8DFF]">
+                <p id="accesoError" class="hidden text-xs text-rose-400"></p>
+                <button type="button" id="btnEntrarAcceso"
+                    class="tap w-full h-12 rounded-xl bg-[#4C8DFF] text-white text-sm font-bold disabled:opacity-60">Entrar</button>
+            </div>
+            <p class="text-center text-[11px] text-[#5B6472]">Si no la sabés, pedísela al dueño.</p>
+        </div>
+    </div>
+
     <script>
         'use strict';
 
@@ -399,6 +417,9 @@
             if (!respuesta.ok) {
                 const error = new Error((datos && datos.error) || 'Error ' + respuesta.status);
                 error.codigo = respuesta.status;
+                if (respuesta.status === 401 && datos && datos.codigo === 'CANDADO') {
+                    mostrarCandado();
+                }
                 // El servidor dice "codigo de tienda incorrecto": se borra el
                 // guardado para que el siguiente intento la vuelva a pedir, en
                 // vez de fallar con el mismo valor una y otra vez.
@@ -1204,6 +1225,47 @@
             abrirImpresion(window.ReporteExportacion.construirReporteTermico(datos), 'Reporte térmico');
         }
 
+        // ---------- CANDADO DE ENTRADA ----------
+        //
+        // Clave compartida para los vendedores. No es la sesión: entrar acá no
+        // abre Dueño ni Reportes, eso sigue pidiendo el PIN. Si el servidor no
+        // tiene CLAVE_ACCESO_HASH configurada, `/api/config` dice
+        // `candado:false` y esta pantalla no aparece nunca.
+
+        function mostrarCandado() {
+            $('pantallaCandado').classList.remove('hidden');
+            $('accesoError').classList.add('hidden');
+            const campo = $('inputAcceso');
+            campo.value = '';
+            // En la tablet del mostrador el teclado tarda en aparecer; el
+            // setTimeout evita que el foco se pierda en el cambio de pantalla.
+            setTimeout(() => campo.focus(), 50);
+        }
+
+        function ocultarCandado() {
+            $('pantallaCandado').classList.add('hidden');
+        }
+
+        async function entrarAcceso() {
+            const clave = $('inputAcceso').value.trim();
+            if (!clave) return;
+            const boton = $('btnEntrarAcceso');
+            boton.disabled = true;
+            try {
+                await api('/api/acceso', { cuerpo: { clave: clave } });
+                ocultarCandado();
+                await arranque();
+            } catch (e) {
+                $('accesoError').textContent = e.codigo === 429
+                    ? 'Demasiados intentos. Esperá un minuto.'
+                    : 'Clave incorrecta.';
+                $('accesoError').classList.remove('hidden');
+                $('inputAcceso').select();
+            } finally {
+                boton.disabled = false;
+            }
+        }
+
         // ---------- AUTENTICACION ----------
 
         function abrirLogin() {
@@ -1384,6 +1446,8 @@
                 $('btn-' + id).addEventListener('click', () => cambiarPestana(id));
             });
 
+            $('btnEntrarAcceso').addEventListener('click', entrarAcceso);
+            $('inputAcceso').addEventListener('keydown', (e) => { if (e.key === 'Enter') entrarAcceso(); });
             $('btnEntrarLogin').addEventListener('click', entrar);
             $('inputPin').addEventListener('keydown', (e) => { if (e.key === 'Enter') entrar(); });
             $('btnCancelarLogin').addEventListener('click', () => {
@@ -1426,6 +1490,25 @@
                 return;
             }
 
+            // Candado: se pregunta antes de cargar nada. Si la clave ya está en
+            // la cookie, arranca derecho; si no, no se pide inventario siquiera.
+            if (ESTADO.config.candado) {
+                let estado = null;
+                try {
+                    estado = await conReintentos(() => api('/api/acceso'), 3, 3000);
+                } catch (e) {
+                    estado = null;
+                }
+                if (!estado || !estado.abierto) {
+                    mostrarCandado();
+                    return;
+                }
+            }
+
+            await arranque();
+        }
+
+        async function arranque() {
             // La sesión se comprueba recién con el servidor despierto: antes un
             // 502 en /api/auth/session sacaba al dueño aunque su cookie siguiera
             // siendo válida.

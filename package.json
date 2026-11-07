@@ -9,6 +9,7 @@
     "dev": "node --watch server.js",
     "test": "node --test",
     "hash-pin": "node scripts/hash-pin.js",
+    "hash-acceso": "node scripts/hash-acceso.js",
     "indexar": "node scripts/indexar-fichas.js"
   },
   "engines": {
