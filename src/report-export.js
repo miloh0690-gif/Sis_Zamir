@@ -78,7 +78,7 @@ function construirReporteImprimible(reporte) {
 <body>
     <header class="encabezado">
         <h1>Reporte de ventas</h1>
-        <p>Jhessel Tech Mobiles</p>
+        <p>Milo Crack</p>
         <p class="filtros">Vendedor: <strong>${escaparHtml(filtros.vendedor)}</strong> · Periodo: <strong>${escaparHtml(filtros.desde)} al ${escaparHtml(filtros.hasta)}</strong></p>
     </header>
     <section class="resumen">
@@ -125,7 +125,7 @@ function construirReporteTermico(reporte) {
     </style>
 </head>
 <body>
-    <h1>Jhessel Tech Mobiles</h1>
+    <h1>Milo Crack</h1>
     <p>REPORTE DE VENTAS</p>
     <div class="filtros">${escaparHtml(filtros.vendedor)}<br>${escaparHtml(filtros.desde)} - ${escaparHtml(filtros.hasta)}</div>
     <div class="resumen">
