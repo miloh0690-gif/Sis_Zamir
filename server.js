@@ -127,6 +127,12 @@ function responderError(res, e) {
   res.status(codigo).json({ error: (e && e.message) || 'Error inesperado en el servidor.' });
 }
 
+// Medir el servidor desde afuera, sin adivinar: el navegador deja estos
+// tiempos en la pestana Network (Server-Timing) y curl los muestra con -D.
+function desde(inicio) {
+  return (Number(process.hrtime.bigint() - inicio) / 1e6).toFixed(1);
+}
+
 function exigirSheets(res) {
   if (!inventory.estaConfigurado()) {
     res.status(503).json({
@@ -255,6 +261,9 @@ app.get('/api/health', (req, res) => {
   res.json({
     ok: true,
     hora: new Date().toISOString(),
+    // Segundos desde que arranco el proceso: sirve para distinguir una
+    // instancia despierta de un arranque en frio tras el sueno de Render.
+    uptimeSeg: Math.round(process.uptime()),
     sheets: inventory.completo(),
     sheetsUrl: inventory.estaConfigurado(),
     sheetsClave: inventory.tieneClave(),
@@ -393,10 +402,12 @@ app.get('/api/auth/session', (req, res) => {
 });
 
 app.get('/api/inventario', limitar(60, 60000), acceso.exigir, async (req, res) => {
+  const inicio = process.hrtime.bigint();
   try {
     if (!exigirSheets(res)) return;
     const lista = await inventory.listar();
     const autorizado = auth.estaAutenticado(req);
+    res.setHeader('Server-Timing', 'inventario;dur=' + desde(inicio));
     res.json({ productos: lista.map((p) => sinCosto(p, autorizado)) });
   } catch (e) {
     responderError(res, e);
@@ -404,6 +415,7 @@ app.get('/api/inventario', limitar(60, 60000), acceso.exigir, async (req, res) =
 });
 
 app.post('/api/ventas/preview', limitar(120, 60000), acceso.exigir, async (req, res) => {
+  const inicio = process.hrtime.bigint();
   try {
     if (!exigirSheets(res)) return;
     const modelo = texto(req.body && req.body.modelo, 120);
@@ -412,6 +424,7 @@ app.post('/api/ventas/preview', limitar(120, 60000), acceso.exigir, async (req, 
     // Si el modelo no esta en el inventario igual se puede calcular: el
     // vendedor escribe el costo y el precio a mano. No se descuenta stock.
     const enInventario = !!producto;
+    res.setHeader('Server-Timing', 'preview;dur=' + desde(inicio));
     res.json({
       encontrado: true,
       enInventario: enInventario,
@@ -825,5 +838,24 @@ app.listen(PUERTO, '0.0.0.0', () => {
   console.log('Diagnostico de Sheets: /api/diagnostico');
   if (!process.env.SESSION_SECRET) {
     console.error('AVISO: SESSION_SECRET no esta definido. Las sesiones no funcionaran.');
+  }
+
+  // Precalentar el inventario apenas arranca la instancia. Render free se
+  // duerme y al despertar el primer vendedor pagaba, ademas del arranque, el
+  // viaje completo a Google Sheets. En segundo plano no bloquea el arranque y
+  // deja el cache listo antes de que la mayoria llegue a escribir un modelo.
+  if (inventory.completo()) {
+    const inicio = Date.now();
+    inventory
+      .listar()
+      .then((lista) => {
+        console.log(
+          'Inventario precalentado: ' + lista.length + ' productos en ' + (Date.now() - inicio) + ' ms'
+        );
+      })
+      .catch((e) => {
+        // No se relanza: si Sheets no responde, la app igual tiene que abrir.
+        console.error('No se pudo precalentar el inventario: ' + ((e && e.message) || e));
+      });
   }
 });

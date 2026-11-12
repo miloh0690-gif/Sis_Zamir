@@ -343,6 +343,12 @@
             precioManual: false,
             costoManual: false,
             temporizador: null,
+            // Control de competencia del preview: cada pedido lleva un numero
+            // y solo se pinta la respuesta del ultimo. Sin esto, la respuesta
+            // de un modelo anterior puede llegar despues y pisar el precio.
+            previewSecuencia: 0,
+            previewControlador: null,
+            ultimoModeloConsultado: '',
             reporteActual: null,
             claveVenta: null,
             claveConsignacion: null,
@@ -399,6 +405,11 @@
         async function api(ruta, opciones) {
             const config = Object.assign({}, opciones || {});
             config.headers = Object.assign({}, config.headers);
+            // Sin esto el navegador puede servir un GET de /api/inventario o
+            // /api/ficha-tecnica desde su cache y mostrar datos viejos, aunque
+            // el servidor ya responda con Cache-Control: no-store. Es barato y
+            // no afecta los POST (que nunca se cachean).
+            if (!config.cache) config.cache = 'no-store';
             if (config.cuerpo !== undefined) {
                 config.method = 'POST';
                 config.headers['Content-Type'] = 'application/json';
@@ -579,6 +590,27 @@
             }
         }
 
+        /**
+         * Borra lo que pertenece al modelo anterior.
+         *
+         * Caso real: el vendedor escribe un precio a mano y despues cambia el
+         * modelo tecleando (no eligiendo la sugerencia). Antes, precioManual
+         * seguia en true y el precio del modelo A viajaba en la venta del B.
+         */
+        function reiniciarPrecioDeModelo() {
+            ESTADO.precioManual = false;
+            ESTADO.costoManual = false;
+            $('avisoPrecio').classList.add('hidden');
+            $('ventaCostoUsd').value = '';
+            $('ventaPrecioCobrado').value = '';
+            $('ventaPrecioCobrado').classList.remove('campo-manual');
+            $('ventaPrecioCobrado').classList.add('campo-calculado');
+            $('txtTotalCobrar').textContent = '0.00';
+            $('txtGananciaPura').textContent = '0.00';
+            $('txtComisionVendedor').textContent = '0.00';
+            $('detallePrecio').classList.remove('text-rose-400');
+        }
+
         function marcarManual() {
             ESTADO.precioManual = true;
             $('avisoPrecio').classList.remove('hidden');
@@ -728,13 +760,40 @@
 
         async function pedirPreview() {
             const cuerpo = cuerpoVenta(false);
+            const modelo = normalizar(cuerpo.modelo);
+
+            // Red de seguridad: si el modelo cambio por una via que no dispara
+            // el evento input, lo viejo ya no sirve. El handler de input
+            // actualiza ultimoModeloConsultado en el acto, asi que esto no
+            // borra un precio que el vendedor acaba de escribir.
+            if (modelo !== ESTADO.ultimoModeloConsultado) {
+                reiniciarPrecioDeModelo();
+                ESTADO.ultimoModeloConsultado = modelo;
+            }
+
             if (!cuerpo.modelo) {
                 limpiarPanelPrecio();
                 return;
             }
 
+            // Cada pedido lleva un numero y cancela el anterior. El debounce
+            // de 250 ms no alcanza: si se pide A, se espera y se pide B, la
+            // respuesta de A puede volver ultima y pisar el precio de B. Solo
+            // se pinta la respuesta del ultimo pedido.
+            const secuencia = ++ESTADO.previewSecuencia;
+            if (ESTADO.previewControlador) ESTADO.previewControlador.abort();
+            const controlador = typeof AbortController === 'function' ? new AbortController() : null;
+            ESTADO.previewControlador = controlador;
+
+            $('detallePrecio').textContent = 'Calculando ' + cuerpo.modelo + '…';
+            $('detallePrecio').classList.remove('text-rose-400');
+
             try {
-                const datos = await api('/api/ventas/preview', { cuerpo: cuerpo });
+                const datos = await api('/api/ventas/preview', {
+                    cuerpo: cuerpo,
+                    signal: controlador ? controlador.signal : undefined,
+                });
+                if (secuencia !== ESTADO.previewSecuencia) return; // respuesta vieja
                 if (!datos.encontrado) {
                     limpiarPanelPrecio(
                         datos.motivo === 'vacio'
@@ -747,8 +806,11 @@
                 $('detallePrecio').classList.remove('text-rose-400');
                 pintarCalculo(datos);
             } catch (e) {
+                if (e.name === 'AbortError' || secuencia !== ESTADO.previewSecuencia) return;
                 limpiarPanelPrecio(e.message);
                 $('detallePrecio').classList.add('text-rose-400');
+            } finally {
+                if (ESTADO.previewControlador === controlador) ESTADO.previewControlador = null;
             }
         }
 
@@ -783,6 +845,7 @@
 
                 $('ventaVendedor').value = '';
                 $('ventaModelo').value = '';
+                ESTADO.ultimoModeloConsultado = '';
                 $('ventaCantidad').value = 1;
                 ESTADO.precioManual = false;
                 ESTADO.costoManual = false;
@@ -1358,16 +1421,23 @@
 
         function conectarEventos() {
             const inputModelo = $('ventaModelo');
-            // Solo se pisan costo y precio cuando el modelo cambia de verdad
-            // (se elige uno de la lista). Escribir en el campo no debe borrar
-            // lo que el vendedor ya escribio a mano.
+            // Costo y precio se pisan solo cuando el modelo cambia de verdad,
+            // no en cada tecla: si el vendedor corrige una letra del mismo
+            // modelo no pierde el precio que ya habia escrito. Pero al pasar a
+            // otro modelo, lo manual del anterior se borra: era el bug de
+            // cobrar el precio viejo.
             inputModelo.addEventListener('input', () => {
+                // El modelo escrito cambio: el costo y el precio visibles son
+                // de otro producto. Se limpian en el acto, sin esperar al
+                // servidor, para que no se pueda cobrar el precio anterior.
+                const modelo = normalizar(inputModelo.value);
+                if (modelo !== ESTADO.ultimoModeloConsultado) {
+                    reiniciarPrecioDeModelo();
+                    ESTADO.ultimoModeloConsultado = modelo;
+                }
                 renderSugerencias('sugerenciasVenta', 'ventaModelo', () => {
-                    ESTADO.precioManual = false;
-                    ESTADO.costoManual = false;
-                    $('ventaCostoUsd').value = '';
-                    $('ventaPrecioCobrado').value = '';
-                    $('avisoPrecio').classList.add('hidden');
+                    ESTADO.ultimoModeloConsultado = normalizar($('ventaModelo').value);
+                    reiniciarPrecioDeModelo();
                     programarPreview();
                 });
                 programarPreview();
@@ -1375,10 +1445,8 @@
 
             $('btnLimpiarModelo').addEventListener('click', () => {
                 inputModelo.value = '';
-                ESTADO.precioManual = false;
-                ESTADO.costoManual = false;
-                $('ventaCostoUsd').value = '';
-                $('avisoPrecio').classList.add('hidden');
+                ESTADO.ultimoModeloConsultado = '';
+                reiniciarPrecioDeModelo();
                 $('fichaPanel').classList.add('hidden');
                 renderSugerencias('sugerenciasVenta', 'ventaModelo', null);
                 programarPreview();
