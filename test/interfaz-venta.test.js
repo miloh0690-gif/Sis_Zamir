@@ -47,3 +47,15 @@ test('el total de los accesorios se muestra y se suma al detalle de precio', () 
   assert.ok(html.includes('leerAccesorios'));
   assert.match(html, /programarPreview[\s\S]{0,500}(?:accesorio|Accesorio)/);
 });
+
+test('escribir el cliente o la nota no vuelve a pedir el precio', () => {
+  // El precio solo depende de modelo, tipo, cantidad, TC, costo y accesorios.
+  // Cliente y nota disparaban un POST por pausa de 250 ms sin cambiar nada.
+  assert.doesNotMatch(html, /\$\('clienteVenta'\)\.addEventListener\('input',\s*programarPreview\)/);
+  assert.doesNotMatch(html, /\$\('notaVenta'\)\.addEventListener\('input',\s*programarPreview\)/);
+});
+
+test('el detalle del precio dice que modelo resolvio el servidor', () => {
+  assert.match(html, /datos\.modeloResuelto/);
+  assert.match(html, /coincidencia === 'parcial'/);
+});

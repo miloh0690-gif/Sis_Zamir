@@ -63,7 +63,8 @@ function abierto(req) {
   try {
     carga = auth.verificar(auth.leerCookies(req.headers.cookie)[NOMBRE_COOKIE]);
   } catch (e) {
-    return true;
+    // Cookie rota, firma invalida o secreto cambiado: cerrado, no abierto.
+    return false;
   }
   return Boolean(carga && carga.tipo === 'acceso');
 }

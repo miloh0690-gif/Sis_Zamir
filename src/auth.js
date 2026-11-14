@@ -66,7 +66,15 @@ function leerCookies(cabecera) {
     if (indice < 0) continue;
     const clave = trozo.slice(0, indice).trim();
     const valor = trozo.slice(indice + 1).trim();
-    if (clave) salida[clave] = decodeURIComponent(valor);
+    if (!clave) continue;
+    // Un valor con % mal escapado lanza URIError y tumbaba la peticion entera
+    // (500 en vez de "cerrado"). Si no se puede decodificar, se usa el valor
+    // crudo: la firma fallara igual, pero la app sigue respondiendo.
+    try {
+      salida[clave] = decodeURIComponent(valor);
+    } catch (e) {
+      salida[clave] = valor;
+    }
   }
   return salida;
 }

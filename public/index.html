@@ -572,11 +572,22 @@
             $('txtGananciaPura').textContent = fmt(c.gananciaBs);
             $('txtComisionVendedor').textContent = fmt(c.comisionBs);
 
-            const partes = [
-                datos.enInventario === false ? 'Sin inventario' : 'Stock registrado: ' + datos.stock + ' u.',
-                'Costo unitario: ' + fmt(c.costoUnitarioBs) + ' Bs',
-                'Margen: ' + fmt(c.margenPct) + '%',
-            ];
+            const partes = [];
+            if (datos.modeloResuelto) {
+                // Con nombre incompleto el servidor puede resolver otro SKU
+                // ("REDMI 15" -> "REDMI 15C"): precio, costo y stock serian de
+                // otro equipo. Se avisa antes de cobrar.
+                partes.push(
+                    datos.coincidencia === 'parcial'
+                        ? '⚠️ Modelo: ' + datos.modeloResuelto + ' (nombre incompleto)'
+                        : 'Modelo: ' + datos.modeloResuelto
+                );
+            }
+            partes.push(
+                datos.enInventario === false ? 'Sin inventario' : 'Stock registrado: ' + datos.stock + ' u.'
+            );
+            partes.push('Costo unitario: ' + fmt(c.costoUnitarioBs) + ' Bs');
+            partes.push('Margen: ' + fmt(c.margenPct) + '%');
             if (c.descuentoAplicadoPct > 0) {
                 partes.push('Descuento mayorista: -' + fmt(c.descuentoAplicadoPct) + '%' + (c.tramoDescuento ? ' (' + c.tramoDescuento + ')' : ''));
             }
@@ -1456,8 +1467,7 @@
             $('ventaCantidad').addEventListener('input', programarPreview);
             $('ventaTipoCambio').addEventListener('input', programarPreview);
 
-            $('clienteVenta').addEventListener('input', programarPreview);
-            $('notaVenta').addEventListener('input', programarPreview);
+            // Cliente y nota no cambian el precio: no disparan preview.
             $('btnAgregarAccesorio').addEventListener('click', agregarAccesorio);
             $('listaAccesorios').addEventListener('input', (evento) => {
                 if (evento.target.closest('[data-accesorio]')) {

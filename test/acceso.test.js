@@ -32,7 +32,7 @@ function pedido(cookie) {
 }
 
 const SECRETO = 'secreto-de-prueba-largo';
-const HASH = auth.hashearPassword('OpenMilo');
+const HASH = auth.hashearPin('OpenMilo');
 
 function cookieDe(encabezado) {
   // "sz_acceso=TOKEN; Path=/; HttpOnly; ..." -> "sz_acceso=TOKEN"
@@ -106,6 +106,18 @@ test('la cookie del candado dura 30 dias y es HttpOnly + SameSite=Strict', () =>
     assert.match(cookie, /Max-Age=2592000/);
     assert.match(cookie, /HttpOnly/);
     assert.match(cookie, /SameSite=Strict/);
+  });
+});
+
+test('una cookie malformada no abre el candado (ni lo rompe)', () => {
+  conEntorno(SECRETO, HASH, () => {
+    // decodeURIComponent('%E0%A4%A') lanza URIError. Antes eso caia en un
+    // catch que devolvia true, o sea que una cookie rota abria la puerta.
+    let resultado = null;
+    assert.doesNotThrow(() => {
+      resultado = acceso.abierto(pedido('sz_acceso=%E0%A4%A'));
+    });
+    assert.equal(resultado, false);
   });
 });
 

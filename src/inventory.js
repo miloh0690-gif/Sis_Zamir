@@ -2,7 +2,7 @@
 
 const URL_BASE = (process.env.SHEETS_WEBAPP_URL || '').trim();
 const API_KEY = (process.env.SHEETS_API_KEY || '').trim();
-const TTL_MS = Math.max(5, Number(process.env.STOCK_CACHE_SEG) || 30) * 1000;
+const TTL_MS = Math.max(1, Number(process.env.STOCK_CACHE_SEG) || 900) * 1000;
 const TIMEOUT_MS = 20000;
 
 let cache = { datos: null, expira: 0 };
@@ -185,6 +185,10 @@ async function pedirRemoto(payload) {
  * Apps Script responde HTTP 200 incluso cuando rechaza la operacion,
  * devolviendo {status:'ERROR', message:'...'}. Si no se chequea eso, el
  * usuario ve "venta registrada" aunque la hoja nunca se haya tocado.
+ *
+ * Despues de escribir NO se borra el catalogo: se marca vencido y se refresca
+ * por detras. Borrarlo costaba una lectura completa de la hoja (2-4 s) en el
+ * primer precio de despues de cada venta, consignacion o reporte.
  */
 async function escribir(payload) {
   const respuesta = await pedirRemoto(payload);
@@ -195,7 +199,10 @@ async function escribir(payload) {
     throw e;
   }
 
-  limpiarCache();
+  if (cache.datos) {
+    cache = { datos: cache.datos, expira: 0 };
+    refrescarDeFondo();
+  }
   return respuesta;
 }
 
@@ -209,11 +216,8 @@ async function leerRemoto() {
   return datos.map(mapearFila).filter((p) => p.modelo);
 }
 
-async function listar(opciones) {
-  if (!opciones || !opciones.forzar) {
-    if (cache.datos && Date.now() < cache.expira) return cache.datos;
-  }
-
+/** Una sola lectura a la vez: si ya hay una en curso, se reusa. */
+function leerYGuardar() {
   if (!enCurso) {
     enCurso = leerRemoto()
       .then((datos) => {
@@ -224,8 +228,34 @@ async function listar(opciones) {
         enCurso = null;
       });
   }
-
   return enCurso;
+}
+
+/**
+ * Refresco de fondo: si Google falla, se sigue sirviendo el catalogo viejo y
+ * nadie ve el error. Es lo que hace que el mostrador no se quede sin precios
+ * porque la red parpadee.
+ */
+function refrescarDeFondo() {
+  if (enCurso) return;
+  leerYGuardar().catch(() => {});
+}
+
+async function listar(opciones) {
+  const forzar = Boolean(opciones && opciones.forzar);
+  const hayDatos = Array.isArray(cache.datos) && cache.datos.length > 0;
+
+  if (!forzar && hayDatos) {
+    // Vigente: se devuelve tal cual.
+    if (Date.now() < cache.expira) return cache.datos;
+    // Vencido: se devuelve el que hay y se actualiza por detras
+    // (stale-while-revalidate). El vendedor nunca espera a Google.
+    refrescarDeFondo();
+    return cache.datos;
+  }
+
+  // Sin catalogo previo, o con forzar: hay que leer y, si falla, informarlo.
+  return leerYGuardar();
 }
 
 function buscarEn(lista, texto) {
@@ -237,9 +267,36 @@ function buscarEn(lista, texto) {
   return parcial || null;
 }
 
+/**
+ * 'exacta' | 'parcial' | 'ninguna'.
+ *
+ * Existe porque buscarEn() cae a una coincidencia parcial y devuelve el
+ * primero de la hoja: escribir "REDMI 15" puede resolver a "REDMI 15C", y
+ * entonces el precio, el costo y el stock son de otro equipo. El servidor no
+ * cambia lo que cobra, pero el mostrador tiene que poder verlo.
+ */
+function coincidenciaEn(lista, texto) {
+  const clave = normalizar(texto);
+  if (!clave) return 'ninguna';
+  const productos = Array.isArray(lista) ? lista : [];
+  if (productos.some((p) => p.clave === clave)) return 'exacta';
+  const parcial = productos.some(
+    (p) => p.clave.indexOf(clave) >= 0 || clave.indexOf(p.clave) >= 0
+  );
+  return parcial ? 'parcial' : 'ninguna';
+}
+
 async function buscar(texto) {
   const lista = await listar();
   return buscarEn(lista, texto);
+}
+
+async function buscarConCoincidencia(texto) {
+  const lista = await listar();
+  return {
+    producto: buscarEn(lista, texto),
+    coincidencia: coincidenciaEn(lista, texto),
+  };
 }
 
 function limpiarCache() {
@@ -414,6 +471,8 @@ module.exports = {
   listar: listar,
   buscar: buscar,
   buscarEn: buscarEn,
+  buscarConCoincidencia: buscarConCoincidencia,
+  coincidenciaEn: coincidenciaEn,
   mapearFila: mapearFila,
   normalizar: normalizar,
   escribir: escribir,

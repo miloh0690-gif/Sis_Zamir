@@ -420,7 +420,7 @@ app.post('/api/ventas/preview', limitar(120, 60000), acceso.exigir, async (req, 
     if (!exigirSheets(res)) return;
     const modelo = texto(req.body && req.body.modelo, 120);
     if (!modelo) return res.json({ encontrado: false, motivo: 'vacio' });
-    const producto = await inventory.buscar(modelo);
+    const { producto, coincidencia } = await inventory.buscarConCoincidencia(modelo);
     // Si el modelo no esta en el inventario igual se puede calcular: el
     // vendedor escribe el costo y el precio a mano. No se descuenta stock.
     const enInventario = !!producto;
@@ -429,6 +429,10 @@ app.post('/api/ventas/preview', limitar(120, 60000), acceso.exigir, async (req, 
       encontrado: true,
       enInventario: enInventario,
       modelo: enInventario ? producto.modelo : modelo,
+      // El nombre tal cual lo tecleo el vendedor, para poder avisar cuando el
+      // servidor resolvio otro SKU por coincidencia parcial.
+      modeloResuelto: enInventario ? producto.modelo : null,
+      coincidencia: coincidencia,
       stock: enInventario ? producto.stock : 0,
       sucursal: enInventario ? producto.sucursal : '',
       calculo: construirCalculo(enInventario ? producto : null, req.body),
@@ -576,15 +580,13 @@ app.post('/api/ventas', limitar(60, 60000), acceso.exigir, exigirLlaveTienda, as
       console.error('[ledger]', e.message);
     }
 
-    const lista = await inventory.listar({ forzar: true });
-    const actualizado = producto ? inventory.buscarEn(lista, producto.modelo) : null;
-
     const respuesta = {
       venta: ledger.normalizarVenta(registro),
       calculo: calculo,
-      stockRestante: actualizado
-        ? actualizado.stock
-        : (producto ? Math.max(0, producto.stock - cantidad) : 0),
+      // El catalogo ya tiene el stock: descontarlo en memoria evita una
+      // lectura completa de la hoja (1,4 s medidos) en cada cobro. El refresco
+      // de fondo que dispara escribir() corrige si otra caja vendio a la vez.
+      stockRestante: producto ? Math.max(0, producto.stock - cantidad) : 0,
       advertencia: advertencia,
     };
 
@@ -696,12 +698,9 @@ app.post('/api/consignaciones', limitar(60, 60000), acceso.exigir, exigirLlaveTi
       console.error('[ledger]', e.message);
     }
 
-    const lista = await inventory.listar({ forzar: true });
-    const actualizado = inventory.buscarEn(lista, producto.modelo);
-
     const respuesta = {
       consignacion: consignacion,
-      stockRestante: actualizado ? actualizado.stock : Math.max(0, producto.stock - cantidad),
+      stockRestante: Math.max(0, producto.stock - cantidad),
       advertencia: advertencia,
     };
 
