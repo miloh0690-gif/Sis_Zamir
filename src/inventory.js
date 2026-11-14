@@ -236,9 +236,23 @@ function leerYGuardar() {
  * nadie ve el error. Es lo que hace que el mostrador no se quede sin precios
  * porque la red parpadee.
  */
+/**
+ * Si Google falla, no se reintenta en cada request: con 120 previews por
+ * minuto, un catalogo vencido martillaria Apps Script hasta agotar la cuota.
+ */
+const ESPERA_TRAS_FALLO_MS = 30000;
+let proximoIntento = 0;
+
 function refrescarDeFondo() {
   if (enCurso) return;
-  leerYGuardar().catch(() => {});
+  if (Date.now() < proximoIntento) return;
+  leerYGuardar()
+    .then(() => {
+      proximoIntento = 0;
+    })
+    .catch(() => {
+      proximoIntento = Date.now() + ESPERA_TRAS_FALLO_MS;
+    });
 }
 
 async function listar(opciones) {

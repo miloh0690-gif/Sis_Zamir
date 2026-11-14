@@ -140,6 +140,27 @@ test('si nunca hubo catalogo, el fallo de Google se informa (no se silencia)', a
   await assert.rejects(() => inventario.listar(), /Google Sheets/i);
 });
 
+test('si Google falla, no se reintenta en cada request', async () => {
+  const inventario = cargar();
+  montarFetch();
+
+  await inventario.listar();
+  await esperar(1100);
+  const llamadas = montarFetch({ fallaLaRed: true });
+
+  await inventario.listar();
+  await esperar(50);
+  await inventario.listar();
+  await inventario.listar();
+  await esperar(50);
+
+  assert.equal(
+    llamadas.get,
+    1,
+    'con Google caido, un refresco por request martillaria Apps Script'
+  );
+});
+
 test('el cobro no paga una segunda lectura completa del catalogo', () => {
   // Medido: /api/ventas tardaba ~1,4 s solo por el listar({forzar:true}) que
   // recalculaba el stock restante. El catalogo ya tiene el stock: se descuenta
